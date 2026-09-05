@@ -107,7 +107,7 @@ def run_sync():
     # 3. Kodi UI und Properties via Dispatcher setzen
     ts = int(time.time())
     kodi_cmd("Skin.SetString(WeatherLocationMode,live)")
-    kodi_cmd(f"Skin.SetString(WeatherLiveLocationName,{full_name})")
+    kodi_cmd(f"Skin.SetString(WeatherLiveLocationName,"{full_name}")")
     kodi_cmd(f"Skin.SetString(WeatherRadarLivePath,{radar_target})")
     kodi_cmd(f"Skin.SetString(RadarTimestamp,{ts})")
     kodi_cmd("Weather.LocationSet(2)")
