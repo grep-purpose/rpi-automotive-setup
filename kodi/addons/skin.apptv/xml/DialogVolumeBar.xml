@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<controls>
+		<visible>!Window.IsVisible(notification)</visible>
+		<control type="progress">
+			<left>768</left>
+			<top>20</top>
+			<width>384</width>
+			<height>48</height>
+			<info>Player.Volume</info>
+			<texturebg border="12,12,12,12">volume-background.png</texturebg>
+			<midtexture border="12,12,12,12">volume-bar.png</midtexture>
+			<colordiffuse>white</colordiffuse>
+			<animation effect="fade" end="50" condition="Player.Passthrough">Conditional</animation>
+			<visible>Integer.IsGreater(Player.Volume,0)</visible>
+		</control>
+		<control type="image"><!-- Non muted image -->
+			<left>790</left>
+			<top>28</top>
+			<width>32</width>
+			<height>32</height>
+			<texture>$VAR[VolumeIcon]</texture>
+			<visible>!Player.Muted</visible>
+		</control>
+		<control type="image"><!-- Muted image -->
+			<left>790</left>
+			<top>28</top>
+			<width>32</width>
+			<height>32</height>
+			<aspectratio>keep</aspectratio>
+			<texture>volume-mute.png</texture>
+			<visible>Player.Muted</visible>
+		</control>
+		<control type="label" id="0"><!-- Volume -->
+			<left>720</left>
+			<top>28</top>
+			<width>480</width>
+			<height>32</height>
+			<font>apptv16</font>
+			<align>center</align>
+			<label>$INFO[Player.Volume]</label>
+			<visible>!Player.Muted</visible>
+		</control>
+		<control type="label"><!-- Muted label -->
+			<left>720</left>
+			<top>28</top>
+			<width>480</width>
+			<height>32</height>
+			<font>apptv16</font>
+			<align>center</align>
+			<label>$LOCALIZE[31651]</label>
+			<visible>Player.Muted</visible>
+		</control>
+		<control type="label"><!-- Passthrough -->
+			<left>720</left>
+			<top>50</top>
+			<width>480</width>
+			<height>22</height>
+			<label>$LOCALIZE[29802]</label>
+			<font>apptv16</font>
+			<align>center</align>
+			<visible>Player.Passthrough + !Player.Muted</visible>
+		</control>
+	</controls>
+</window>

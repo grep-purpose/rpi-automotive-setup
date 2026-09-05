@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<defaultcontrol always="true">100</defaultcontrol>
+	<backgroundcolor>background</backgroundcolor>
+	<onload>SetProperty(WeatherView,forecast,weather)</onload>
+	<controls>
+		<!-- Hintergrund / Fanart -->
+		<control type="multiimage">
+			<depth>DepthBackground</depth>
+			<include>FullScreenDimensions</include>
+			<aspectratio>scale</aspectratio>
+			<fadetime>400</fadetime>
+			<imagepath background="true" colordiffuse="bg_overlay">$VAR[WeatherFanartVar]</imagepath>
+		</control>
+
+		<!-- ================= OBERE LEISTE (HEADER & NAVIGATION) ================= -->
+		<control type="group">
+			<left>60</left>
+			<top>40</top>
+			<width>1800</width>
+			<height>60</height>
+
+			<!-- 1. Oben Links: Standort Toggle Button -->
+			<control type="button" id="100">
+				<left>0</left>
+				<top>0</top>
+				<width>350</width>
+				<height>50</height>
+				<font>font14_title</font>
+				<textcolor>orange</textcolor>
+				<focusedcolor>white</focusedcolor>
+				<align>left</align>
+				<label>Standort</label>
+				<onright>101</onright>
+				<ondown>200</ondown>
+				<onclick>RunScript(/home/pi/.kodi/userdata/toggle_weather_location.py)</onclick>
+			</control>
+
+			<!-- 2. Oben Mitte: Fester Header Wetter -->
+			<control type="label">
+				<left>750</left>
+				<top>0</top>
+				<width>300</width>
+				<height>50</height>
+				<font>font14_title</font>
+				<textcolor>red</textcolor>
+				<align>center</align>
+				<label>Wetter</label>
+			</control>
+
+			<!-- 3. Oben Rechts: View-Toggle (Vorhersage / Radar) -->
+			<!-- Wenn Forecast aktiv ist: Zeige Button "Radar" -->
+			<control type="button" id="101">
+				<left>1450</left>
+				<top>0</top>
+				<width>350</width>
+				<height>50</height>
+				<font>font14_title</font>
+				<textcolor>grey</textcolor>
+				<focusedcolor>white</focusedcolor>
+				<align>right</align>
+				<label>Radar</label>
+				<visible>!String.IsEqual(Window(weather).Property(WeatherView),radar)</visible>
+				<onleft>100</onleft>
+				<ondown>300</ondown>
+				<onclick>SetProperty(WeatherView,radar,weather)</onclick>
+			</control>
+
+			<!-- Wenn Radar aktiv ist: Zeige Button "Vorhersage" -->
+			<control type="button" id="102">
+				<left>1450</left>
+				<top>0</top>
+				<width>350</width>
+				<height>50</height>
+				<font>font14_title</font>
+				<textcolor>grey</textcolor>
+				<focusedcolor>white</focusedcolor>
+				<align>right</align>
+				<label>Vorhersage</label>
+				<visible>String.IsEqual(Window(weather).Property(WeatherView),radar)</visible>
+				<onleft>100</onleft>
+				<ondown>300</ondown>
+				<onclick>SetProperty(WeatherView,forecast,weather)</onclick>
+			</control>
+		</control>
+
+		<!-- ================= HAUPTINHALT (SPLIT-SCREEN) ================= -->
+
+		<!-- LINKER BLOCK: AKTUELLES WETTER & TELEMETRIE -->
+		<control type="group">
+			<left>60</left>
+			<top>120</top>
+			<width>870</width>
+			<height>820</height>
+
+			<!-- Hintergrund-Kachel links -->
+			<control type="image">
+				<left>0</left>
+				<top>0</top>
+				<width>870</width>
+				<height>820</height>
+				<texture colordiffuse="D9000000">colors/black.png</texture>
+			</control>
+
+			<!-- Stadtname -->
+			<control type="label">
+				<left>50</left>
+				<top>40</top>
+				<width>770</width>
+				<height>50</height>
+				<font>font16_title</font>
+				<textcolor>white</textcolor>
+				<label>$INFO[Window(weather).Property(Location)]</label>
+			</control>
+
+			<!-- Wetter-Icon -->
+			<control type="image">
+				<left>50</left>
+				<top>110</top>
+				<width>130</width>
+				<height>130</height>
+				<aspectratio>keep</aspectratio>
+				<texture>$INFO[Weather.ConditionsIcon]</texture>
+			</control>
+
+			<!-- Temperatur & Min/Max -->
+			<control type="label">
+				<left>210</left>
+				<top>100</top>
+				<width>600</width>
+				<height>70</height>
+				<font>WeatherTemp</font>
+				<textcolor>orange</textcolor>
+				<label>$INFO[Weather.Temperature]</label>
+			</control>
+			<control type="label">
+				<left>215</left>
+				<top>175</top>
+				<width>600</width>
+				<height>35</height>
+				<font>font12</font>
+				<textcolor>grey</textcolor>
+				<label>Gefühlt: $INFO[Window(weather).Property(Current.FeelsLike)]$INFO[System.TemperatureUnits]</label>
+			</control>
+			<control type="label">
+				<left>215</left>
+				<top>210</top>
+				<width>600</width>
+				<height>35</height>
+				<font>font12</font>
+				<textcolor>grey</textcolor>
+				<label>Max: $INFO[Window(weather).Property(Today.MaxTemp)]$INFO[System.TemperatureUnits]   Min: $INFO[Window(weather).Property(Today.MinTemp)]$INFO[System.TemperatureUnits]</label>
+			</control>
+
+			<!-- Roter Header BEDINGUNGEN -->
+			<control type="label">
+				<left>50</left>
+				<top>290</top>
+				<width>770</width>
+				<height>40</height>
+				<font>font13_title</font>
+				<textcolor>red</textcolor>
+				<label>BEDINGUNGEN</label>
+			</control>
+
+			<!-- Telemetrie-Werte -->
+			<control type="label">
+				<left>50</left>
+				<top>350</top>
+				<width>770</width>
+				<height>45</height>
+				<font>font13</font>
+				<textcolor>white</textcolor>
+				<label>Windgeschwindigkeit: $INFO[Window(weather).Property(Current.Wind)]</label>
+			</control>
+			<control type="label">
+				<left>50</left>
+				<top>410</top>
+				<width>770</width>
+				<height>45</height>
+				<font>font13</font>
+				<textcolor>white</textcolor>
+				<label>Luftfeuchtigkeit: $INFO[Window(weather).Property(Current.Humidity)]</label>
+			</control>
+			<control type="label">
+				<left>50</left>
+				<top>470</top>
+				<width>770</width>
+				<height>45</height>
+				<font>font13</font>
+				<textcolor>white</textcolor>
+				<label>Luftdruck: $INFO[Window(weather).Property(Current.Pressure)]</label>
+			</control>
+			<control type="label">
+				<left>50</left>
+				<top>530</top>
+				<width>770</width>
+				<height>45</height>
+				<font>font13</font>
+				<textcolor>white</textcolor>
+				<label>UV-Index: $INFO[Window(weather).Property(Current.UVIndex)]</label>
+			</control>
+		</control>
+
+		<!-- RECHTER BLOCK: DYNAMISCH (VORHERSAGE ODER RADAR) -->
+		<control type="group" id="300">
+			<left>960</left>
+			<top>120</top>
+			<width>900</width>
+			<height>820</height>
+
+			<!-- ZUSTAND A: VORHERSAGE-KACHELN (4 TAGE) -->
+			<control type="group">
+				<visible>!String.IsEqual(Window(weather).Property(WeatherView),radar)</visible>
+
+				<!-- Tag 1: Morgen -->
+				<control type="group">
+					<left>0</left>
+					<top>0</top>
+					<width>900</width>
+					<height>190</height>
+					<control type="image">
+						<left>0</left><top>0</top><width>900</width><height>190</height>
+						<texture colordiffuse="D9000000">colors/black.png</texture>
+					</control>
+					<control type="label">
+						<left>40</left><top>70</top><width>300</width><height>50</height>
+						<font>font14_title</font><textcolor>white</textcolor>
+						<label>$INFO[Window(weather).Property(Day1.Title)]</label>
+					</control>
+					<control type="image">
+						<left>520</left><top>45</top><width>100</width><height>100</height>
+						<aspectratio>keep</aspectratio>
+						<texture>$INFO[Window(weather).Property(Day1.OutlookIcon)]</texture>
+					</control>
+					<control type="label">
+						<left>680</left><top>70</top><width>180</width><height>50</height>
+						<font>font14_title</font><textcolor>orange</textcolor><align>right</align>
+						<label>$INFO[Window(weather).Property(Day1.HighTemp)] / $INFO[Window(weather).Property(Day1.LowTemp)]</label>
+					</control>
+				</control>
+
+				<!-- Tag 2: Uebermorgen -->
+				<control type="group">
+					<left>0</left>
+					<top>210</top>
+					<width>900</width>
+					<height>190</height>
+					<control type="image">
+						<left>0</left><top>0</top><width>900</width><height>190</height>
+						<texture colordiffuse="D9000000">colors/black.png</texture>
+					</control>
+					<control type="label">
+						<left>40</left><top>70</top><width>300</width><height>50</height>
+						<font>font14_title</font><textcolor>white</textcolor>
+						<label>$INFO[Window(weather).Property(Day2.Title)]</label>
+					</control>
+					<control type="image">
+						<left>520</left><top>45</top><width>100</width><height>100</height>
+						<aspectratio>keep</aspectratio>
+						<texture>$INFO[Window(weather).Property(Day2.OutlookIcon)]</texture>
+					</control>
+					<control type="label">
+						<left>680</left><top>70</top><width>180</width><height>50</height>
+						<font>font14_title</font><textcolor>orange</textcolor><align>right</align>
+						<label>$INFO[Window(weather).Property(Day2.HighTemp)] / $INFO[Window(weather).Property(Day2.LowTemp)]</label>
+					</control>
+				</control>
+
+				<!-- Tag 3 -->
+				<control type="group">
+					<left>0</left>
+					<top>420</top>
+					<width>900</width>
+					<height>190</height>
+					<control type="image">
+						<left>0</left><top>0</top><width>900</width><height>190</height>
+						<texture colordiffuse="D9000000">colors/black.png</texture>
+					</control>
+					<control type="label">
+						<left>40</left><top>70</top><width>300</width><height>50</height>
+						<font>font14_title</font><textcolor>white</textcolor>
+						<label>$INFO[Window(weather).Property(Day3.Title)]</label>
+					</control>
+					<control type="image">
+						<left>520</left><top>45</top><width>100</width><height>100</height>
+						<aspectratio>keep</aspectratio>
+						<texture>$INFO[Window(weather).Property(Day3.OutlookIcon)]</texture>
+					</control>
+					<control type="label">
+						<left>680</left><top>70</top><width>180</width><height>50</height>
+						<font>font14_title</font><textcolor>orange</textcolor><align>right</align>
+						<label>$INFO[Window(weather).Property(Day3.HighTemp)] / $INFO[Window(weather).Property(Day3.LowTemp)]</label>
+					</control>
+				</control>
+
+				<!-- Tag 4 -->
+				<control type="group">
+					<left>0</left>
+					<top>630</top>
+					<width>900</width>
+					<height>190</height>
+					<control type="image">
+						<left>0</left><top>0</top><width>900</width><height>190</height>
+						<texture colordiffuse="D9000000">colors/black.png</texture>
+					</control>
+					<control type="label">
+						<left>40</left><top>70</top><width>300</width><height>50</height>
+						<font>font14_title</font><textcolor>white</textcolor>
+						<label>$INFO[Window(weather).Property(Day4.Title)]</label>
+					</control>
+					<control type="image">
+						<left>520</left><top>45</top><width>100</width><height>100</height>
+						<aspectratio>keep</aspectratio>
+						<texture>$INFO[Window(weather).Property(Day4.OutlookIcon)]</texture>
+					</control>
+					<control type="label">
+						<left>680</left><top>70</top><width>180</width><height>50</height>
+						<font>font14_title</font><textcolor>orange</textcolor><align>right</align>
+						<label>$INFO[Window(weather).Property(Day4.HighTemp)] / $INFO[Window(weather).Property(Day4.LowTemp)]</label>
+					</control>
+				</control>
+			</control>
+
+			<!-- ZUSTAND B: NIEDERSCHLAGSRADAR -->
+			<control type="group">
+				<visible>String.IsEqual(Window(weather).Property(WeatherView),radar)</visible>
+				<control type="image">
+					<left>0</left><top>0</top><width>900</width><height>820</height>
+					<texture colordiffuse="D9000000">colors/black.png</texture>
+				</control>
+				<control type="label">
+					<left>40</left><top>30</top><width>820</width><height>40</height>
+					<font>font13_title</font><textcolor>red</textcolor>
+					<label>NIEDERSCHLAGSRADAR</label>
+				</control>
+				<control type="image">
+					<left>40</left><top>90</top><width>820</width><height>700</height>
+					<aspectratio align="center" aligny="center">scale</aspectratio>
+					<texture fallback="/home/pi/.kodi/userdata/radar.png">/home/pi/.kodi/userdata/radar.png</texture>
+				</control>
+			</control>
+		</control>
+
+		<!-- ================= UNTERE LEISTE (FOOTER) ================= -->
+		<control type="group">
+			<left>60</left>
+			<top>980</top>
+			<width>1800</width>
+			<height>60</height>
+
+			<!-- 1. Unten Links: Einstellungen -->
+			<control type="button" id="200">
+				<left>0</left>
+				<top>0</top>
+				<width>300</width>
+				<height>50</height>
+				<font>font13_title</font>
+				<textcolor>grey</textcolor>
+				<focusedcolor>white</focusedcolor>
+				<align>left</align>
+				<label>Einstellungen</label>
+				<onup>100</onup>
+				<onright>201</onright>
+				<onclick>ActivateWindow(servicesettings,weather)</onclick>
+			</control>
+
+			<!-- 2. Unten Mitte: Wetter-Icon + Temperatur + Uhrzeit -->
+			<control type="group">
+				<left>700</left>
+				<top>0</top>
+				<width>400</width>
+				<height>50</height>
+				<control type="image">
+					<left>0</left>
+					<top>5</top>
+					<width>40</width>
+					<height>40</height>
+					<aspectratio>keep</aspectratio>
+					<texture>$INFO[Weather.ConditionsIcon]</texture>
+				</control>
+				<control type="label">
+					<left>50</left>
+					<top>0</top>
+					<width>140</width>
+					<height>50</height>
+					<font>font13</font>
+					<textcolor>white</textcolor>
+					<label>$INFO[Weather.Temperature]</label>
+				</control>
+				<control type="label">
+					<left>210</left>
+					<top>0</top>
+					<width>180</width>
+					<height>50</height>
+					<font>font13</font>
+					<textcolor>white</textcolor>
+					<label>$INFO[System.Time]</label>
+				</control>
+			</control>
+
+			<!-- 3. Unten Rechts: Hauptmenü -->
+			<control type="button" id="201">
+				<left>1500</left>
+				<top>0</top>
+				<width>300</width>
+				<height>50</height>
+				<font>font13_title</font>
+				<textcolor>grey</textcolor>
+				<focusedcolor>white</focusedcolor>
+				<align>right</align>
+				<label>Hauptmenü</label>
+				<onup>101</onup>
+				<onleft>200</onleft>
+				<onclick>ActivateWindow(home)</onclick>
+			</control>
+		</control>
+	</controls>
+</window>

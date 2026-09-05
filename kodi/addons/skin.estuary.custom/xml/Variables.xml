@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+	<!-- Umschalter oben rechts -->
+	<variable name="WeatherViewToggleLabel">
+		<value condition="Skin.HasSetting(WeatherShowRadar)">[B]Vorhersage[/B]</value>
+		<value>[B]Radar[/B]</value>
+	</variable>
+
+	<!-- Wochentage Vorhersage -->
+	<variable name="WeatherDay1Title">
+		<value>Morgen</value>
+	</variable>
+
+	<variable name="WeatherDay2Title">
+		<value>Übermorgen</value>
+	</variable>
+
+	<variable name="WeatherDay3Title">
+		<value condition="String.Contains(Window(Weather).Property(Day3.Title),Monday) | String.Contains(Window(Weather).Property(Day3.Title),Mon)">Montag</value>
+		<value condition="String.Contains(Window(Weather).Property(Day3.Title),Tuesday) | String.Contains(Window(Weather).Property(Day3.Title),Tue)">Dienstag</value>
+		<value condition="String.Contains(Window(Weather).Property(Day3.Title),Wednesday) | String.Contains(Window(Weather).Property(Day3.Title),Wed)">Mittwoch</value>
+		<value condition="String.Contains(Window(Weather).Property(Day3.Title),Thursday) | String.Contains(Window(Weather).Property(Day3.Title),Thu)">Donnerstag</value>
+		<value condition="String.Contains(Window(Weather).Property(Day3.Title),Friday) | String.Contains(Window(Weather).Property(Day3.Title),Fri)">Freitag</value>
+		<value condition="String.Contains(Window(Weather).Property(Day3.Title),Saturday) | String.Contains(Window(Weather).Property(Day3.Title),Sat)">Samstag</value>
+		<value condition="String.Contains(Window(Weather).Property(Day3.Title),Sunday) | String.Contains(Window(Weather).Property(Day3.Title),Sun)">Sonntag</value>
+		<value>$INFO[Window(Weather).Property(Day3.Title)]</value>
+	</variable>
+
+	<variable name="WeatherDay4Title">
+		<value condition="String.Contains(Window(Weather).Property(Day4.Title),Monday) | String.Contains(Window(Weather).Property(Day4.Title),Mon)">Montag</value>
+		<value condition="String.Contains(Window(Weather).Property(Day4.Title),Tuesday) | String.Contains(Window(Weather).Property(Day4.Title),Tue)">Dienstag</value>
+		<value condition="String.Contains(Window(Weather).Property(Day4.Title),Wednesday) | String.Contains(Window(Weather).Property(Day4.Title),Wed)">Mittwoch</value>
+		<value condition="String.Contains(Window(Weather).Property(Day4.Title),Thursday) | String.Contains(Window(Weather).Property(Day4.Title),Thu)">Donnerstag</value>
+		<value condition="String.Contains(Window(Weather).Property(Day4.Title),Friday) | String.Contains(Window(Weather).Property(Day4.Title),Fri)">Freitag</value>
+		<value condition="String.Contains(Window(Weather).Property(Day4.Title),Saturday) | String.Contains(Window(Weather).Property(Day4.Title),Sat)">Samstag</value>
+		<value condition="String.Contains(Window(Weather).Property(Day4.Title),Sunday) | String.Contains(Window(Weather).Property(Day4.Title),Sun)">Sonntag</value>
+		<value>$INFO[Window(Weather).Property(Day4.Title)]</value>
+	</variable>
+
+	<!-- Ort -->
+	<variable name="WeatherLocationClean">
+		<value condition="String.IsEqual(Skin.String(WeatherLocationMode),live) + !String.IsEmpty(Skin.String(WeatherLiveLocationName))">$INFO[Skin.String(WeatherLiveLocationName)]</value>
+		<value condition="String.IsEqual(Skin.String(WeatherLocationMode),kleve)">Kleve</value>
+		<value condition="String.StartsWith(Weather.Location,Cleves) | String.StartsWith(Window(Weather).Property(Location),Cleves) | String.StartsWith(Window(Weather).Property(Current.Location),Cleves)">Kleve</value>
+		<value condition="!String.IsEmpty(Window(Weather).Property(Location))">$INFO[Window(Weather).Property(Location)]</value>
+		<value condition="!String.IsEmpty(Window(Weather).Property(Current.Location))">$INFO[Window(Weather).Property(Current.Location)]</value>
+		<value condition="!String.IsEmpty(Weather.Location)">$INFO[Weather.Location]</value>
+		<value>Kleve</value>
+	</variable>
+
+	<!-- Aktuelle Temperatur -->
+	<variable name="WeatherCurrentTempVar">
+		<value condition="!String.IsEmpty(Window(Weather).Property(Current.Temperature))">$INFO[Window(Weather).Property(Current.Temperature)]°C</value>
+		<value condition="!String.IsEmpty(Weather.Temperature)">$INFO[Weather.Temperature]</value>
+		<value>--°C</value>
+	</variable>
+
+	<!-- Heute Max Temp -->
+	<variable name="WeatherTodayHighVar">
+		<value condition="String.EndsWith(Window(Weather).Property(Daily.1.HighTemperature),C)">$INFO[Window(Weather).Property(Daily.1.HighTemperature)]</value>
+		<value condition="!String.IsEmpty(Window(Weather).Property(Daily.1.HighTemperature))">$INFO[Window(Weather).Property(Daily.1.HighTemperature)]°C</value>
+		<value condition="!String.IsEmpty(Window(Weather).Property(Day0.HighTemp))">$INFO[Window(Weather).Property(Day0.HighTemp)]°C</value>
+		<value condition="!String.IsEmpty(Window(Weather).Property(Day0.HighTem))">$INFO[Window(Weather).Property(Day0.HighTem)]°C</value>
+		<value>--°C</value>
+	</variable>
+
+	<!-- Heute Min Temp -->
+	<variable name="WeatherTodayLowVar">
+		<value condition="String.EndsWith(Window(Weather).Property(Daily.1.LowTemperature),C)">$INFO[Window(Weather).Property(Daily.1.LowTemperature)]</value>
+		<value condition="!String.IsEmpty(Window(Weather).Property(Daily.1.LowTemperature))">$INFO[Window(Weather).Property(Daily.1.LowTemperature)]°C</value>
+		<value condition="!String.IsEmpty(Window(Weather).Property(Day0.LowTemp))">$INFO[Window(Weather).Property(Day0.LowTemp)]°C</value>
+		<value>--°C</value>
+	</variable>
+
+	<!-- Gefuehlt (Real Feel) -->
+	<variable name="WeatherFeelTempVar">
+		<value condition="String.EndsWith(Window(Weather).Property(Current.FeelsLike),C)">$INFO[Window(Weather).Property(Current.FeelsLike)]</value>
+		<value condition="!String.IsEmpty(Window(Weather).Property(Current.FeelsLike))">$INFO[Window(Weather).Property(Current.FeelsLike)]°C</value>
+		<value condition="String.EndsWith(Window(Weather).Property(Daily.1.FeelsLike),C)">$INFO[Window(Weather).Property(Daily.1.FeelsLike)]</value>
+		<value condition="!String.IsEmpty(Window(Weather).Property(Daily.1.FeelsLike))">$INFO[Window(Weather).Property(Daily.1.FeelsLike)]°C</value>
+		<value condition="!String.IsEmpty(Weather.FeelTemp)">$INFO[Weather.FeelTemp]</value>
+		<value condition="!String.IsEmpty(Window(Weather).Property(Current.Temperature))">$INFO[Window(Weather).Property(Current.Temperature)]°C</value>
+		<value>--°C</value>
+	</variable>
+
+	<!-- Telemetrie -->
+	<variable name="WeatherWindVar">
+		<value condition="!String.IsEmpty(Window(Weather).Property(Current.Wind))">$INFO[Window(Weather).Property(Current.Wind)] km/h</value>
+		<value condition="!String.IsEmpty(Weather.Wind)">$INFO[Weather.Wind]</value>
+		<value>--</value>
+	</variable>
+
+	<variable name="WeatherHumidityVar">
+		<value condition="!String.IsEmpty(Window(Weather).Property(Current.Humidity))">$INFO[Window(Weather).Property(Current.Humidity)] %</value>
+		<value condition="!String.IsEmpty(Weather.Humidity)">$INFO[Weather.Humidity]</value>
+		<value>--</value>
+	</variable>
+
+	<variable name="WeatherPressureVar">
+		<value condition="!String.IsEmpty(Window(Weather).Property(Current.Pressure))">$INFO[Window(Weather).Property(Current.Pressure)]</value>
+		<value>--</value>
+	</variable>
+
+	<variable name="WeatherUVVar">
+		<value condition="!String.IsEmpty(Window(Weather).Property(Current.UVIndex))">$INFO[Window(Weather).Property(Current.UVIndex)]</value>
+		<value>--</value>
+	</variable>
+</includes>

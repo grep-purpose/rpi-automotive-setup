@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+	<include name="View_50_List">
+		<!-- 1. KACHEL-VIEW FUER TWITCH & YOUTUBE (ID 50) -->
+		<control type="panel" id="50">
+			<left>40</left>
+			<top>100</top>
+			<width>1840</width>
+			<height>940</height>
+			<onup>9001</onup>
+			<ondown>noop</ondown>
+			<onleft>50</onleft>
+			<onright>50</onright>
+			<viewtype label="Kacheln">panel</viewtype>
+			<orientation>horizontal</orientation>
+			<scrolltime tween="sine" easing="out">180</scrolltime>
+			<visible>String.Contains(Container.FolderPath,plugin.video) | !String.IsEmpty(Container.PluginName)</visible>
+
+			<itemlayout width="440" height="280">
+				<control type="image">
+					<left>10</left>
+					<top>10</top>
+					<width>420</width>
+					<height>236</height>
+					<texture background="true" fallback="DefaultVideo.png">$INFO[ListItem.Art(thumb)]</texture>
+					<aspectratio align="center" aligny="center">scale</aspectratio>
+				</control>
+				<control type="label">
+					<left>15</left>
+					<top>250</top>
+					<width>410</width>
+					<height>30</height>
+					<font>font13</font>
+					<textcolor>grey</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+			</itemlayout>
+
+			<focusedlayout width="440" height="280">
+				<control type="image">
+					<left>4</left>
+					<top>4</top>
+					<width>432</width>
+					<height>248</height>
+					<texture border="4">colors/white.png</texture>
+					<colordiffuse>button_focus</colordiffuse>
+				</control>
+				<control type="image">
+					<left>10</left>
+					<top>10</top>
+					<width>420</width>
+					<height>236</height>
+					<texture background="true" fallback="DefaultVideo.png">$INFO[ListItem.Art(thumb)]</texture>
+					<aspectratio align="center" aligny="center">scale</aspectratio>
+				</control>
+				<control type="label">
+					<left>15</left>
+					<top>250</top>
+					<width>410</width>
+					<height>30</height>
+					<font>font13_bold</font>
+					<textcolor>white</textcolor>
+					<scroll>true</scroll>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+			</focusedlayout>
+		</control>
+
+		<!-- 2. NORMALE ESTUARY-LISTE (NUR FUER SYSTEM / DATEIEN) -->
+		<control type="group">
+			<visible>!String.Contains(Container.FolderPath,plugin.video) + String.IsEmpty(Container.PluginName)</visible>
+			<include>OpenClose_Right</include>
+			<left>596</left>
+			<include>Visible_Right</include>
+			<include content="ListContainer">
+				<param name="list_id" value="50" />
+				<param name="right" value="594" />
+				<param name="viewtype_label" value="$LOCALIZE[535]" />
+			</include>
+		</control>
+	</include>
+</includes>

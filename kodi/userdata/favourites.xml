@@ -1,0 +1,6 @@
+<favourites>
+    <favourite name="Install from repository">ActivateWindow(10040,&quot;addons://repos/&quot;,return)</favourite>
+    <favourite name="Live Channels" thumb="/home/pi/.kodi/addons/plugin.video.twitch/resources/media/thumbnails/Live_Channels.png">ActivateWindow(10025,&quot;plugin://plugin.video.twitch/?content=live&amp;mode=followed&quot;,return)</favourite>
+    <favourite name="Recommendations" thumb="special://home/addons/plugin.video.youtube/resources/media/home.png">ActivateWindow(10025,&quot;plugin://plugin.video.youtube/special/recommendations?category_label=Recommendations&quot;,return)</favourite>
+    <favourite name="Local stations" thumb="/home/pi/.kodi/addons/plugin.audio.radiode/src/../icon.png">ActivateWindow(10502,&quot;plugin://plugin.audio.radiode/?data=%7b%22name%22%3a%20%22Local%20stations%22%7d&amp;mode=get_local_stations&quot;,return)</favourite>
+</favourites>
