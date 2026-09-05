@@ -165,7 +165,7 @@
         <value>Radar</value>
     </variable>
 <variable name="WeatherRadarImageVar">
-        <value condition="String.IsEqual(Skin.String(WeatherLocationMode),live)">/home/pi/.kodi/userdata/radar_2.png</value>
+        <value condition="String.IsEqual(Skin.String(WeatherLocationMode),live)">$INFO[Skin.String(WeatherRadarLivePath)]</value>
         <value>/home/pi/.kodi/userdata/radar_1.png</value>
     </variable>
 </includes>
