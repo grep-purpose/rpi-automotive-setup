@@ -138,11 +138,11 @@ if not is_live:
 
     # 3. Kodi GUI aktualisieren
     xbmc.executebuiltin("Skin.SetString(WeatherLocationMode,live)")
-    xbmc.executebuiltin(f"Skin.SetString(WeatherLiveLocationName,{town})")
+    xbmc.executebuiltin(f"Skin.SetString(WeatherLiveLocationName,{full_name})")
     xbmc.executebuiltin("Weather.LocationSet(2)")
     xbmc.executebuiltin("SetProperty(RadarFile,/home/pi/.kodi/userdata/radar.png,Weather)")
     xbmc.executebuiltin('RunScript(weather.multi,2)')
-    notify(f"Aktiv: {town}")
+    notify(f"Aktiv: {full_name}")
 else:
     # Modus: KLEVE
     with open(STATE_FILE, "w") as f:
