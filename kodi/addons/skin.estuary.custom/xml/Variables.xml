@@ -40,12 +40,9 @@
 	
 	<variable name="WeatherLocationClean">
 		<value condition="String.IsEqual(Skin.String(WeatherLocationMode),live) + !String.IsEmpty(Skin.String(WeatherLiveLocationName))">$INFO[Skin.String(WeatherLiveLocationName)]</value>
-		<value condition="String.IsEqual(Skin.String(WeatherLocationMode),kleve)">Kleve</value>
-		<value condition="String.StartsWith(Weather.Location,Cleves) | String.StartsWith(Window(Weather).Property(Location),Cleves) | String.StartsWith(Window(Weather).Property(Current.Location),Cleves)">Kleve</value>
-		<value condition="!String.IsEmpty(Window(Weather).Property(Location))">$INFO[Window(Weather).Property(Location)]</value>
-		<value condition="!String.IsEmpty(Window(Weather).Property(Current.Location))">$INFO[Window(Weather).Property(Current.Location)]</value>
-		<value condition="!String.IsEmpty(Weather.Location)">$INFO[Weather.Location]</value>
-		<value>Kleve</value>
+		<value condition="String.IsEqual(Skin.String(WeatherLocationMode),kleve) | String.Contains(Weather.Location,Cleves) | String.Contains(Window(Weather).Property(Location),Cleves)">Kleve, NRW, DE</value>
+		<value condition="!String.IsEmpty(Skin.String(WeatherLiveLocationName)) + String.IsEqual(Skin.String(WeatherLocationMode),live)">$INFO[Skin.String(WeatherLiveLocationName)]</value>
+		<value>Kleve, NRW, DE</value>
 	</variable>
 
 	
@@ -156,10 +153,10 @@
         <value>$INFO[Window(Weather).Property(Daily.5.ShortDay)]</value>
     </variable>
 <variable name="WeatherCurrentLocationVar">
-        <value condition="String.IsEqual(Skin.String(WeatherLocationMode),live)">$INFO[Skin.String(WeatherLiveLocationName)]</value>
-        <value condition="String.Contains(Weather.Location,Cleves)">Kleve, NRW, DE</value>
-        <value>$INFO[Weather.Location]</value>
-    </variable>
+	<value condition="String.IsEqual(Skin.String(WeatherLocationMode),live) + !String.IsEmpty(Skin.String(WeatherLiveLocationName))">$INFO[Skin.String(WeatherLiveLocationName)]</value>
+	<value condition="String.IsEqual(Skin.String(WeatherLocationMode),kleve) | String.Contains(Weather.Location,Cleves)">Kleve, NRW, DE</value>
+	<value>Kleve, NRW, DE</value>
+	</variable>
 <variable name="WeatherToggleLabelVar">
         <value condition="String.IsEqual(Window(home).Property(WeatherView),radar)">Vorhersage</value>
         <value>Radar</value>
