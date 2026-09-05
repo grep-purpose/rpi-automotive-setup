@@ -86,7 +86,7 @@ def resolve_location_schema(lat, lon):
         req = urllib.request.Request(bdc_url, headers={'User-Agent': BROWSER_AGENT})
         with urllib.request.urlopen(req, timeout=4, context=ctx) as r:
             data = json.loads(r.read().decode())
-            town = data.get("city") or data.get("locality") or data.get("principalSubdivision")
+            town = data.get("city") or data.get("localityInfo", {}).get("administrative", [{}])[-1].get("name") or data.get("locality") or data.get("principalSubdivision")
             region = data.get("principalSubdivision")
             country_code = data.get("countryCode", "de").lower()
     except Exception as e:
