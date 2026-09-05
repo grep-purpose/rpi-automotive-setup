@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?>
+<settings version="2">
+    <setting id="loc1_name">Cleves, NW, DE</setting>
+    <setting id="loc2_name">Cheb, Karlovarský kraj, CZ</setting>
+    <setting id="loc3_name" default="true" />
+    <setting id="loc4_name" default="true" />
+    <setting id="loc5_name" default="true" />
+    <setting id="loc1_url">de/nw/cleves</setting>
+    <setting id="loc2_url">cz/karlovarský-kraj/cheb</setting>
+    <setting id="loc3_url" default="true" />
+    <setting id="loc4_url" default="true" />
+    <setting id="loc5_url" default="true" />
+    <setting id="loc1_lat">51.7904</setting>
+    <setting id="loc2_lat">50.0803</setting>
+    <setting id="loc3_lat" default="true">0</setting>
+    <setting id="loc4_lat" default="true">0</setting>
+    <setting id="loc5_lat" default="true">0</setting>
+    <setting id="loc1_lon">6.13777</setting>
+    <setting id="loc2_lon">12.366</setting>
+    <setting id="loc3_lon" default="true">0</setting>
+    <setting id="loc4_lon" default="true">0</setting>
+    <setting id="loc5_lon" default="true">0</setting>
+    <setting id="loc1_id">667337</setting>
+    <setting id="loc2_id">2934246</setting>
+    <setting id="loc3_id" default="true">-1</setting>
+    <setting id="loc4_id" default="true">-1</setting>
+    <setting id="loc5_id" default="true">-1</setting>
+    <setting id="WAdd" default="true">false</setting>
+    <setting id="API">2192a34e7fff476ea1805d347e44ddb5</setting>
+    <setting id="WMaps" default="true">false</setting>
+    <setting id="MAPAPI">3601887509dab15db7fd05624f1eef44</setting>
+    <setting id="Zoom" default="true">4</setting>
+    <setting id="Debug" default="true">false</setting>
+</settings>

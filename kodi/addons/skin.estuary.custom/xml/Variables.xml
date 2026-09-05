@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <includes>
-	<!-- Umschalter oben rechts -->
+	
 	<variable name="WeatherViewToggleLabel">
 		<value condition="Skin.HasSetting(WeatherShowRadar)">[B]Vorhersage[/B]</value>
 		<value>[B]Radar[/B]</value>
 	</variable>
 
-	<!-- Wochentage Vorhersage -->
+	
 	<variable name="WeatherDay1Title">
 		<value>Morgen</value>
 	</variable>
@@ -37,7 +37,7 @@
 		<value>$INFO[Window(Weather).Property(Day4.Title)]</value>
 	</variable>
 
-	<!-- Ort -->
+	
 	<variable name="WeatherLocationClean">
 		<value condition="String.IsEqual(Skin.String(WeatherLocationMode),live) + !String.IsEmpty(Skin.String(WeatherLiveLocationName))">$INFO[Skin.String(WeatherLiveLocationName)]</value>
 		<value condition="String.IsEqual(Skin.String(WeatherLocationMode),kleve)">Kleve</value>
@@ -48,14 +48,14 @@
 		<value>Kleve</value>
 	</variable>
 
-	<!-- Aktuelle Temperatur -->
+	
 	<variable name="WeatherCurrentTempVar">
 		<value condition="!String.IsEmpty(Window(Weather).Property(Current.Temperature))">$INFO[Window(Weather).Property(Current.Temperature)]°C</value>
 		<value condition="!String.IsEmpty(Weather.Temperature)">$INFO[Weather.Temperature]</value>
 		<value>--°C</value>
 	</variable>
 
-	<!-- Heute Max Temp -->
+	
 	<variable name="WeatherTodayHighVar">
 		<value condition="String.EndsWith(Window(Weather).Property(Daily.1.HighTemperature),C)">$INFO[Window(Weather).Property(Daily.1.HighTemperature)]</value>
 		<value condition="!String.IsEmpty(Window(Weather).Property(Daily.1.HighTemperature))">$INFO[Window(Weather).Property(Daily.1.HighTemperature)]°C</value>
@@ -64,7 +64,7 @@
 		<value>--°C</value>
 	</variable>
 
-	<!-- Heute Min Temp -->
+	
 	<variable name="WeatherTodayLowVar">
 		<value condition="String.EndsWith(Window(Weather).Property(Daily.1.LowTemperature),C)">$INFO[Window(Weather).Property(Daily.1.LowTemperature)]</value>
 		<value condition="!String.IsEmpty(Window(Weather).Property(Daily.1.LowTemperature))">$INFO[Window(Weather).Property(Daily.1.LowTemperature)]°C</value>
@@ -72,7 +72,7 @@
 		<value>--°C</value>
 	</variable>
 
-	<!-- Gefuehlt (Real Feel) -->
+	
 	<variable name="WeatherFeelTempVar">
 		<value condition="String.EndsWith(Window(Weather).Property(Current.FeelsLike),C)">$INFO[Window(Weather).Property(Current.FeelsLike)]</value>
 		<value condition="!String.IsEmpty(Window(Weather).Property(Current.FeelsLike))">$INFO[Window(Weather).Property(Current.FeelsLike)]°C</value>
@@ -83,7 +83,7 @@
 		<value>--°C</value>
 	</variable>
 
-	<!-- Telemetrie -->
+	
 	<variable name="WeatherWindVar">
 		<value condition="!String.IsEmpty(Window(Weather).Property(Current.Wind))">$INFO[Window(Weather).Property(Current.Wind)] km/h</value>
 		<value condition="!String.IsEmpty(Weather.Wind)">$INFO[Weather.Wind]</value>
@@ -105,4 +105,67 @@
 		<value condition="!String.IsEmpty(Window(Weather).Property(Current.UVIndex))">$INFO[Window(Weather).Property(Current.UVIndex)]</value>
 		<value>--</value>
 	</variable>
+    <variable name="WeatherDisplayLocationVar">
+        <value condition="String.Contains(Weather.Location,Cleves)">Kleve, NRW, DE</value>
+        <value condition="String.Contains(Window(Weather).Property(Location),Cleves)">Kleve, NRW, DE</value>
+        <value condition="!String.IsEmpty(Weather.Location)">$INFO[Weather.Location]</value>
+        <value>$INFO[Window(Weather).Property(Location)]</value>
+    </variable>
+
+    
+    <variable name="WeatherDay3NameVar">
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Mon) | String.StartsWith(Window(Weather).Property(Daily.4.LongDay),Mon)">Montag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Tue) | String.StartsWith(Window(Weather).Property(Daily.4.LongDay),Die) | String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Die)">Dienstag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Wed) | String.StartsWith(Window(Weather).Property(Daily.4.LongDay),Mit) | String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Mit)">Mittwoch</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Thu) | String.StartsWith(Window(Weather).Property(Daily.4.LongDay),Don) | String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Don)">Donnerstag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Fri) | String.StartsWith(Window(Weather).Property(Daily.4.LongDay),Fre) | String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Fre)">Freitag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Sat) | String.StartsWith(Window(Weather).Property(Daily.4.LongDay),Sam) | String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Sam)">Samstag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Sun) | String.StartsWith(Window(Weather).Property(Daily.4.LongDay),Son) | String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Son)">Sonntag</value>
+        <value>$INFO[Window(Weather).Property(Daily.4.LongDay)]</value>
+    </variable>
+
+    <variable name="WeatherDay4NameVar">
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Mon) | String.StartsWith(Window(Weather).Property(Daily.5.LongDay),Mon)">Montag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Tue) | String.StartsWith(Window(Weather).Property(Daily.5.LongDay),Die) | String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Die)">Dienstag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Wed) | String.StartsWith(Window(Weather).Property(Daily.5.LongDay),Mit) | String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Mit)">Mittwoch</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Thu) | String.StartsWith(Window(Weather).Property(Daily.5.LongDay),Don) | String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Don)">Donnerstag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Fri) | String.StartsWith(Window(Weather).Property(Daily.5.LongDay),Fre) | String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Fre)">Freitag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Sat) | String.StartsWith(Window(Weather).Property(Daily.5.LongDay),Sam) | String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Sam)">Samstag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Sun) | String.StartsWith(Window(Weather).Property(Daily.5.LongDay),Son) | String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Son)">Sonntag</value>
+        <value>$INFO[Window(Weather).Property(Daily.5.LongDay)]</value>
+    </variable>
+<variable name="WeatherDay3Var">
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Mon) | String.StartsWith(Window(Weather).Property(Daily.4.LongDay),Mon)">Montag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Tue) | String.StartsWith(Window(Weather).Property(Daily.4.LongDay),Die) | String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Die)">Dienstag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Wed) | String.StartsWith(Window(Weather).Property(Daily.4.LongDay),Mit) | String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Mit)">Mittwoch</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Thu) | String.StartsWith(Window(Weather).Property(Daily.4.LongDay),Don) | String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Don)">Donnerstag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Fri) | String.StartsWith(Window(Weather).Property(Daily.4.LongDay),Fre) | String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Fre)">Freitag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Sat) | String.StartsWith(Window(Weather).Property(Daily.4.LongDay),Sam) | String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Sam)">Samstag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Sun) | String.StartsWith(Window(Weather).Property(Daily.4.LongDay),Son) | String.StartsWith(Window(Weather).Property(Daily.4.ShortDay),Son)">Sonntag</value>
+        <value>$INFO[Window(Weather).Property(Daily.4.ShortDay)]</value>
+    </variable>
+
+    <variable name="WeatherDay4Var">
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Mon) | String.StartsWith(Window(Weather).Property(Daily.5.LongDay),Mon)">Montag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Tue) | String.StartsWith(Window(Weather).Property(Daily.5.LongDay),Die) | String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Die)">Dienstag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Wed) | String.StartsWith(Window(Weather).Property(Daily.5.LongDay),Mit) | String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Mit)">Mittwoch</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Thu) | String.StartsWith(Window(Weather).Property(Daily.5.LongDay),Don) | String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Don)">Donnerstag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Fri) | String.StartsWith(Window(Weather).Property(Daily.5.LongDay),Fre) | String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Fre)">Freitag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Sat) | String.StartsWith(Window(Weather).Property(Daily.5.LongDay),Sam) | String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Sam)">Samstag</value>
+        <value condition="String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Sun) | String.StartsWith(Window(Weather).Property(Daily.5.LongDay),Son) | String.StartsWith(Window(Weather).Property(Daily.5.ShortDay),Son)">Sonntag</value>
+        <value>$INFO[Window(Weather).Property(Daily.5.ShortDay)]</value>
+    </variable>
+<variable name="WeatherCurrentLocationVar">
+        <value condition="String.IsEqual(Skin.String(WeatherLocationMode),live)">$INFO[Skin.String(WeatherLiveLocationName)]</value>
+        <value condition="String.Contains(Weather.Location,Cleves)">Kleve, NRW, DE</value>
+        <value>$INFO[Weather.Location]</value>
+    </variable>
+<variable name="WeatherToggleLabelVar">
+        <value condition="String.IsEqual(Window(home).Property(WeatherView),radar)">Vorhersage</value>
+        <value>Radar</value>
+    </variable>
+<variable name="WeatherRadarImageVar">
+        <value condition="String.IsEqual(Skin.String(WeatherLocationMode),live)">/home/pi/.kodi/userdata/radar_2.png</value>
+        <value>/home/pi/.kodi/userdata/radar_1.png</value>
+    </variable>
 </includes>
