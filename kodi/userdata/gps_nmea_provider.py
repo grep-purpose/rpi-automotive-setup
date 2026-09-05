@@ -15,6 +15,7 @@ ctx.verify_mode = ssl.CERT_NONE
 S24_MAC = "F4:2B:8C:23:CD:78"
 LCURL = 'https://weather.yahoo.com/_atmos/api/search-assist/locations?query=%s'
 BROWSER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+HEADERS = {'User-Agent': BROWSER_AGENT, 'Accept': 'application/json'}
 
 def parse_nmea_coord(raw, direction):
     if not raw or not direction:
@@ -68,7 +69,7 @@ def get_live_gps(mac=S24_MAC):
             if attempt == 0:
                 time.sleep(1.0)
                 continue
-            print(f"[GPS] Fehler: {e}")
+            print(f"[GPS] Fehler: {e}", flush=True)
         finally:
             if s:
                 try: s.close()
@@ -80,61 +81,61 @@ def resolve_location_schema(lat, lon):
     region = None
     country_code = "de"
 
-    # 1. Reverse Geocode (BigDataCloud)
+    # 1. Reverse Geocoding via BigDataCloud (bevorzugt Deutsch)
     try:
-        bdc_url = f"https://api.bigdatacloud.net/data/reverse-geocode-client?latitude={lat}&longitude={lon}&localityLanguage=en"
-        req = urllib.request.Request(bdc_url, headers={'User-Agent': BROWSER_AGENT})
+        bdc_url = f"https://api.bigdatacloud.net/data/reverse-geocode-client?latitude={lat}&longitude={lon}&localityLanguage=de"
+        req = urllib.request.Request(bdc_url, headers=HEADERS)
         with urllib.request.urlopen(req, timeout=4, context=ctx) as r:
             data = json.loads(r.read().decode())
-            town = data.get("city") or data.get("localityInfo", {}).get("administrative", [{}])[-1].get("name") or data.get("locality") or data.get("principalSubdivision")
+            town = data.get("city") or data.get("locality") or data.get("principalSubdivision")
             region = data.get("principalSubdivision")
             country_code = data.get("countryCode", "de").lower()
     except Exception as e:
-        print(f"[GEO] BDC: {e}")
+        print(f"[GEO] BDC: {e}", flush=True)
 
     # Fallback Nominatim
     if not town:
         try:
-            nom_url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}&zoom=10&addressdetails=1&accept-language=en"
-            req = urllib.request.Request(nom_url, headers={'User-Agent': BROWSER_AGENT})
+            nom_url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}&zoom=10&addressdetails=1&accept-language=de"
+            req = urllib.request.Request(nom_url, headers=HEADERS)
             with urllib.request.urlopen(req, timeout=4, context=ctx) as r:
                 data = json.loads(r.read().decode())
                 addr = data.get("address", {})
-                town = addr.get("city") or addr.get("town") or addr.get("municipality") or addr.get("county")
+                town = addr.get("city") or addr.get("town") or addr.get("municipality") or addr.get("village")
                 region = addr.get("state") or addr.get("county")
                 country_code = addr.get("country_code", "de").lower()
         except Exception as e:
-            print(f"[GEO] Nominatim: {e}")
+            print(f"[GEO] Nominatim: {e}", flush=True)
 
     if not town:
-        town = "Current Position"
-        country_code = "xx"
+        town = "Live-Standort"
+        country_code = "de"
 
-    # Dynamische Basiswerte (KEINE harten fremden Städte!)
+    c_code = country_code.upper()
+    
+    # Einheitliches Schema: Stadt, Region, LAND
+    if region and region.lower() != town.lower():
+        full_name = f"{town}, {region}, {c_code}"
+    else:
+        full_name = f"{town}, {c_code}"
+
+    # Yahoo URL Fallback-Struktur
     clean_town = town.lower().replace(" ", "-")
     clean_region = (region or "").lower().replace(" ", "-")
-    c_code = country_code.lower()
-
-    if clean_region:
-        url_slug = f"{c_code}/{clean_region}/{clean_town}"
-    else:
-        url_slug = f"{c_code}/{clean_town}"
-
-    full_name = f"{town}, {c_code.upper()}"
+    url_slug = f"{country_code.lower()}/{clean_region}/{clean_town}" if clean_region else f"{country_code.lower()}/{clean_town}"
     woeid = 0
 
     # 2. Yahoo Search Assist
-    safe_query = urllib.parse.quote(town)
-    y_url = LCURL % safe_query
-    y_req = urllib.request.Request(y_url, headers={'User-Agent': BROWSER_AGENT, 'Accept': 'application/json'})
-
     try:
+        safe_query = urllib.parse.quote(town)
+        y_url = LCURL % safe_query
+        y_req = urllib.request.Request(y_url, headers=HEADERS)
         with urllib.request.urlopen(y_req, timeout=5, context=ctx) as resp:
             data = json.loads(resp.read().decode())
             sugg = data.get("suggestions", [])
             if sugg:
                 loc = sugg[0].get("location", {})
-                yc_code = loc.get("country", {}).get("code", c_code).lower()
+                yc_code = loc.get("country", {}).get("code", country_code).lower()
                 yr_name = loc.get("region", {}).get("name", region or "").lower().replace(" ", "-")
                 yt_name = loc.get("town", {}).get("name", town).lower().replace(" ", "-")
                 w_id = loc.get("town", {}).get("woeid", 0)
@@ -143,10 +144,8 @@ def resolve_location_schema(lat, lon):
                     url_slug = f"{yc_code}/{yr_name}/{yt_name}-{w_id}"
                 else:
                     url_slug = f"{yc_code}/{yt_name}-{w_id}"
-
                 woeid = w_id
-                full_name = f"{loc.get('town', {}).get('name', town)}, {yc_code.upper()}"
     except Exception as e:
-        print(f"[YAHOO] Assist Error: {e}")
+        print(f"[YAHOO] Assist Error: {e}", flush=True)
 
     return town, full_name, url_slug, woeid
