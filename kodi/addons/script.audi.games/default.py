@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Kodi-native games: 1920x1080 coordinates, no external GUI dependency."""
 import math
+import random
 import os
 import base64
 import time
@@ -184,12 +185,157 @@ class GameWindow(xbmcgui.WindowDialog):
         self.ball_view.setPosition(int((self.ball_x - self.BALL_RADIUS) * self.scale_x),
                                    int((self.ball_y - self.BALL_RADIUS) * self.scale_y))
 
+class LaneRunnerWindow(xbmcgui.WindowDialog):
+    """Three-lane arcade game with a lightweight perspective effect."""
+
+    def __init__(self):
+        super().__init__()
+        self.sx, self.sy = self.getWidth() / W, self.getHeight() / H
+        self.rng = random.Random()
+        self.closed = self.started = self.paused = self.finished = False
+        self.lane = 1
+        self.score = 0
+        self.spawn_elapsed = 0.0
+        self.obstacles = []
+        self.box(0, 0, W, H, 'FF05070A')
+        self.label('AUDI ENTERTAINMENT  /  LANE RUNNER', 30, 18, 1850, 92, 'FFFF6B00', 'font60')
+        self.score_label = self.label('PUNKTE  0', 30, 110, 1100, 75, 'FFFFFFFF', 'font45_title')
+        self.box(30, 195, 1860, 6, 'FF8D99AE')
+        # A perspective road made from Kodi-native rectangles.
+        for row in range(20):
+            depth = (row + 0.5) / 20.0
+            width = int(480 + 1120 * depth)
+            self.box((W - width) // 2, 229 + row * 35, width, 36,
+                     'FF121A26' if row % 2 else 'FF17212C')
+        for row in range(6):
+            depth = (row + 0.5) / 6.0
+            y = int(260 + 600 * depth)
+            road_width = 480 + 1120 * depth
+            for boundary in (-1, 1):
+                x = int(W / 2 + boundary * road_width / 6)
+                self.box(x - 5, y, 10, 42, 'FF8D99AE')
+        self.box(30, 940, 1860, 6, 'FF8D99AE')
+        self.status = self.label('DREHEN Spur wechseln  |  DRÜCKEN Start/Pause  |  RETURN Ende',
+                                 30, 962, 1860, 105, 'FFFFFFFF', 'font45_title')
+        self.player = self.make_car('FFFF6B00', 'FF253548')
+        for _ in range(8):
+            parts = self.make_car('FFD90429', 'FFB7C9D8')
+            self.set_car(parts, 960, 270, 55, 70, False)
+            self.obstacles.append({'lane': 1, 'depth': 0.0, 'active': False, 'parts': parts})
+        self.set_car(self.player, self.lane_center(self.lane, 1.0), 830, 150, 170, True)
+
+    def box(self, x, y, width, height, color):
+        control = xbmcgui.ControlImage(int(x * self.sx), int(y * self.sy),
+                                        max(1, int(width * self.sx)), max(1, int(height * self.sy)),
+                                        WHITE, colorDiffuse=color)
+        self.addControl(control)
+        return control
+
+    def label(self, value, x, y, width, height, color, font):
+        control = xbmcgui.ControlLabel(int(x * self.sx), int(y * self.sy),
+                                        int(width * self.sx), int(height * self.sy),
+                                        value, font=font, textColor=color)
+        self.addControl(control)
+        return control
+
+    def make_car(self, body_color, glass_color):
+        # Body, windscreen, rear glass, left and right lamps.
+        return [self.box(0, 0, 10, 10, body_color),
+                self.box(0, 0, 10, 10, glass_color),
+                self.box(0, 0, 10, 10, glass_color),
+                self.box(0, 0, 10, 10, 'FFFFFFFF'),
+                self.box(0, 0, 10, 10, 'FFFFFFFF')]
+
+    def set_car(self, parts, cx, cy, width, height, visible):
+        x, y = cx - width / 2, cy - height / 2
+        shapes = ((0, 0, 1, 1), (.18, .12, .64, .27),
+                  (.20, .64, .60, .20), (.12, .04, .20, .08),
+                  (.68, .04, .20, .08))
+        for control, (rx, ry, rw, rh) in zip(parts, shapes):
+            control.setPosition(int((x + rx * width) * self.sx), int((y + ry * height) * self.sy))
+            control.setWidth(max(1, int(rw * width * self.sx)))
+            control.setHeight(max(1, int(rh * height * self.sy)))
+            control.setVisible(visible)
+
+    @staticmethod
+    def lane_center(lane, depth):
+        return W / 2 + (lane - 1) * (480 + 1120 * depth) / 3
+
+    def onAction(self, action):
+        key = action.getId()
+        if key in BACK:
+            self.closed = True
+        elif key in LEFT or key in RIGHT:
+            if not self.finished:
+                self.lane = max(0, min(2, self.lane + (-1 if key in LEFT else 1)))
+                self.set_car(self.player, self.lane_center(self.lane, 1.0), 830, 150, 170, True)
+        elif key in SELECT:
+            if self.finished:
+                self.reset()
+            elif not self.started:
+                self.started = True
+                self.status.setLabel('DREHEN Spur wechseln  |  DRÜCKEN Pause  |  RETURN Ende')
+            else:
+                self.paused = not self.paused
+                self.status.setLabel('PAUSE  |  DRÜCKEN Weiter  |  RETURN Ende' if self.paused else
+                                     'DREHEN Spur wechseln  |  DRÜCKEN Pause  |  RETURN Ende')
+
+    def reset(self):
+        self.lane = 1
+        self.score = 0
+        self.spawn_elapsed = 0.0
+        self.started, self.paused, self.finished = True, False, False
+        self.score_label.setLabel('PUNKTE  0')
+        self.status.setLabel('DREHEN Spur wechseln  |  DRÜCKEN Pause  |  RETURN Ende')
+        self.set_car(self.player, self.lane_center(self.lane, 1.0), 830, 150, 170, True)
+        for car in self.obstacles:
+            car['active'] = False
+            self.set_car(car['parts'], 960, 270, 55, 70, False)
+
+    def spawn(self):
+        for car in self.obstacles:
+            if not car['active']:
+                car['active'] = True
+                car['lane'] = self.rng.randrange(3)
+                car['depth'] = 0.0
+                return
+
+    def tick(self, dt):
+        if not self.started or self.paused or self.finished:
+            return
+        self.spawn_elapsed += dt
+        interval = max(0.85, 1.50 - self.score * .0012)
+        if self.spawn_elapsed >= interval:
+            self.spawn_elapsed -= interval
+            self.spawn()
+        speed = min(.56, .30 + self.score * .00055)
+        for car in self.obstacles:
+            if not car['active']:
+                continue
+            car['depth'] += speed * dt
+            depth = car['depth']
+            if depth >= .87 and car['lane'] == self.lane:
+                self.finished = True
+                self.status.setLabel('GAME OVER  |  DRÜCKEN Neustart  |  RETURN Ende')
+                break
+            if depth >= 1.04:
+                car['active'] = False
+                self.set_car(car['parts'], 960, 270, 55, 70, False)
+                self.score += 10
+                self.score_label.setLabel('PUNKTE  {}'.format(self.score))
+                continue
+            size = min(1.0, depth)
+            width, height = 48 + 108 * size, 65 + 105 * size
+            cy = 285 + 550 * size * size
+            self.set_car(car['parts'], self.lane_center(car['lane'], size), cy,
+                         width, height, True)
+
 def main():
     # Dialog.select uses Kodi's own focus/input navigation for the wheel.
-    selected = xbmcgui.Dialog().select('AUDI Entertainment  /  Spiele', ['Breakout', 'Zurück'])
-    if selected != 0:
+    selected = xbmcgui.Dialog().select('AUDI Entertainment  /  Spiele', ['Breakout', 'Lane Runner', 'Zurück'])
+    if selected not in (0, 1):
         return
-    window = GameWindow()
+    window = GameWindow() if selected == 0 else LaneRunnerWindow()
     monitor = xbmc.Monitor()
     try:
         window.show()
