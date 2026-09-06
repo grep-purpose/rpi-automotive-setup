@@ -1,27 +1,27 @@
 <?xml version='1.0' encoding='utf-8'?>
 <settings version="2">
     <setting id="loc1_name">Cleves, NW, DE</setting>
-    <setting id="loc2_name">Wesel, Nordrhein-Westfalen, DE</setting>
+    <setting id="loc2_name">Kleve, Nordrhein-Westfalen, DE</setting>
     <setting id="loc3_name" default="true" />
     <setting id="loc4_name" default="true" />
     <setting id="loc5_name" default="true" />
     <setting id="loc1_url">de/nw/cleves</setting>
-    <setting id="loc2_url">de/lower-saxony/wesel-20166682</setting>
+    <setting id="loc2_url">de/north-rhine-westphalia/cleves-667337</setting>
     <setting id="loc3_url" default="true" />
     <setting id="loc4_url" default="true" />
     <setting id="loc5_url" default="true" />
     <setting id="loc1_lat">51.7904</setting>
-    <setting id="loc2_lat">51.6652</setting>
+    <setting id="loc2_lat">51.7874</setting>
     <setting id="loc3_lat" default="true">0</setting>
     <setting id="loc4_lat" default="true">0</setting>
     <setting id="loc5_lat" default="true">0</setting>
     <setting id="loc1_lon">6.13777</setting>
-    <setting id="loc2_lon">6.629</setting>
+    <setting id="loc2_lon">6.1257</setting>
     <setting id="loc3_lon" default="true">0</setting>
     <setting id="loc4_lon" default="true">0</setting>
     <setting id="loc5_lon" default="true">0</setting>
     <setting id="loc1_id">667337</setting>
-    <setting id="loc2_id">20166682</setting>
+    <setting id="loc2_id">667337</setting>
     <setting id="loc3_id" default="true">-1</setting>
     <setting id="loc4_id" default="true">-1</setting>
     <setting id="loc5_id" default="true">-1</setting>
