@@ -479,13 +479,190 @@ class RooftopRunnerWindow(xbmcgui.WindowDialog):
                 else:
                     self.fail('NICHT GESPRUNGEN')
 
+class TorwandWindow(xbmcgui.WindowDialog):
+    """Six alternating targets, with visible sway and accuracy-based scoring."""
+
+    SHOTS = 6
+    HOLES = ((710, 390), (1210, 650))
+    PAGE_UP, PAGE_DOWN = 5, 6
+    RADII = (105, 88, 70)
+    SWAY = (24, 68, 108)
+
+    def __init__(self):
+        super().__init__()
+        self.sx, self.sy = self.getWidth() / W, self.getHeight() / H
+        self.closed = False
+        self.aim_x, self.aim_y = 960, 520
+        self.shots = self.hits = 0
+        self.points = self.streak = 0
+        self.phase = 0.0
+        self.flight = None
+        self.image('torwand_background.png', 0, 0, W, H)
+        self.title = self.label('AUDI ENTERTAINMENT  /  TORWANDSCHIESSEN',
+                                30, 18, 1860, 92, 'FFFF6B00', 'font60')
+        self.score_label = self.label('', 30, 100, 1270, 86, 'FFFFFFFF', 'font45_title')
+        self.target_label = self.label('', 1300, 100, 600, 86, 'FF72F0CF', 'font45_title')
+        self.status = self.label('DREHEN Links/Rechts  |  STEUERKREUZ Hoch/Runter  |  DRÜCKEN Schuss',
+                                 30, 966, 1860, 103, 'FFFFFFFF', 'font45_title')
+        self.target_ring = self.image('torwand_target.png', 0, 0, 230, 230)
+        self.marker = [self.box(0, 0, 12, 55, 'FFFF6B00') for _ in range(4)]
+        self.ball = self.image('torwand_ball.png', 915, 820, 90, 90)
+        self.ball.setVisible(False)
+        self.update_hud()
+        self.update_target()
+        self.update_marker()
+
+    def image(self, filename, x, y, width, height):
+        path = os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'media', filename)
+        control = xbmcgui.ControlImage(int(x * self.sx), int(y * self.sy),
+                                        max(1, int(width * self.sx)), max(1, int(height * self.sy)), path)
+        self.addControl(control)
+        return control
+
+    def box(self, x, y, width, height, color):
+        control = xbmcgui.ControlImage(int(x * self.sx), int(y * self.sy),
+                                        max(1, int(width * self.sx)), max(1, int(height * self.sy)),
+                                        WHITE, colorDiffuse=color)
+        self.addControl(control)
+        return control
+
+    def label(self, value, x, y, width, height, color, font):
+        control = xbmcgui.ControlLabel(int(x * self.sx), int(y * self.sy),
+                                        int(width * self.sx), int(height * self.sy),
+                                        value, font=font, textColor=color)
+        self.addControl(control)
+        return control
+
+    def update_marker(self):
+        x, y = self.aim_position()
+        segments = ((x-7, y-65, 14, 42), (x-7, y+23, 14, 42),
+                    (x-65, y-7, 42, 14), (x+23, y-7, 42, 14))
+        for control, (px, py, width, height) in zip(self.marker, segments):
+            control.setPosition(int(px * self.sx), int(py * self.sy))
+            control.setWidth(max(1, int(width * self.sx)))
+            control.setHeight(max(1, int(height * self.sy)))
+
+    def stage(self):
+        return min(2, self.shots // 2)
+
+    def aim_position(self):
+        amplitude = self.SWAY[self.stage()]
+        # Two different periods make the marker drift without sudden jumps.
+        return (self.aim_x + amplitude * math.sin(self.phase * 2.1),
+                self.aim_y + amplitude * 0.75 * math.sin(self.phase * 2.9 + 1.1))
+
+    def update_target(self):
+        hole = self.HOLES[self.shots % 2]
+        radius = self.RADII[self.stage()]
+        self.target_ring.setPosition(int((hole[0] - radius) * self.sx),
+                                     int((hole[1] - radius) * self.sy))
+        self.target_ring.setWidth(max(1, int(2 * radius * self.sx)))
+        self.target_ring.setHeight(max(1, int(2 * radius * self.sy)))
+        self.target_label.setLabel('ZIEL  ' + ('OBEN LINKS' if self.shots % 2 == 0 else 'UNTEN RECHTS'))
+
+    def update_hud(self):
+        self.score_label.setLabel('PUNKTE  {}   TREFFER  {}/6   SCHUSS  {}/6'.format(
+            self.points, self.hits, min(self.SHOTS, self.shots + 1)))
+
+    def reset(self):
+        self.aim_x, self.aim_y = 960, 520
+        self.shots = self.hits = 0
+        self.points = self.streak = 0
+        self.phase = 0.0
+        self.flight = None
+        self.ball.setVisible(False)
+        self.target_ring.setVisible(True)
+        self.update_hud()
+        self.update_target()
+        self.status.setLabel('DREHEN Links/Rechts  |  STEUERKREUZ Hoch/Runter  |  DRÜCKEN Schuss')
+        self.update_marker()
+
+    def onAction(self, action):
+        key = action.getId()
+        if key in BACK:
+            self.closed = True
+            return
+        if self.flight is not None:
+            return
+        if key in SELECT:
+            if self.shots >= self.SHOTS:
+                self.reset()
+            else:
+                x, y = self.aim_position()
+                self.flight = {'time': 0.0, 'x': x, 'y': y,
+                               'target': self.HOLES[self.shots % 2],
+                               'radius': self.RADII[self.stage()]}
+                self.ball.setVisible(True)
+            return
+        if self.shots >= self.SHOTS:
+            return
+        if key in LEFT:
+            self.aim_x = max(570, self.aim_x - 80)
+            note = 'LINKS erkannt'
+        elif key in RIGHT:
+            self.aim_x = min(1350, self.aim_x + 80)
+            note = 'RECHTS erkannt'
+        elif key == self.PAGE_UP:
+            self.aim_y = max(310, self.aim_y - 65)
+            note = 'OBEN erkannt'
+        elif key == self.PAGE_DOWN:
+            self.aim_y = min(730, self.aim_y + 65)
+            note = 'UNTEN erkannt'
+        else:
+            return
+        self.update_marker()
+        self.status.setLabel(note + '  |  DRÜCKEN zum Schießen  |  RETURN Ende')
+
+    def tick(self, dt):
+        if self.flight is None:
+            if self.shots < self.SHOTS:
+                self.phase += max(0.0, dt)
+                self.update_marker()
+            return
+        self.flight['time'] += dt
+        t = min(1.0, self.flight['time'] / 0.72)
+        easing = t * t * (3 - 2 * t)
+        x = 960 + (self.flight['x'] - 960) * easing
+        y = 865 + (self.flight['y'] - 865) * easing
+        size = int(100 - 66 * t)
+        self.ball.setPosition(int((x - size/2) * self.sx), int((y - size/2) * self.sy))
+        self.ball.setWidth(max(1, int(size * self.sx)))
+        self.ball.setHeight(max(1, int(size * self.sy)))
+        if t < 1.0:
+            return
+        self.ball.setVisible(False)
+        x, y = self.flight['x'], self.flight['y']
+        hx, hy = self.flight['target']
+        radius = self.flight['radius']
+        distance = math.hypot(x - hx, y - hy)
+        hit = distance <= radius
+        self.hits += int(hit)
+        self.streak = self.streak + 1 if hit else 0
+        earned = (int(50 + 50 * (1 - distance / radius)) +
+                  20 * (self.streak - 1)) if hit else 0
+        self.points += earned
+        self.shots += 1
+        self.flight = None
+        self.update_hud()
+        if self.shots >= self.SHOTS:
+            self.target_ring.setVisible(False)
+            self.status.setLabel('RUNDE ENDE: {} TREFFER, {} PUNKTE  |  DRÜCKEN Neustart'.format(
+                self.hits, self.points))
+        else:
+            self.aim_x, self.aim_y = 960, 520
+            self.update_target()
+            self.update_marker()
+            self.status.setLabel(('TREFFER! +{} PUNKTE'.format(earned) if hit else 'DANEBEN') +
+                                 '  |  NÄCHSTES ZIEL  |  DRÜCKEN Schuss')
+
 def main():
     # Dialog.select uses Kodi's own focus/input navigation for the wheel.
-    selected = xbmcgui.Dialog().select('AUDI Entertainment  /  Spiele', ['Breakout', 'Lane Runner', 'Rooftop Runner', 'Zurück'])
-    if selected not in (0, 1, 2):
+    selected = xbmcgui.Dialog().select('AUDI Entertainment  /  Spiele', ['Breakout', 'Lane Runner', 'Rooftop Runner', 'Torwandschießen', 'Zurück'])
+    if selected not in (0, 1, 2, 3):
         return
     window = (GameWindow() if selected == 0 else
-              LaneRunnerWindow() if selected == 1 else RooftopRunnerWindow())
+              LaneRunnerWindow() if selected == 1 else
+              RooftopRunnerWindow() if selected == 2 else TorwandWindow())
     monitor = xbmc.Monitor()
     try:
         window.show()
