@@ -1,0 +1,14 @@
+[Unit]
+Description=Audi CarPC Live Weather & Radar Sync Service
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 /home/pi/.kodi/userdata/live_sync_worker.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

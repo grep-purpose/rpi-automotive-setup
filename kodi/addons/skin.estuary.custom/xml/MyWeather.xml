@@ -139,25 +139,27 @@
                 <width>230</width>
                 <height>230</height>
                 <aspectratio>keep</aspectratio>
-                <texture>$INFO[Weather.ConditionsIcon]</texture>
+                <texture condition="!String.IsEmpty(Window(Weather).Property(Current.ConditionIcon))">$INFO[Window(Weather).Property(Current.ConditionIcon)]</texture>
+                <texture condition="String.IsEmpty(Window(Weather).Property(Current.ConditionIcon))">$INFO[Weather.ConditionsIcon]</texture>
             </control>
 
             <!-- Temperatur Groß -->
             <control type="label">
-                <left>285</left>
-                <top>145</top>
-                <width>585</width>
+                <left>315</left>
+                <top>165</top>
+                <width>555</width>
                 <height>85</height>
                 <font>font60</font>
                 <textcolor>FFFFA500</textcolor>
-                <label>[B]$INFO[Weather.Temperature][/B]</label>
+                <label condition="!String.IsEmpty(Window(Weather).Property(Current.Temperature))">[B]$INFO[Window(Weather).Property(Current.Temperature)]°C[/B]</label>
+                <label condition="String.IsEmpty(Window(Weather).Property(Current.Temperature))">[B]$INFO[Weather.Temperature][/B]</label>
             </control>
 
             <!-- Gefühlt -->
             <control type="label">
-                <left>285</left>
-                <top>245</top>
-                <width>585</width>
+                <left>315</left>
+                <top>255</top>
+                <width>555</width>
                 <height>50</height>
                 <font>font45</font>
                 <label>[B][COLOR fff0f2f5]Gefühlt:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Current.FeelsLike)]°C[/COLOR][/B]</label>
@@ -166,9 +168,9 @@
 
             <!-- Max -->
             <control type="label">
-                <left>285</left>
-                <top>310</top>
-                <width>585</width>
+                <left>315</left>
+                <top>315</top>
+                <width>555</width>
                 <height>50</height>
                 <font>font45</font>
                 <label>[B][COLOR fff0f2f5]Max:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Daily.1.HighTemperature)][/COLOR][/B]</label>
@@ -177,9 +179,9 @@
 
             <!-- Min -->
             <control type="label">
-                <left>285</left>
+                <left>315</left>
                 <top>375</top>
-                <width>585</width>
+                <width>555</width>
                 <height>50</height>
                 <font>font45</font>
                 <label>[B][COLOR fff0f2f5]Min:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Daily.1.LowTemperature)][/COLOR][/B]</label>
