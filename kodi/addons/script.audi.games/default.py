@@ -24,6 +24,17 @@ BACK = (9, 10, 92)
 
 
 class GameWindow(xbmcgui.WindowDialog):
+    """Breakout on a 1920x1080 design grid, fitted to Kodi's GUI window."""
+
+    WALL_LEFT, WALL_RIGHT = 24, 1896
+    BALL_RADIUS = 20
+    PADDLE_Y = 870
+    PADDLE_HEIGHT = 42
+    PADDLE_START_WIDTH = 430
+    PADDLE_MIN_WIDTH = 164
+    PADDLE_STEP = 38
+    BRICK_WIDTH, BRICK_HEIGHT = 194, 110
+
     def __init__(self):
         super().__init__()
         self.scale_x = self.getWidth() / W
@@ -34,34 +45,43 @@ class GameWindow(xbmcgui.WindowDialog):
         self.finished = False
         self.won = False
         self.score = 0
-        self.paddle = 800.0
-        self.ball_x, self.ball_y = 960.0, 805.0
+        self.paddle_width = self.PADDLE_START_WIDTH
+        self.paddle = (W - self.paddle_width) / 2
+        self.ball_x, self.ball_y = W / 2, 835.0
         self.vx, self.vy = 320.0, -430.0
         self.blocks = []
+
         self.add_box(0, 0, W, H, 'FF05070A')
-        self.title = self.add_label('AUDI ENTERTAINMENT  /  BREAKOUT', 100, 42, 1720, 95, 'FFFF6B00', 60)
-        self.status = self.add_label('DREHEN Bewegen   |   DRÜCKEN Start/Pause   |   RETURN Ende', 100, 905, 1720, 105, 'FFFFFFFF', 45)
-        self.score_label = self.add_label('PUNKTE  0', 100, 143, 700, 85, 'FFFFFFFF', 45)
-        self.add_box(100, 242, 1720, 6, 'FF8D99AE')
-        self.add_box(100, 876, 1720, 6, 'FF8D99AE')
-        self.paddle_view = self.add_box(int(self.paddle), 835, 320, 35, 'FFFF6B00')
-        self.ball_view = self.add_box(944, 789, 32, 32, 'FFFFFFFF')
+        self.title = self.add_label('AUDI ENTERTAINMENT  /  BREAKOUT', 30, 18, 1860, 92, 'FFFF6B00', 60)
+        self.score_label = self.add_label('PUNKTE  0     STUFE  1', 30, 110, 1500, 75, 'FFFFFFFF', 45)
+        self.add_box(30, 196, 1860, 6, 'FF8D99AE')
+        self.add_box(30, 945, 1860, 6, 'FF8D99AE')
+        self.status = self.add_label('DREHEN Bewegen   |   DRÜCKEN Start/Pause   |   RETURN Ende',
+                                     30, 968, 1860, 100, 'FFFFFFFF', 45)
+        self.paddle_view = self.add_box(int(self.paddle), self.PADDLE_Y,
+                                        self.paddle_width, self.PADDLE_HEIGHT, 'FFFF6B00')
+        self.ball_view = self.add_box(int(self.ball_x - self.BALL_RADIUS),
+                                      int(self.ball_y - self.BALL_RADIUS),
+                                      2 * self.BALL_RADIUS, 2 * self.BALL_RADIUS, 'FFFFFFFF')
         colors = ('FFD90429', 'FFFF6B00', 'FF8D99AE', 'FFFFFFFF')
         for row in range(4):
             for col in range(9):
-                x, y = 150 + col * 180, 270 + row * 112
-                view = self.add_box(x, y, 165, 85, colors[row])
+                x, y = 30 + col * 208, 235 + row * 125
+                view = self.add_box(x, y, self.BRICK_WIDTH, self.BRICK_HEIGHT, colors[row])
                 self.blocks.append([x, y, True, view])
 
     def add_box(self, x, y, w, h, color):
-        control = xbmcgui.ControlImage(int(x * self.scale_x), int(y * self.scale_y), max(1, int(w * self.scale_x)), max(1, int(h * self.scale_y)), WHITE, colorDiffuse=color)
+        control = xbmcgui.ControlImage(int(x * self.scale_x), int(y * self.scale_y),
+                                        max(1, int(w * self.scale_x)), max(1, int(h * self.scale_y)),
+                                        WHITE, colorDiffuse=color)
         self.addControl(control)
         return control
 
     def add_label(self, value, x, y, w, h, color, size):
-        # Kodi resolves the font name through the current skin.
-        font = 'font60' if size >= 60 else 'font45_title' if size >= 40 else 'font30_title'
-        control = xbmcgui.ControlLabel(int(x * self.scale_x), int(y * self.scale_y), max(1, int(w * self.scale_x)), max(1, int(h * self.scale_y)), value, font=font, textColor=color)
+        font = 'font60' if size >= 60 else 'font45_title'
+        control = xbmcgui.ControlLabel(int(x * self.scale_x), int(y * self.scale_y),
+                                        max(1, int(w * self.scale_x)), max(1, int(h * self.scale_y)),
+                                        value, font=font, textColor=color)
         self.addControl(control)
         return control
 
@@ -72,8 +92,8 @@ class GameWindow(xbmcgui.WindowDialog):
             return
         if key in LEFT or key in RIGHT:
             if not self.finished:
-                amount = -100 if key in LEFT else 100
-                self.paddle = max(108, min(1492, self.paddle + amount))
+                self.paddle += -110 if key in LEFT else 110
+                self.clamp_paddle()
             return
         if key in SELECT:
             if self.finished:
@@ -86,52 +106,74 @@ class GameWindow(xbmcgui.WindowDialog):
                 self.status.setLabel('PAUSE   |   DRÜCKEN Weiter   |   RETURN Ende' if self.paused else
                                      'DREHEN Bewegen   |   DRÜCKEN Pause   |   RETURN Ende')
 
+    def clamp_paddle(self):
+        self.paddle = max(self.WALL_LEFT, min(self.WALL_RIGHT - self.paddle_width, self.paddle))
+
+    def update_difficulty(self):
+        # Shrink after 50, 100, ... points; keep the paddle centred while shrinking.
+        new_width = max(self.PADDLE_MIN_WIDTH,
+                        self.PADDLE_START_WIDTH - (self.score // 50) * self.PADDLE_STEP)
+        if new_width != self.paddle_width:
+            self.paddle += (self.paddle_width - new_width) / 2
+            self.paddle_width = new_width
+            self.clamp_paddle()
+            self.paddle_view.setWidth(max(1, int(new_width * self.scale_x)))
+        level = 1 + (self.PADDLE_START_WIDTH - new_width) // self.PADDLE_STEP
+        self.score_label.setLabel('PUNKTE  {}     STUFE  {}'.format(self.score, level))
+
     def reset(self):
         self.score = 0
-        self.score_label.setLabel('PUNKTE  0')
-        self.ball_x, self.ball_y = 960.0, 805.0
+        self.paddle_width = self.PADDLE_START_WIDTH
+        self.paddle = (W - self.paddle_width) / 2
+        self.paddle_view.setWidth(max(1, int(self.paddle_width * self.scale_x)))
+        self.ball_x, self.ball_y = W / 2, 835.0
         self.vx, self.vy = 320.0, -430.0
-        self.paddle = 800.0
         self.started = True
         self.paused = self.finished = self.won = False
-        for x, y, alive, view in self.blocks:
-            view.setVisible(True)
         for block in self.blocks:
             block[2] = True
+            block[3].setVisible(True)
+        self.update_difficulty()
+        self.ball_view.setPosition(int((self.ball_x - self.BALL_RADIUS) * self.scale_x),
+                                   int((self.ball_y - self.BALL_RADIUS) * self.scale_y))
         self.status.setLabel('DREHEN Bewegen   |   DRÜCKEN Pause   |   RETURN Ende')
 
     def tick(self, dt):
-        self.paddle_view.setPosition(int(self.paddle * self.scale_x), int(835 * self.scale_y))
+        self.paddle_view.setPosition(int(self.paddle * self.scale_x), int(self.PADDLE_Y * self.scale_y))
         if not self.started or self.paused or self.finished:
             return
-        # Substeps reduce tunneling through the thin blocks on a busy Pi.
         steps = max(1, min(8, int(math.ceil(dt / 0.012))))
         for _ in range(steps):
             step = dt / steps
             old_y = self.ball_y
             self.ball_x += self.vx * step
             self.ball_y += self.vy * step
-            if self.ball_x < 116:
-                self.ball_x, self.vx = 116, abs(self.vx)
-            if self.ball_x > 1804:
-                self.ball_x, self.vx = 1804, -abs(self.vx)
-            if self.ball_y < 260:
-                self.ball_y, self.vy = 260, abs(self.vy)
-            if self.vy > 0 and old_y <= 819 and self.ball_y >= 819 and self.paddle - 16 <= self.ball_x <= self.paddle + 336:
-                self.ball_y = 819
-                offset = max(-1, min(1, (self.ball_x - self.paddle - 160) / 160))
+            if self.ball_x < self.WALL_LEFT + self.BALL_RADIUS:
+                self.ball_x, self.vx = self.WALL_LEFT + self.BALL_RADIUS, abs(self.vx)
+            if self.ball_x > self.WALL_RIGHT - self.BALL_RADIUS:
+                self.ball_x, self.vx = self.WALL_RIGHT - self.BALL_RADIUS, -abs(self.vx)
+            if self.ball_y < 216:
+                self.ball_y, self.vy = 216, abs(self.vy)
+            hit_y = self.PADDLE_Y - self.BALL_RADIUS
+            if (self.vy > 0 and old_y <= hit_y <= self.ball_y and
+                    self.paddle - self.BALL_RADIUS <= self.ball_x <=
+                    self.paddle + self.paddle_width + self.BALL_RADIUS):
+                self.ball_y = hit_y
+                offset = max(-1, min(1, (self.ball_x - self.paddle - self.paddle_width / 2)
+                                       / (self.paddle_width / 2)))
                 self.vx = 490 * offset
                 self.vy = -math.sqrt(max(80000, 490 * 490 - self.vx * self.vx))
             for block in self.blocks:
                 x, y, alive, view = block
-                if alive and x - 16 <= self.ball_x <= x + 181 and y - 16 <= self.ball_y <= y + 101:
+                if (alive and x - self.BALL_RADIUS <= self.ball_x <= x + self.BRICK_WIDTH + self.BALL_RADIUS
+                        and y - self.BALL_RADIUS <= self.ball_y <= y + self.BRICK_HEIGHT + self.BALL_RADIUS):
                     block[2] = False
                     view.setVisible(False)
                     self.vy = -self.vy
                     self.score += 10
-                    self.score_label.setLabel('PUNKTE  {}'.format(self.score))
+                    self.update_difficulty()
                     break
-            if self.ball_y > 885:
+            if self.ball_y > 955:
                 self.finished = True
                 self.status.setLabel('GAME OVER   |   DRÜCKEN Neustart   |   RETURN Ende')
                 break
@@ -139,8 +181,8 @@ class GameWindow(xbmcgui.WindowDialog):
                 self.finished = self.won = True
                 self.status.setLabel('GESCHAFFT!   |   DRÜCKEN Neustart   |   RETURN Ende')
                 break
-        self.ball_view.setPosition(int((self.ball_x - 16) * self.scale_x), int((self.ball_y - 16) * self.scale_y))
-
+        self.ball_view.setPosition(int((self.ball_x - self.BALL_RADIUS) * self.scale_x),
+                                   int((self.ball_y - self.BALL_RADIUS) * self.scale_y))
 
 def main():
     # Dialog.select uses Kodi's own focus/input navigation for the wheel.
