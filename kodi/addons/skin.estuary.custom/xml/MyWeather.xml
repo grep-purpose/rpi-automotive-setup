@@ -142,17 +142,30 @@
                 <texture condition="String.IsEmpty(Window(Weather).Property(Current.ConditionIcon))">$INFO[Weather.ConditionsIcon]</texture>
             </control>
 
-            <control type="label">
-                <left>20</left>
+                        <control type="label">
+                <left>10</left>
                 <top>432</top>
-                <width>285</width>
-                <height>38</height>
-                <font>font32</font>
-                <textcolor>ff9e9e9e</textcolor>
+                <width>305</width>
+                <height>50</height>
+                <font>font37</font>
+                <textcolor>fff0f2f5</textcolor>
                 <align>center</align>
                 <scroll>true</scroll>
                 <scrollspeed>25</scrollspeed>
-                <label condition="!String.IsEmpty(Window(Weather).Property(Current.Condition))">[B]$INFO[Window(Weather).Property(Current.Condition)][/B]</label>
+                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Partly Cloudy)">[B]Teilweise bewölkt[/B]</label>
+                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Mostly Cloudy)">[B]Meist bewölkt[/B]</label>
+                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Sunny)">[B]Sonnig[/B]</label>
+                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Clear)">[B]Klar[/B]</label>
+                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Cloudy)">[B]Bewölkt[/B]</label>
+                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Overcast)">[B]Bedeckt[/B]</label>
+                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Fair)">[B]Heiter[/B]</label>
+                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Rain)">[B]Regen[/B]</label>
+                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Light Rain)">[B]Leichter Regen[/B]</label>
+                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Heavy Rain)">[B]Starker Regen[/B]</label>
+                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Showers)">[B]Schauer[/B]</label>
+                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Thunderstorm)">[B]Gewitter[/B]</label>
+                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Fog)">[B]Nebel[/B]</label>
+                <label condition="!String.IsEmpty(Window(Weather).Property(Current.Condition)) + !String.IsEqual(Window(Weather).Property(Current.Condition),Partly Cloudy) + !String.IsEqual(Window(Weather).Property(Current.Condition),Mostly Cloudy) + !String.IsEqual(Window(Weather).Property(Current.Condition),Sunny) + !String.IsEqual(Window(Weather).Property(Current.Condition),Clear) + !String.IsEqual(Window(Weather).Property(Current.Condition),Cloudy) + !String.IsEqual(Window(Weather).Property(Current.Condition),Overcast) + !String.IsEqual(Window(Weather).Property(Current.Condition),Fair) + !String.IsEqual(Window(Weather).Property(Current.Condition),Rain) + !String.IsEqual(Window(Weather).Property(Current.Condition),Light Rain) + !String.IsEqual(Window(Weather).Property(Current.Condition),Heavy Rain) + !String.IsEqual(Window(Weather).Property(Current.Condition),Showers) + !String.IsEqual(Window(Weather).Property(Current.Condition),Thunderstorm) + !String.IsEqual(Window(Weather).Property(Current.Condition),Fog)">[B]$INFO[Window(Weather).Property(Current.Condition)][/B]</label>
                 <label condition="String.IsEmpty(Window(Weather).Property(Current.Condition))">[B]$INFO[Weather.Conditions][/B]</label>
             </control>
 
@@ -193,7 +206,7 @@
             
             <control type="image">
                 <left>35</left>
-                <top>480</top>
+                <top>495</top>
                 <width>835</width>
                 <height>2</height>
                 <texture colordiffuse="55ffffff">colors/white.png</texture>
@@ -202,7 +215,7 @@
             
             <control type="label">
                 <left>35</left>
-                <top>505</top>
+                <top>520</top>
                 <width>835</width>
                 <height>55</height>
                 <font>font45_title</font>
@@ -213,7 +226,7 @@
             
             <control type="label">
                 <left>35</left>
-                <top>580</top>
+                <top>588</top>
                 <width>835</width>
                 <height>65</height>
                 <font>font45</font>
@@ -221,7 +234,7 @@
             </control>
             <control type="label">
                 <left>35</left>
-                <top>655</top>
+                <top>656</top>
                 <width>835</width>
                 <height>65</height>
                 <font>font45</font>
@@ -229,7 +242,7 @@
             </control>
             <control type="label">
                 <left>35</left>
-                <top>730</top>
+                <top>724</top>
                 <width>835</width>
                 <height>65</height>
                 <font>font45</font>
@@ -237,7 +250,7 @@
             </control>
             <control type="label">
                 <left>35</left>
-                <top>805</top>
+                <top>792</top>
                 <width>835</width>
                 <height>65</height>
                 <font>font45</font>
