@@ -106,22 +106,36 @@
                 <texture colordiffuse="26FFFFFF">colors/white.png</texture>
             </control>
 
-            <!-- Standort-Name -->
+            <!-- Standort-Name (Zweizeilig OEM MMI Style) -->
+            <!-- Zeile 1: Stadt gross -->
             <control type="label">
                 <left>35</left>
-                <top>25</top>
+                <top>15</top>
                 <width>835</width>
-                <height>80</height>
+                <height>65</height>
                 <font>font60</font>
                 <textcolor>fff0f2f5</textcolor>
                 <scroll>true</scroll>
-                <label>[B]$VAR[WeatherCurrentLocationVar][/B]</label>
+                <scrollspeed>30</scrollspeed>
+                <label>[B]$VAR[WeatherCurrentTownVar][/B]</label>
+            </control>
+            <!-- Zeile 2: Region / Land (font45, Audi-Silber) -->
+            <control type="label">
+                <left>35</left>
+                <top>82</top>
+                <width>835</width>
+                <height>48</height>
+                <font>font45</font>
+                <textcolor>ff99aab5</textcolor>
+                <scroll>true</scroll>
+                <scrollspeed>30</scrollspeed>
+                <label>[B]$VAR[WeatherCurrentSubVar][/B]</label>
             </control>
 
             <!-- Großes Wetter-Icon -->
             <control type="image">
                 <left>35</left>
-                <top>140</top>
+                <top>155</top>
                 <width>230</width>
                 <height>230</height>
                 <aspectratio>keep</aspectratio>
@@ -131,9 +145,9 @@
             <!-- Temperatur Groß -->
             <control type="label">
                 <left>285</left>
-                <top>130</top>
+                <top>145</top>
                 <width>585</width>
-                <height>90</height>
+                <height>85</height>
                 <font>font60</font>
                 <textcolor>FFFFA500</textcolor>
                 <label>[B]$INFO[Weather.Temperature][/B]</label>
@@ -142,9 +156,9 @@
             <!-- Gefühlt -->
             <control type="label">
                 <left>285</left>
-                <top>235</top>
+                <top>245</top>
                 <width>585</width>
-                <height>55</height>
+                <height>50</height>
                 <font>font45</font>
                 <label>[B][COLOR fff0f2f5]Gefühlt:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Current.FeelsLike)]°C[/COLOR][/B]</label>
                 <visible>!String.IsEmpty(Window(Weather).Property(Current.FeelsLike))</visible>
@@ -153,9 +167,9 @@
             <!-- Max -->
             <control type="label">
                 <left>285</left>
-                <top>305</top>
+                <top>310</top>
                 <width>585</width>
-                <height>55</height>
+                <height>50</height>
                 <font>font45</font>
                 <label>[B][COLOR fff0f2f5]Max:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Daily.1.HighTemperature)][/COLOR][/B]</label>
                 <visible>!String.IsEmpty(Window(Weather).Property(Daily.1.HighTemperature))</visible>
@@ -166,7 +180,7 @@
                 <left>285</left>
                 <top>375</top>
                 <width>585</width>
-                <height>55</height>
+                <height>50</height>
                 <font>font45</font>
                 <label>[B][COLOR fff0f2f5]Min:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Daily.1.LowTemperature)][/COLOR][/B]</label>
                 <visible>!String.IsEmpty(Window(Weather).Property(Daily.1.LowTemperature))</visible>
@@ -175,7 +189,7 @@
             <!-- 2px Trennlinie -->
             <control type="image">
                 <left>35</left>
-                <top>470</top>
+                <top>480</top>
                 <width>835</width>
                 <height>2</height>
                 <texture colordiffuse="55ffffff">colors/white.png</texture>
@@ -184,7 +198,7 @@
             <!-- Trennung BEDINGUNGEN -->
             <control type="label">
                 <left>35</left>
-                <top>495</top>
+                <top>505</top>
                 <width>835</width>
                 <height>55</height>
                 <font>font45_title</font>
@@ -195,7 +209,7 @@
             <!-- Messwerte -->
             <control type="label">
                 <left>35</left>
-                <top>575</top>
+                <top>580</top>
                 <width>835</width>
                 <height>65</height>
                 <font>font45</font>
@@ -203,7 +217,7 @@
             </control>
             <control type="label">
                 <left>35</left>
-                <top>650</top>
+                <top>655</top>
                 <width>835</width>
                 <height>65</height>
                 <font>font45</font>
@@ -211,7 +225,7 @@
             </control>
             <control type="label">
                 <left>35</left>
-                <top>725</top>
+                <top>730</top>
                 <width>835</width>
                 <height>65</height>
                 <font>font45</font>
@@ -219,7 +233,7 @@
             </control>
             <control type="label">
                 <left>35</left>
-                <top>800</top>
+                <top>805</top>
                 <width>835</width>
                 <height>65</height>
                 <font>font45</font>

@@ -165,4 +165,14 @@
         <value condition="String.IsEqual(Skin.String(WeatherLocationMode),live)">$INFO[Skin.String(WeatherRadarLivePath)]</value>
         <value>/home/pi/.kodi/userdata/radar_1.png</value>
     </variable>
+    <variable name="WeatherCurrentTownVar">
+        <value condition="String.IsEqual(Skin.String(WeatherLocationMode),live) + !String.IsEmpty(Skin.String(WeatherLiveTown))">$INFO[Skin.String(WeatherLiveTown)]</value>
+        <value condition="String.IsEqual(Skin.String(WeatherLocationMode),kleve)">Kleve</value>
+        <value>Kleve</value>
+    </variable>
+    <variable name="WeatherCurrentSubVar">
+        <value condition="String.IsEqual(Skin.String(WeatherLocationMode),live) + !String.IsEmpty(Skin.String(WeatherLiveSub))">$INFO[Skin.String(WeatherLiveSub)]</value>
+        <value condition="String.IsEqual(Skin.String(WeatherLocationMode),kleve)">NRW, DE</value>
+        <value>NRW, DE</value>
+    </variable>
 </includes>
