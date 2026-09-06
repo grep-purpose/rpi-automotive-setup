@@ -155,6 +155,12 @@
 			<filename>NotoMono-Regular.ttf</filename>
 			<size>26</size>
 		</font>
+			<font>
+			<name>font75</name>
+			<filename>NotoSans-Bold.ttf</filename>
+			<size>75</size>
+			<style>bold</style>
+		</font>
 	</fontset>
 	<fontset id="Arial" idloc="31053">
 		<!-- Arial Font better for non English -->

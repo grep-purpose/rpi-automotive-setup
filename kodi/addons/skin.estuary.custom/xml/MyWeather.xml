@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <window id="2600">
     <defaultcontrol always="true">100</defaultcontrol>
     <onload>SetProperty(WeatherView,forecast,home)</onload>
     <controls>
-        <!-- Hintergrund -->
+        
         <control type="image">
             <left>0</left>
             <top>0</top>
@@ -12,11 +11,11 @@
             <texture colordiffuse="FF0A0A0A">colors/black.png</texture>
         </control>
 
-        <!-- ========================================================= -->
-        <!-- OBERE LEISTE (TOP BAR)                                   -->
-        <!-- ========================================================= -->
+        
+        
+        
 
-        <!-- 1. Standort-Button (Oben Links - ID 100) -->
+        
         <control type="button" id="100">
             <left>40</left>
             <top>15</top>
@@ -30,12 +29,12 @@
             <textoffsetx>10</textoffsetx>
             <texturefocus />
             <texturenofocus />
-            <!-- Ausfuehren des Bluetooth-NMEA-Tethering-Umschalters -->
+            
             <onclick>RunScript(/home/pi/.kodi/userdata/toggle_weather_location.py)</onclick>
-            <!-- Drehrad im Uhrzeigersinn (Down / Right) -> Radar -->
+            
             <ondown>200</ondown>
             <onright>200</onright>
-            <!-- Drehrad gegen den Uhrzeigersinn (Up / Left) -> Einstellungen -->
+            
             <onup>900</onup>
             <onleft>900</onleft>
         </control>
@@ -47,7 +46,7 @@
             <texture colordiffuse="FFFFFFFF">colors/white.png</texture>
         </control>
 
-        <!-- Wetter Label (Oben Mitte) -->
+        
         <control type="label">
             <left>660</left>
             <top>15</top>
@@ -60,7 +59,7 @@
             <label>[B]Wetter[/B]</label>
         </control>
 
-        <!-- 2. Toggle-Button Radar / Vorhersage (Oben Rechts - ID 200) -->
+        
         <control type="button" id="200">
             <left>1480</left>
             <top>15</top>
@@ -89,9 +88,9 @@
             <texture colordiffuse="FFFFFFFF">colors/white.png</texture>
         </control>
 
-        <!-- ========================================================= -->
-        <!-- LINKE BOX: AKTUELLES WETTER & BEDINGUNGEN                 -->
-        <!-- ========================================================= -->
+        
+        
+        
         <control type="group">
             <left>40</left>
             <top>115</top>
@@ -106,8 +105,8 @@
                 <texture colordiffuse="26FFFFFF">colors/white.png</texture>
             </control>
 
-            <!-- Standort-Name (Zweizeilig OEM MMI Style) -->
-            <!-- Zeile 1: Stadt gross -->
+            
+            
             <control type="label">
                 <left>35</left>
                 <top>15</top>
@@ -119,7 +118,7 @@
                 <scrollspeed>30</scrollspeed>
                 <label>[B]$VAR[WeatherCurrentTownVar][/B]</label>
             </control>
-            <!-- Zeile 2: Region / Land (font45, Audi-Silber) -->
+            
             <control type="label">
                 <left>35</left>
                 <top>82</top>
@@ -132,63 +131,52 @@
                 <label>[B]$VAR[WeatherCurrentSubVar][/B]</label>
             </control>
 
-            <!-- Großes Wetter-Icon -->
+            
             <control type="image">
-                <left>35</left>
-                <top>155</top>
-                <width>230</width>
-                <height>230</height>
+                <left>45</left>
+                <top>205</top>
+                <width>235</width>
+                <height>220</height>
                 <aspectratio>keep</aspectratio>
                 <texture condition="!String.IsEmpty(Window(Weather).Property(Current.ConditionIcon))">$INFO[Window(Weather).Property(Current.ConditionIcon)]</texture>
                 <texture condition="String.IsEmpty(Window(Weather).Property(Current.ConditionIcon))">$INFO[Weather.ConditionsIcon]</texture>
             </control>
 
-            <!-- Temperatur Groß -->
+            
             <control type="label">
-                <left>315</left>
-                <top>165</top>
-                <width>555</width>
-                <height>85</height>
-                <font>font60</font>
+                <left>305</left>
+                <top>185</top>
+                <width>550</width>
+                <height>80</height>
+                <font>font75</font>
                 <textcolor>FFFFA500</textcolor>
                 <label condition="!String.IsEmpty(Window(Weather).Property(Current.Temperature))">[B]$INFO[Window(Weather).Property(Current.Temperature)]°C[/B]</label>
                 <label condition="String.IsEmpty(Window(Weather).Property(Current.Temperature))">[B]$INFO[Weather.Temperature][/B]</label>
             </control>
 
-            <!-- Gefühlt -->
+            
             <control type="label">
-                <left>315</left>
-                <top>255</top>
-                <width>555</width>
-                <height>50</height>
+                <left>305</left>
+                <top>290</top>
+                <width>550</width>
+                <height>45</height>
                 <font>font45</font>
                 <label>[B][COLOR fff0f2f5]Gefühlt:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Current.FeelsLike)]°C[/COLOR][/B]</label>
                 <visible>!String.IsEmpty(Window(Weather).Property(Current.FeelsLike))</visible>
             </control>
 
-            <!-- Max -->
+            
             <control type="label">
-                <left>315</left>
-                <top>315</top>
-                <width>555</width>
-                <height>50</height>
+                <left>305</left>
+                <top>345</top>
+                <width>550</width>
+                <height>45</height>
                 <font>font45</font>
-                <label>[B][COLOR fff0f2f5]Max:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Daily.1.HighTemperature)][/COLOR][/B]</label>
+                <label>[B][COLOR fff0f2f5]Max:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Daily.1.HighTemperature)][/COLOR]   [COLOR 55ffffff]|[/COLOR]   [COLOR fff0f2f5]Min:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Daily.1.LowTemperature)][/COLOR][/B]</label>
                 <visible>!String.IsEmpty(Window(Weather).Property(Daily.1.HighTemperature))</visible>
             </control>
 
-            <!-- Min -->
-            <control type="label">
-                <left>315</left>
-                <top>375</top>
-                <width>555</width>
-                <height>50</height>
-                <font>font45</font>
-                <label>[B][COLOR fff0f2f5]Min:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Daily.1.LowTemperature)][/COLOR][/B]</label>
-                <visible>!String.IsEmpty(Window(Weather).Property(Daily.1.LowTemperature))</visible>
-            </control>
-
-            <!-- 2px Trennlinie -->
+            
             <control type="image">
                 <left>35</left>
                 <top>480</top>
@@ -197,7 +185,7 @@
                 <texture colordiffuse="55ffffff">colors/white.png</texture>
             </control>
 
-            <!-- Trennung BEDINGUNGEN -->
+            
             <control type="label">
                 <left>35</left>
                 <top>505</top>
@@ -208,7 +196,7 @@
                 <label>[B]BEDINGUNGEN[/B]</label>
             </control>
 
-            <!-- Messwerte -->
+            
             <control type="label">
                 <left>35</left>
                 <top>580</top>
@@ -243,9 +231,9 @@
             </control>
         </control>
 
-        <!-- ========================================================= -->
-        <!-- RECHTE BOX A: 4-TAGE-VORHERSAGE                           -->
-        <!-- ========================================================= -->
+        
+        
+        
         <control type="group">
             <left>975</left>
             <top>115</top>
@@ -253,7 +241,7 @@
             <height>900</height>
             <visible>!String.IsEqual(Window(home).Property(WeatherView),radar)</visible>
 
-            <!-- Tag 1 (Morgen) -->
+            
             <control type="group">
                 <left>0</left>
                 <top>0</top>
@@ -297,7 +285,7 @@
                 </control>
             </control>
 
-            <!-- Tag 2 (Übermorgen) -->
+            
             <control type="group">
                 <left>0</left>
                 <top>227</top>
@@ -341,7 +329,7 @@
                 </control>
             </control>
 
-            <!-- Tag 3 -->
+            
             <control type="group">
                 <left>0</left>
                 <top>454</top>
@@ -385,7 +373,7 @@
                 </control>
             </control>
 
-            <!-- Tag 4 -->
+            
             <control type="group">
                 <left>0</left>
                 <top>681</top>
@@ -430,9 +418,9 @@
             </control>
         </control>
 
-        <!-- ========================================================= -->
-        <!-- RECHTE BOX B: NIEDERSCHLAGSRADAR                          -->
-        <!-- ========================================================= -->
+        
+        
+        
         <control type="group">
             <left>975</left>
             <top>115</top>
@@ -468,9 +456,9 @@
             </control>
         </control>
 
-        <!-- ========================================================= -->
-        <!-- 5. OEM AUDI BOTTOM-BAR                                    -->
-        <!-- ========================================================= -->
+        
+        
+        
         <control type="group">
             <bottom>15</bottom>
             <left>40</left>
@@ -485,7 +473,7 @@
                 <texture colordiffuse="99ffffff">colors/white.png</texture>
             </control>
 
-            <!-- 4. Einstellungen (Unten Links - ID 900) -->
+            
             <control type="button" id="900">
                 <left>20</left>
                 <top>30</top>
@@ -500,15 +488,15 @@
                 <texturefocus />
                 <texturenofocus />
                 <onclick>ActivateWindow(servicesettings,weather)</onclick>
-                <!-- Drehrad im Uhrzeigersinn (Down / Right) -> Standort -->
+                
                 <ondown>100</ondown>
                 <onright>100</onright>
-                <!-- Drehrad gegen den Uhrzeigersinn (Up / Left) -> Hauptmenü -->
+                
                 <onup>910</onup>
                 <onleft>910</onleft>
             </control>
 
-            <!-- Unten Mitte: Wetter & Digitaluhr -->
+            
             <control type="group">
                 <left>0</left>
                 <right>0</right>
@@ -550,7 +538,7 @@
                 </control>
             </control>
 
-            <!-- 3. Hauptmenü (Unten Rechts - ID 910) -->
+            
             <control type="button" id="910">
                 <right>20</right>
                 <top>30</top>
@@ -565,10 +553,10 @@
                 <texturefocus />
                 <texturenofocus />
                 <onclick>ActivateWindow(home)</onclick>
-                <!-- Drehrad im Uhrzeigersinn (Down / Right) -> Einstellungen -->
+                
                 <ondown>900</ondown>
                 <onright>900</onright>
-                <!-- Drehrad gegen den Uhrzeigersinn (Up / Left) -> Radar -->
+                
                 <onup>200</onup>
                 <onleft>200</onleft>
             </control>
