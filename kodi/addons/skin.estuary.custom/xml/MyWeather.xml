@@ -114,6 +114,7 @@
                 <height>80</height>
                 <font>font60</font>
                 <textcolor>fff0f2f5</textcolor>
+                <scroll>true</scroll>
                 <label>[B]$VAR[WeatherCurrentLocationVar][/B]</label>
             </control>
 
