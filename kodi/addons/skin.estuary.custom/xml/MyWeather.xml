@@ -154,7 +154,7 @@
                 <label condition="String.IsEmpty(Window(Weather).Property(Current.Temperature))">[B]$INFO[Weather.Temperature][/B]</label>
             </control>
 
-            <!-- 2. Zustand Klartext (Deutsch) -->
+            <!-- 2. Zustand Klartext (Deutsch via Skin-Variable) -->
             <control type="label">
                 <left>305</left>
                 <top>270</top>
@@ -163,21 +163,7 @@
                 <font>font45</font>
                 <textcolor>fff0f2f5</textcolor>
                 <scroll>false</scroll>
-                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Partly Cloudy)">[B]Teilweise bewölkt[/B]</label>
-                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Mostly Cloudy)">[B]Meist bewölkt[/B]</label>
-                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Sunny)">[B]Sonnig[/B]</label>
-                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Clear)">[B]Klar[/B]</label>
-                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Cloudy)">[B]Bewölkt[/B]</label>
-                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Overcast)">[B]Bedeckt[/B]</label>
-                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Fair)">[B]Heiter[/B]</label>
-                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Rain)">[B]Regen[/B]</label>
-                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Light Rain)">[B]Leichter Regen[/B]</label>
-                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Heavy Rain)">[B]Starker Regen[/B]</label>
-                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Showers)">[B]Schauer[/B]</label>
-                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Thunderstorm)">[B]Gewitter[/B]</label>
-                <label condition="String.IsEqual(Window(Weather).Property(Current.Condition),Fog)">[B]Nebel[/B]</label>
-                <label condition="!String.IsEmpty(Window(Weather).Property(Current.Condition))">[B]$INFO[Window(Weather).Property(Current.Condition)][/B]</label>
-                <label condition="String.IsEmpty(Window(Weather).Property(Current.Condition))">[B]$INFO[Weather.Conditions][/B]</label>
+                <label>[B]$VAR[WeatherConditionGermanVar][/B]</label>
             </control>
 
             <!-- 3. Gefuehlt -->

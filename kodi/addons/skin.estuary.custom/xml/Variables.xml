@@ -175,4 +175,36 @@
         <value condition="String.IsEqual(Skin.String(WeatherLocationMode),kleve)">NRW, DE</value>
         <value>NRW, DE</value>
     </variable>
+    <variable name="WeatherConditionGermanVar">
+        <value condition="String.IsEqual(Window(Weather).Property(Current.Condition),Sunny)">Sonnig</value>
+        <value condition="String.IsEqual(Weather.Conditions,Sunny)">Sonnig</value>
+        <value condition="String.IsEqual(Window(Weather).Property(Current.Condition),Clear)">Klar</value>
+        <value condition="String.IsEqual(Weather.Conditions,Clear)">Klar</value>
+        <value condition="String.IsEqual(Window(Weather).Property(Current.Condition),Fair)">Heiter</value>
+        <value condition="String.IsEqual(Weather.Conditions,Fair)">Heiter</value>
+        <value condition="String.IsEqual(Window(Weather).Property(Current.Condition),Partly Cloudy)">Teilweise bewölkt</value>
+        <value condition="String.IsEqual(Weather.Conditions,Partly Cloudy)">Teilweise bewölkt</value>
+        <value condition="String.IsEqual(Window(Weather).Property(Current.Condition),Mostly Cloudy)">Meist bewölkt</value>
+        <value condition="String.IsEqual(Weather.Conditions,Mostly Cloudy)">Meist bewölkt</value>
+        <value condition="String.IsEqual(Window(Weather).Property(Current.Condition),Cloudy)">Bewölkt</value>
+        <value condition="String.IsEqual(Weather.Conditions,Cloudy)">Bewölkt</value>
+        <value condition="String.IsEqual(Window(Weather).Property(Current.Condition),Overcast)">Bedeckt</value>
+        <value condition="String.IsEqual(Weather.Conditions,Overcast)">Bedeckt</value>
+        <value condition="String.IsEqual(Window(Weather).Property(Current.Condition),Rain)">Regen</value>
+        <value condition="String.IsEqual(Weather.Conditions,Rain)">Regen</value>
+        <value condition="String.IsEqual(Window(Weather).Property(Current.Condition),Light Rain)">Leichter Regen</value>
+        <value condition="String.IsEqual(Weather.Conditions,Light Rain)">Leichter Regen</value>
+        <value condition="String.IsEqual(Window(Weather).Property(Current.Condition),Heavy Rain)">Starker Regen</value>
+        <value condition="String.IsEqual(Weather.Conditions,Heavy Rain)">Starker Regen</value>
+        <value condition="String.IsEqual(Window(Weather).Property(Current.Condition),Showers)">Schauer</value>
+        <value condition="String.IsEqual(Weather.Conditions,Showers)">Schauer</value>
+        <value condition="String.IsEqual(Window(Weather).Property(Current.Condition),Thunderstorm)">Gewitter</value>
+        <value condition="String.IsEqual(Weather.Conditions,Thunderstorm)">Gewitter</value>
+        <value condition="String.IsEqual(Window(Weather).Property(Current.Condition),Snow)">Schnee</value>
+        <value condition="String.IsEqual(Weather.Conditions,Snow)">Schnee</value>
+        <value condition="String.IsEqual(Window(Weather).Property(Current.Condition),Fog)">Nebel</value>
+        <value condition="String.IsEqual(Weather.Conditions,Fog)">Nebel</value>
+        <value condition="!String.IsEmpty(Window(Weather).Property(Current.Condition))">$INFO[Window(Weather).Property(Current.Condition)]</value>
+        <value>$INFO[Weather.Conditions]</value>
+    </variable>
 </includes>
