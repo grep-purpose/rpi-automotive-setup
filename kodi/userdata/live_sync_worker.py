@@ -81,7 +81,7 @@ def run_sync():
     town, full_name, url, woeid = resolve_location_schema(lat, lon)
     print(f"[WORKER] Live-Standort: {full_name} ({lat}, {lon})", flush=True)
 
-    # settings.xml aktualisieren (Slot 2)
+    # settings.xml aktualisieren (Slot 1)
     if os.path.exists(SETTINGS_MULTI):
         try:
             tree = ET.parse(SETTINGS_MULTI)
@@ -95,22 +95,27 @@ def run_sync():
                 elif sid == "loc1_id": s.text = str(woeid)
             tree.write(SETTINGS_MULTI, encoding="utf-8", xml_declaration=True)
             print("[WORKER] Settings.xml geschrieben.", flush=True)
-    # 1b. Kodi zwingen, die neuen Settings sofort einzulesen
-    try:
-        import urllib.request, base64, json
-        rpc_cmd = {
-            "jsonrpc": "2.0",
-            "method": "GUI.ExecuteBuiltIn",
-            "params": {"executable": "Weather.Refresh"},
-            "id": 1
-        }
-        req = urllib.request.Request("http://127.0.0.1:8080/jsonrpc", data=json.dumps(rpc_cmd).encode(), headers={"Content-Type": "application/json"})
-        req.add_header("Authorization", "Basic " + base64.b64encode(b"kodi:1998").decode())
-        with urllib.request.urlopen(req, timeout=2) as resp:
-            pass
-        print("[WORKER] Sofort-Refresh (Weather.Refresh) an Kodi gesendet.", flush=True)
-    except Exception as e:
-        print(f"[WORKER] Konnte Kodi Refresh nicht senden: {e}", flush=True)
+
+            # Kodi sofort zum Reload zwingen
+            try:
+                rpc_cmd = {
+                    "jsonrpc": "2.0",
+                    "method": "GUI.ExecuteBuiltIn",
+                    "params": {"executable": "Weather.Refresh"},
+                    "id": 1
+                }
+                req = urllib.request.Request(
+                    "http://127.0.0.1:8080/jsonrpc",
+                    data=json.dumps(rpc_cmd).encode(),
+                    headers={"Content-Type": "application/json"}
+                )
+                req.add_header("Authorization", "Basic " + base64.b64encode(b"kodi:1998").decode())
+                with urllib.request.urlopen(req, timeout=2) as resp:
+                    pass
+                print("[WORKER] Sofort-Refresh (Weather.Refresh) an Kodi gesendet.", flush=True)
+            except Exception as rpc_err:
+                print(f"[WORKER] RPC-Refresh nicht moeglich: {rpc_err}", flush=True)
+
         except Exception as e:
             print(f"[WORKER] Fehler beim Schreiben der settings.xml: {e}", flush=True)
 
