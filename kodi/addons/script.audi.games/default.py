@@ -197,29 +197,18 @@ class LaneRunnerWindow(xbmcgui.WindowDialog):
         self.score = 0
         self.spawn_elapsed = 0.0
         self.obstacles = []
-        self.box(0, 0, W, H, 'FF05070A')
+        self.image(0, 0, W, H, 'road.png')
         self.label('AUDI ENTERTAINMENT  /  LANE RUNNER', 30, 18, 1850, 92, 'FFFF6B00', 'font60')
         self.score_label = self.label('PUNKTE  0', 30, 110, 1100, 75, 'FFFFFFFF', 'font45_title')
         self.box(30, 195, 1860, 6, 'FF8D99AE')
-        # A perspective road made from Kodi-native rectangles.
-        for row in range(20):
-            depth = (row + 0.5) / 20.0
-            width = int(480 + 1120 * depth)
-            self.box((W - width) // 2, 229 + row * 35, width, 36,
-                     'FF121A26' if row % 2 else 'FF17212C')
-        for row in range(6):
-            depth = (row + 0.5) / 6.0
-            y = int(260 + 600 * depth)
-            road_width = 480 + 1120 * depth
-            for boundary in (-1, 1):
-                x = int(W / 2 + boundary * road_width / 6)
-                self.box(x - 5, y, 10, 42, 'FF8D99AE')
         self.box(30, 940, 1860, 6, 'FF8D99AE')
         self.status = self.label('DREHEN Spur wechseln  |  DRÜCKEN Start/Pause  |  RETURN Ende',
                                  30, 962, 1860, 105, 'FFFFFFFF', 'font45_title')
-        self.player = self.make_car('FFFF6B00', 'FF253548')
-        for _ in range(8):
-            parts = self.make_car('FFD90429', 'FFB7C9D8')
+        self.player_visual_x = self.lane_center(self.lane, 1.0)
+        self.player = self.make_car('player.png')
+        for index in range(8):
+            sprite = ('traffic_red.png', 'traffic_blue.png', 'traffic_silver.png')[index % 3]
+            parts = self.make_car(sprite)
             self.set_car(parts, 960, 270, 55, 70, False)
             self.obstacles.append({'lane': 1, 'depth': 0.0, 'active': False, 'parts': parts})
         self.set_car(self.player, self.lane_center(self.lane, 1.0), 830, 150, 170, True)
@@ -238,28 +227,25 @@ class LaneRunnerWindow(xbmcgui.WindowDialog):
         self.addControl(control)
         return control
 
-    def make_car(self, body_color, glass_color):
-        # Body, windscreen, rear glass, left and right lamps.
-        return [self.box(0, 0, 10, 10, body_color),
-                self.box(0, 0, 10, 10, glass_color),
-                self.box(0, 0, 10, 10, glass_color),
-                self.box(0, 0, 10, 10, 'FFFFFFFF'),
-                self.box(0, 0, 10, 10, 'FFFFFFFF')]
+    def image(self, x, y, width, height, filename):
+        path = os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'media', filename)
+        control = xbmcgui.ControlImage(int(x * self.sx), int(y * self.sy),
+                                        max(1, int(width * self.sx)), max(1, int(height * self.sy)), path)
+        self.addControl(control)
+        return control
 
-    def set_car(self, parts, cx, cy, width, height, visible):
-        x, y = cx - width / 2, cy - height / 2
-        shapes = ((0, 0, 1, 1), (.18, .12, .64, .27),
-                  (.20, .64, .60, .20), (.12, .04, .20, .08),
-                  (.68, .04, .20, .08))
-        for control, (rx, ry, rw, rh) in zip(parts, shapes):
-            control.setPosition(int((x + rx * width) * self.sx), int((y + ry * height) * self.sy))
-            control.setWidth(max(1, int(rw * width * self.sx)))
-            control.setHeight(max(1, int(rh * height * self.sy)))
-            control.setVisible(visible)
+    def make_car(self, sprite):
+        return self.image(0, 0, 10, 10, sprite)
+
+    def set_car(self, control, cx, cy, width, height, visible):
+        control.setPosition(int((cx - width / 2) * self.sx), int((cy - height / 2) * self.sy))
+        control.setWidth(max(1, int(width * self.sx)))
+        control.setHeight(max(1, int(height * self.sy)))
+        control.setVisible(visible)
 
     @staticmethod
     def lane_center(lane, depth):
-        return W / 2 + (lane - 1) * (480 + 1120 * depth) / 3
+        return W / 2 + (lane - 1) * (480 + 1280 * depth) / 3
 
     def onAction(self, action):
         key = action.getId()
@@ -268,7 +254,6 @@ class LaneRunnerWindow(xbmcgui.WindowDialog):
         elif key in LEFT or key in RIGHT:
             if not self.finished:
                 self.lane = max(0, min(2, self.lane + (-1 if key in LEFT else 1)))
-                self.set_car(self.player, self.lane_center(self.lane, 1.0), 830, 150, 170, True)
         elif key in SELECT:
             if self.finished:
                 self.reset()
@@ -287,7 +272,8 @@ class LaneRunnerWindow(xbmcgui.WindowDialog):
         self.started, self.paused, self.finished = True, False, False
         self.score_label.setLabel('PUNKTE  0')
         self.status.setLabel('DREHEN Spur wechseln  |  DRÜCKEN Pause  |  RETURN Ende')
-        self.set_car(self.player, self.lane_center(self.lane, 1.0), 830, 150, 170, True)
+        self.player_visual_x = self.lane_center(self.lane, 1.0)
+        self.set_car(self.player, self.player_visual_x, 830, 150, 170, True)
         for car in self.obstacles:
             car['active'] = False
             self.set_car(car['parts'], 960, 270, 55, 70, False)
@@ -301,6 +287,9 @@ class LaneRunnerWindow(xbmcgui.WindowDialog):
                 return
 
     def tick(self, dt):
+        target_x = self.lane_center(self.lane, 1.0)
+        self.player_visual_x += (target_x - self.player_visual_x) * min(1.0, dt * 10.0)
+        self.set_car(self.player, self.player_visual_x, 830, 150, 170, True)
         if not self.started or self.paused or self.finished:
             return
         self.spawn_elapsed += dt
