@@ -69,9 +69,8 @@ def run_sync():
         except Exception:
             is_live = True
 
-    if not is_live:
-        print("[WORKER] Modus steht auf kleve - kein Live-Sync erforderlich.", flush=True)
-        return
+    # Reiner Live-Modus aktiv
+    pass
 
     coords = get_live_gps()
     if not coords:
@@ -89,11 +88,11 @@ def run_sync():
             root = tree.getroot()
             for s in root.findall("setting"):
                 sid = s.get("id")
-                if sid == "loc2_name": s.text = full_name
-                elif sid == "loc2_url": s.text = url
-                elif sid == "loc2_lat": s.text = str(lat)
-                elif sid == "loc2_lon": s.text = str(lon)
-                elif sid == "loc2_id": s.text = str(woeid)
+                if sid == "loc1_name": s.text = full_name
+                elif sid == "loc1_url": s.text = url
+                elif sid == "loc1_lat": s.text = str(lat)
+                elif sid == "loc1_lon": s.text = str(lon)
+                elif sid == "loc1_id": s.text = str(woeid)
             tree.write(SETTINGS_MULTI, encoding="utf-8", xml_declaration=True)
             print("[WORKER] Settings.xml geschrieben.", flush=True)
         except Exception as e:
@@ -114,10 +113,10 @@ def run_sync():
     kodi_cmd(f'Skin.SetString(WeatherLiveLocationName,"{full_name}")')
     kodi_cmd(f"Skin.SetString(WeatherRadarLivePath,{radar_target})")
     kodi_cmd(f"Skin.SetString(RadarTimestamp,{ts})")
-    kodi_cmd("Weather.LocationSet(2)")
+    kodi_cmd("Weather.LocationSet(1)")
 
     # 4. weather.multi abrufen
-    kodi_rpc("Addons.ExecuteAddon", {"addonid": "weather.multi", "params": ["2"]})
+    kodi_rpc("Addons.ExecuteAddon", {"addonid": "weather.multi", "params": ["1"]})
 
     # 5. UI Refresh
     kodi_cmd("Container.Refresh")
