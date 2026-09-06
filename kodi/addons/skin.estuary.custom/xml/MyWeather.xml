@@ -206,7 +206,7 @@
             
             <control type="image">
                 <left>35</left>
-                <top>495</top>
+                <top>510</top>
                 <width>835</width>
                 <height>2</height>
                 <texture colordiffuse="55ffffff">colors/white.png</texture>
@@ -215,7 +215,7 @@
             
             <control type="label">
                 <left>35</left>
-                <top>520</top>
+                <top>535</top>
                 <width>835</width>
                 <height>55</height>
                 <font>font45_title</font>
@@ -226,7 +226,7 @@
             
             <control type="label">
                 <left>35</left>
-                <top>588</top>
+                <top>603</top>
                 <width>835</width>
                 <height>65</height>
                 <font>font45</font>
@@ -234,7 +234,7 @@
             </control>
             <control type="label">
                 <left>35</left>
-                <top>656</top>
+                <top>671</top>
                 <width>835</width>
                 <height>65</height>
                 <font>font45</font>
@@ -242,7 +242,7 @@
             </control>
             <control type="label">
                 <left>35</left>
-                <top>724</top>
+                <top>739</top>
                 <width>835</width>
                 <height>65</height>
                 <font>font45</font>
@@ -250,7 +250,7 @@
             </control>
             <control type="label">
                 <left>35</left>
-                <top>792</top>
+                <top>807</top>
                 <width>835</width>
                 <height>65</height>
                 <font>font45</font>
