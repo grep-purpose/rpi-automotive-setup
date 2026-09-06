@@ -325,12 +325,167 @@ class LaneRunnerWindow(xbmcgui.WindowDialog):
             self.set_car(car['parts'], self.lane_center(car['lane'], size), cy,
                          width, height, True)
 
+class RooftopRunnerWindow(xbmcgui.WindowDialog):
+    """Automatic runner: turn only at a visible corner, jump over gaps/barriers."""
+
+    EVENTS = ('right', 'gap', 'left', 'barrier')
+    JUMP_TIME = 0.92
+
+    def __init__(self):
+        super().__init__()
+        self.sx, self.sy = self.getWidth() / W, self.getHeight() / H
+        self.closed = self.started = self.finished = False
+        self.rng = random.Random()
+        self.scenes = {}
+        self.scene_name = None
+        self.scenes['straight'] = self.image('runner_straight.png', 0, 0, W, H)
+        for direction in ('left', 'right'):
+            for frame in range(5):
+                key = '{}_{}'.format(direction, frame)
+                self.scenes[key] = self.image('runner_{}_{}.png'.format(direction, frame), 0, 0, W, H)
+        for view in self.scenes.values():
+            view.setVisible(False)
+        self.title = self.label('AUDI ENTERTAINMENT  /  ROOFTOP RUNNER',
+                                30, 18, 1860, 92, 'FFFF6B00', 'font60')
+        self.score_label = self.label('PUNKTE  0', 30, 110, 1200, 80,
+                                      'FFFFFFFF', 'font45_title')
+        self.status = self.label('DREHEN Abbiegen  |  DRÜCKEN Springen  |  RETURN Ende',
+                                 30, 962, 1860, 105, 'FFFFFFFF', 'font45_title')
+        self.hazards = {
+            'gap': self.image('runner_gap.png', 0, 0, 40, 20),
+            'barrier': self.image('runner_barrier.png', 0, 0, 40, 20),
+        }
+        for view in self.hazards.values():
+            view.setVisible(False)
+        self.player = self.image('runner_player.png', 887, 755, 146, 180)
+        self.reset(started=False)
+
+    def image(self, filename, x, y, width, height):
+        path = os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'media', filename)
+        control = xbmcgui.ControlImage(int(x * self.sx), int(y * self.sy),
+                                        max(1, int(width * self.sx)), max(1, int(height * self.sy)), path)
+        self.addControl(control)
+        return control
+
+    def label(self, value, x, y, width, height, color, font):
+        control = xbmcgui.ControlLabel(int(x * self.sx), int(y * self.sy),
+                                        int(width * self.sx), int(height * self.sy),
+                                        value, font=font, textColor=color)
+        self.addControl(control)
+        return control
+
+    def show_scene(self, name):
+        if name == self.scene_name:
+            return
+        if self.scene_name is not None:
+            self.scenes[self.scene_name].setVisible(False)
+        self.scenes[name].setVisible(True)
+        self.scene_name = name
+
+    def reset(self, started=True):
+        self.started, self.finished = started, False
+        self.score = 0
+        self.event_index = 0
+        self.event = self.EVENTS[0]
+        self.progress = 0.0
+        self.rest = 0.0
+        self.turn_cooldown = 0.0
+        self.jump_age = None
+        self.score_label.setLabel('PUNKTE  0')
+        self.status.setLabel('DREHEN Abbiegen  |  DRÜCKEN Springen  |  RETURN Ende' if started else
+                             'DRÜCKEN Start  |  DREHEN Abbiegen  |  RETURN Ende')
+        for view in self.hazards.values():
+            view.setVisible(False)
+        self.player.setPosition(int(887 * self.sx), int(755 * self.sy))
+        self.show_scene('right_0')
+
+    def fail(self, reason):
+        self.finished = True
+        self.status.setLabel('{}  |  DRÜCKEN Neustart  |  RETURN Ende'.format(reason))
+
+    def next_event(self, turned=False):
+        self.score += 10
+        self.score_label.setLabel('PUNKTE  {}'.format(self.score))
+        self.event_index += 1
+        self.event = (self.EVENTS[self.event_index] if self.event_index < len(self.EVENTS)
+                      else self.rng.choice(self.EVENTS))
+        self.progress = 0.0
+        self.rest = 0.55
+        self.turn_cooldown = 0.28 if turned else 0.0
+        for view in self.hazards.values():
+            view.setVisible(False)
+        self.show_scene('straight' if self.event in self.hazards else '{}_0'.format(self.event))
+
+    def onAction(self, action):
+        key = action.getId()
+        if key in BACK:
+            self.closed = True
+        elif key in SELECT:
+            if self.finished:
+                self.reset()
+            elif not self.started:
+                self.started = True
+                self.status.setLabel('DREHEN Abbiegen  |  DRÜCKEN Springen  |  RETURN Ende')
+            elif self.jump_age is None:
+                self.jump_age = 0.0
+        elif key in LEFT or key in RIGHT:
+            if not self.started or self.finished or self.turn_cooldown > 0:
+                return
+            direction = 'left' if key in LEFT else 'right'
+            if self.event not in ('left', 'right') or self.rest > 0 or self.progress < 0.76:
+                self.fail('ZU FRÜH GEDREHT')
+            elif direction != self.event:
+                self.fail('FALSCHE RICHTUNG')
+            elif self.progress < 1.0:
+                self.next_event(turned=True)
+            else:
+                self.fail('KURVE VERPASST')
+
+    def tick(self, dt):
+        if not self.started or self.finished:
+            return
+        self.turn_cooldown = max(0.0, self.turn_cooldown - dt)
+        jump_height = 0.0
+        if self.jump_age is not None:
+            self.jump_age += dt
+            if self.jump_age >= self.JUMP_TIME:
+                self.jump_age = None
+            else:
+                jump_height = 140 * math.sin(math.pi * self.jump_age / self.JUMP_TIME)
+        self.player.setPosition(int(887 * self.sx), int((755 - jump_height) * self.sy))
+        if self.rest > 0:
+            self.rest = max(0.0, self.rest - dt)
+            return
+        duration = max(3.25, 4.6 - self.score * .012)
+        self.progress += dt / duration
+        if self.event in ('left', 'right'):
+            frame = min(4, int(self.progress * 5))
+            self.show_scene('{}_{}'.format(self.event, frame))
+            if self.progress >= 1.0:
+                self.fail('KURVE VERPASST')
+        else:
+            view = self.hazards[self.event]
+            z = min(1.0, self.progress)
+            y = 280 + 540 * z ** 1.5
+            width = (250 + 1450 * z) if self.event == 'gap' else (110 + 550 * z)
+            height = (35 + 115 * z) if self.event == 'gap' else (65 + 130 * z)
+            view.setPosition(int((W - width) / 2 * self.sx), int((y - height / 2) * self.sy))
+            view.setWidth(max(1, int(width * self.sx)))
+            view.setHeight(max(1, int(height * self.sy)))
+            view.setVisible(True)
+            if self.progress >= 1.0:
+                if jump_height >= 50:
+                    self.next_event()
+                else:
+                    self.fail('NICHT GESPRUNGEN')
+
 def main():
     # Dialog.select uses Kodi's own focus/input navigation for the wheel.
-    selected = xbmcgui.Dialog().select('AUDI Entertainment  /  Spiele', ['Breakout', 'Lane Runner', 'Zurück'])
-    if selected not in (0, 1):
+    selected = xbmcgui.Dialog().select('AUDI Entertainment  /  Spiele', ['Breakout', 'Lane Runner', 'Rooftop Runner', 'Zurück'])
+    if selected not in (0, 1, 2):
         return
-    window = GameWindow() if selected == 0 else LaneRunnerWindow()
+    window = (GameWindow() if selected == 0 else
+              LaneRunnerWindow() if selected == 1 else RooftopRunnerWindow())
     monitor = xbmc.Monitor()
     try:
         window.show()
