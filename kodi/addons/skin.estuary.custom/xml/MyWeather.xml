@@ -142,6 +142,20 @@
                 <texture condition="String.IsEmpty(Window(Weather).Property(Current.ConditionIcon))">$INFO[Weather.ConditionsIcon]</texture>
             </control>
 
+            <control type="label">
+                <left>20</left>
+                <top>432</top>
+                <width>285</width>
+                <height>38</height>
+                <font>font32</font>
+                <textcolor>ff9e9e9e</textcolor>
+                <align>center</align>
+                <scroll>true</scroll>
+                <scrollspeed>25</scrollspeed>
+                <label condition="!String.IsEmpty(Window(Weather).Property(Current.Condition))">[B]$INFO[Window(Weather).Property(Current.Condition)][/B]</label>
+                <label condition="String.IsEmpty(Window(Weather).Property(Current.Condition))">[B]$INFO[Weather.Conditions][/B]</label>
+            </control>
+
             
             <control type="label">
                 <left>305</left>
