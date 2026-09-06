@@ -245,7 +245,13 @@ class LaneRunnerWindow(xbmcgui.WindowDialog):
 
     @staticmethod
     def lane_center(lane, depth):
-        return W / 2 + (lane - 1) * (480 + 1280 * depth) / 3
+        # Use the car's actual screen height to follow the straight lane in road.png.
+        # The road widens linearly from 490 px at y=224 to 1760 px at y=944.
+        depth = max(0.0, min(1.0, depth))
+        car_y = 285 + 550 * depth * depth
+        road_t = max(0.0, min(1.0, (car_y - 224) / 720))
+        road_width = 490 + 1270 * road_t
+        return W / 2 + (lane - 1) * road_width / 3
 
     def onAction(self, action):
         key = action.getId()
