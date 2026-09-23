@@ -1,0 +1,2 @@
+kanshi &
+sh -c 'sleep 3; HOME=/home/pi /home/pi/.hudiy/share/hudiy_run.sh' &

@@ -1866,6 +1866,15 @@ async def handle_client(reader, writer):
             logger.info("Kill command received.")
             fire_and_forget(asyncio.get_running_loop(), kill_script(), "kill_script_from_remote")
 
+
+        elif command == 'android_auto':
+            logger.info("Android Auto command received -> Toggle Hudiy/Kodi.")
+            fire_and_forget(
+                asyncio.get_running_loop(),
+                toggle_hudiy_kodi(),
+                "toggle_hudiy_kodi_from_remote"
+            )
+
         else:
             logger.warning(f"Unknown command received: {command}")
             # Optional: still respond for unknown command
