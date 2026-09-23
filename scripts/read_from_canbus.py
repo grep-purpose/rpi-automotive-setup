@@ -2771,6 +2771,7 @@ async def import_uinput():
         events = (
             uinput.KEY_1, uinput.KEY_2, uinput.KEY_UP, uinput.KEY_DOWN, uinput.KEY_LEFT, uinput.KEY_RIGHT,
             uinput.KEY_ENTER, uinput.KEY_ESC, uinput.KEY_F2, uinput.KEY_B, uinput.KEY_N, uinput.KEY_V,
+            uinput.KEY_F7, uinput.KEY_F8,
             uinput.KEY_F12, uinput.KEY_M, uinput.KEY_X, uinput.KEY_C, uinput.KEY_LEFTCTRL, uinput.KEY_H, uinput.KEY_T,
             uinput.KEY_O
         )
@@ -6275,8 +6276,8 @@ async def process_canid_461(msg):
         # NEXT TRACK Release
         elif msg == '373004020000' and nextbtn > 0:
             if nextbtn <= 4:
-                device.emit(uinput.KEY_N, 1)
-                device.emit(uinput.KEY_N, 0)
+                device.emit(uinput.KEY_F8, 1)
+                device.emit(uinput.KEY_F8, 0)
             elif nextbtn > 4:
                 device.emit(uinput.KEY_RIGHT, 1)
                 device.emit(uinput.KEY_RIGHT, 0)
@@ -6287,8 +6288,8 @@ async def process_canid_461(msg):
         # PREV TRACK Release
         elif msg == '373004010000' and prev > 0:
             if prev <= 4:
-                device.emit(uinput.KEY_V, 1)
-                device.emit(uinput.KEY_V, 0)
+                device.emit(uinput.KEY_F7, 1)
+                device.emit(uinput.KEY_F7, 0)
             elif 4 < prev <= 16:
                 device.emit(uinput.KEY_LEFT, 1)
                 device.emit(uinput.KEY_LEFT, 0)
