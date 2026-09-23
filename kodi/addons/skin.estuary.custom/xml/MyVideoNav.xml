@@ -16,88 +16,90 @@
 
 		<!-- 2. Großer OEM Audi Top-Header -->
 		<control type="group">
-			<top>15</top>
-			<left>40</left>
-			<right>40</right>
-			<height>85</height>
+                        <top>18</top>
+                        <left>30</left>
+                        <right>30</right>
+                        <height>105</height>
 
-			<!-- Oben Links: Suche (ID 9001) -->
-			<control type="button" id="9001">
-				<left>10</left>
-				<top>5</top>
-				<width>260</width>
-				<height>65</height>
-				<font>font45</font>
-				<label>[B]Suche[/B]</label>
-				<align>left</align>
-				<textoffsetx>10</textoffsetx>
-				<textcolor>fff0f2f5</textcolor>
-				<focusedcolor>ffff8800</focusedcolor>
-				<texturefocus border="0">-</texturefocus>
-				<texturenofocus border="0">-</texturenofocus>
-				<onup>9003</onup>
-				<ondown>50</ondown>
-				<onclick>Skin.SetString(SearchQuery)</onclick>
-			</control>
+                        <!-- Linke Header-Linie -->
+                        <control type="image">
+                                <left>0</left>
+                                <top>82</top>
+                                <width>525</width>
+                                <height>3</height>
+                                <texture colordiffuse="99ffffff">colors/white.png</texture>
+                        </control>
 
-			<!-- Trennlinie Links (top 75) -->
-			<control type="image">
-				<left>10</left>
-				<top>75</top>
-				<width>300</width>
-				<height>4</height>
-				<texture colordiffuse="88ffffff">colors/white.png</texture>
-			</control>
+                        <!-- Linker Softkey: Suche -->
+                        <control type="button" id="9001">
+                                <left>15</left>
+                                <top>0</top>
+                                <width>330</width>
+                                <height>82</height>
+                                <font>font45</font>
+                                <label>[B]Suche[/B]</label>
+                                <align>left</align>
+                                <aligny>center</aligny>
+                                <textcolor>fff0f2f5</textcolor>
+                                <focusedcolor>ffff8800</focusedcolor>
+                                <texturefocus>-</texturefocus>
+                                <texturenofocus>-</texturenofocus>
+                                <onup>9003</onup>
+                                <ondown>9003</ondown>
+                                <onclick>Skin.SetString(SearchQuery)</onclick>
+                        </control>
 
-			<!-- Zentrierter Audi MMI Titel (Audi-Rot) -->
-			<control type="label">
-				<left>0</left>
-				<right>0</right>
-				<top>10</top>
-				<height>75</height>
-				<align>center</align>
-				<font>font45</font>
-				<textcolor>ffd90429</textcolor>
-				<label>[B]$INFO[Container.FolderName][/B]</label>
-			</control>
+                        <!-- Mittiger App-/Ordnername -->
+                        <control type="label">
+                                <left>540</left>
+                                <top>0</top>
+                                <width>780</width>
+                                <height>100</height>
+                                <align>center</align>
+                                <aligny>center</aligny>
+                                <font>font60</font>
+                                <textcolor>ffd90429</textcolor>
+                                <label>[B]$INFO[Container.FolderName][/B]</label>
+                        </control>
 
-			<!-- Oben Rechts: Aktualisieren / Reload (ID 9003 - Anschlag ganz oben) -->
-			<control type="button" id="9003">
-				<right>10</right>
-				<top>5</top>
-				<width>280</width>
-				<height>65</height>
-				<font>font45</font>
-				<label>[B]Neu laden[/B]</label>
-				<align>right</align>
-				<textoffsetx>10</textoffsetx>
-				<textcolor>fff0f2f5</textcolor>
-				<focusedcolor>ffff8800</focusedcolor>
-				<texturefocus border="0">-</texturefocus>
-				<texturenofocus border="0">-</texturenofocus>
-				<onup>noop</onup>
-				<ondown>9001</ondown>
-				<onclick>Container.Refresh</onclick>
-			</control>
+                        <!-- Rechter Softkey: Neu laden -->
+                        <control type="button" id="9003">
+                                <right>15</right>
+                                <top>0</top>
+                                <width>330</width>
+                                <height>82</height>
+                                <font>font45</font>
+                                <label>[B]Neu laden[/B]</label>
+                                <align>right</align>
+                                <aligny>center</aligny>
+                                <textcolor>fff0f2f5</textcolor>
+                                <focusedcolor>ffff8800</focusedcolor>
+                                <texturefocus>-</texturefocus>
+                                <texturenofocus>-</texturenofocus>
+                                <onup>9001</onup>
+                                <ondown>9001</ondown>
+                                <onclick>Container.Refresh</onclick>
+                        </control>
 
-			<!-- Trennlinie Rechts (top 75) -->
-			<control type="image">
-				<right>10</right>
-				<top>75</top>
-				<width>300</width>
-				<height>4</height>
-				<texture colordiffuse="88ffffff">colors/white.png</texture>
-			</control>
-		</control>
+                        <!-- Rechte Header-Linie -->
+                        <control type="image">
+                                <right>0</right>
+                                <top>82</top>
+                                <width>525</width>
+                                <height>3</height>
+                                <texture colordiffuse="99ffffff">colors/white.png</texture>
+                        </control>
+
+                </control>
 
 		<!-- 3. RNS-E Hero List -->
 		<control type="fixedlist" id="50">
 			<left>40</left>
-			<top>105</top>
+			<top>135</top>
 			<bottom>135</bottom>
 			<width>1840</width>
-			<onup>9001</onup>
-			<ondown>9002</ondown>
+			<onup>50</onup>
+			<ondown>50</ondown>
 			<onleft>50</onleft>
 			<onright>50</onright>
 			<viewtype label="Kacheln">list</viewtype>
@@ -180,102 +182,107 @@
 
 		<!-- 4. RNS-E Status-Footer mit symmetrischen Shortcuts -->
 		<control type="group">
-			<bottom>15</bottom>
-			<left>40</left>
-			<right>40</right>
-			<height>120</height>
+                        <bottom>18</bottom>
+                        <left>30</left>
+                        <right>30</right>
+                        <height>124</height>
 
-			<!-- Weiße Trennlinie -->
-			<control type="image">
-				<left>0</left>
-				<top>0</top>
-				<width>100%</width>
-				<height>6</height>
-				<texture colordiffuse="99ffffff">colors/white.png</texture>
-			</control>
+                        <!-- obere MMI-Linie -->
+                        <control type="image">
+                                <left>0</left>
+                                <top>0</top>
+                                <width>100%</width>
+                                <height>5</height>
+                                <texture colordiffuse="aaffffff">colors/white.png</texture>
+                        </control>
 
-			<!-- Unten Links: Einstellungen (ID 9002) -->
-			<control type="button" id="9002">
-				<left>20</left>
-				<top>20</top>
-				<width>380</width>
-				<height>75</height>
-				<font>font45</font>
-				<label>[B]Einstellungen[/B]</label>
-				<align>left</align>
-				<textcolor>fff0f2f5</textcolor>
-				<focusedcolor>ffff8800</focusedcolor>
-				<texturefocus border="0">-</texturefocus>
-				<texturenofocus border="0">-</texturenofocus>
-				<onup>50</onup>
-				<ondown>9004</ondown>
-				<onclick>ActivateWindow(Settings)</onclick>
-			</control>
+                        <!-- Einstellungen links -->
+                        <control type="button" id="9002">
+                                <left>15</left>
+                                <top>20</top>
+                                <width>500</width>
+                                <height>82</height>
+                                <font>font45</font>
+                                <label>[B]Einstellungen[/B]</label>
+                                <align>left</align>
+                                <textoffsetx>0</textoffsetx>
+                                <aligny>center</aligny>
+                                <textcolor>fff0f2f5</textcolor>
+                                <focusedcolor>ffff8800</focusedcolor>
+                                <texturefocus>-</texturefocus>
+                                <texturenofocus>-</texturenofocus>
+                                <onup>9004</onup>
+                                <ondown>9004</ondown>
+                                <onclick>ActivateWindow(Settings)</onclick>
+                        </control>
 
-			<!-- Unten Mitte: Wetter & Digitaluhr -->
-			<control type="group">
-				<left>0</left>
-				<right>0</right>
-				<top>25</top>
-				<height>75</height>
+                        <!-- mittiger Statusblock -->
+                        <control type="group">
+                                <left>720</left>
+                                <top>20</top>
+                                <width>430</width>
+                                <height>82</height>
 
-				<control type="group">
-					<left>700</left>
-					<top>0</top>
-					<width>520</width>
-					<height>75</height>
+                                <control type="image">
+                                        <left>0</left>
+                                        <top>11</top>
+                                        <width>54</width>
+                                        <height>54</height>
+                                        <aspectratio>keep</aspectratio>
+                                        <texture>$INFO[Weather.ConditionsIcon]</texture>
+                                </control>
 
-					<!-- Wetter Icon -->
-					<control type="image">
-						<left>0</left>
-						<top>8</top>
-						<width>65</width>
-						<height>65</height>
-						<aspectratio>keep</aspectratio>
-						<texture>$INFO[Weather.ConditionsIcon]</texture>
-					</control>
+                                <control type="label">
+                                        <left>68</left>
+                                        <top>0</top>
+                                        <width>120</width>
+                                        <height>82</height>
+                                        <aligny>center</aligny>
+                                        <font>font45</font>
+                                        <textcolor>fff0f2f5</textcolor>
+                                        <label>[B]$INFO[Weather.Temperature][/B]</label>
+                                </control>
 
-					<!-- Temperatur -->
-					<control type="label">
-						<left>80</left>
-						<top>0</top>
-						<width>170</width>
-						<height>75</height>
-						<font>font45</font>
-						<textcolor>fff0f2f5</textcolor>
-						<label>[B]$INFO[Weather.Temperature][/B]</label>
-					</control>
+                                <control type="image">
+                                        <left>195</left>
+                                        <top>16</top>
+                                        <width>2</width>
+                                        <height>48</height>
+                                        <texture colordiffuse="55ffffff">colors/white.png</texture>
+                                </control>
 
-					<!-- Digitaluhr -->
-					<control type="label">
-						<left>265</left>
-						<top>0</top>
-						<width>255</width>
-						<height>75</height>
-						<font>font45</font>
-						<textcolor>fff0f2f5</textcolor>
-						<label>[B]$INFO[System.Time(hh:mm)][/B]</label>
-					</control>
-				</control>
-			</control>
+                                <control type="label">
+                                        <left>220</left>
+                                        <top>0</top>
+                                        <width>170</width>
+                                        <height>82</height>
+                                        <aligny>center</aligny>
+                                        <font>font45</font>
+                                        <textcolor>fff0f2f5</textcolor>
+                                        <label>[B]$INFO[System.Time(hh:mm)][/B]</label>
+                                </control>
+                        </control>
 
-			<!-- Unten Rechts: Home (ID 9004 - Anschlag ganz unten) -->
-			<control type="button" id="9004">
-				<right>20</right>
-				<top>20</top>
-				<width>320</width>
-				<height>75</height>
-				<font>font45</font>
-				<label>[B]Hauptmenü[/B]</label>
-				<align>right</align>
-				<textcolor>fff0f2f5</textcolor>
-				<focusedcolor>ffff8800</focusedcolor>
-				<texturefocus border="0">-</texturefocus>
-				<texturenofocus border="0">-</texturenofocus>
-				<onup>9002</onup>
-				<ondown>noop</ondown>
-				<onclick>ActivateWindow(Home)</onclick>
-			</control>
-		</control>
+                        <!-- Hauptmenü rechts -->
+                        <control type="button" id="9004">
+                                <right>15</right>
+                                <top>20</top>
+                                <width>500</width>
+                                <height>82</height>
+                                <font>font45</font>
+                                <label>[B]Hauptmenü[/B]</label>
+                                <align>right</align>
+                                <textoffsetx>0</textoffsetx>
+                                <aligny>center</aligny>
+                                <textcolor>fff0f2f5</textcolor>
+                                <focusedcolor>ffff8800</focusedcolor>
+                                <texturefocus>-</texturefocus>
+                                <texturenofocus>-</texturenofocus>
+                                <onup>9002</onup>
+                                <ondown>9002</ondown>
+                                <onclick>ActivateWindow(Home)</onclick>
+                        </control>
+
+                </control>
 	</controls>
 </window>

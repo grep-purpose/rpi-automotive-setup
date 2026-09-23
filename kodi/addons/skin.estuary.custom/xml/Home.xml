@@ -1,325 +1,623 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
-	<defaultcontrol always="true">9000</defaultcontrol>
-	<views>9000</views>
-	<controls>
-		<!-- 1. Tiefschwarzer Hintergrund -->
-		<control type="image">
-			<left>0</left>
-			<top>0</top>
-			<width>100%</width>
-			<height>100%</height>
-			<texture colordiffuse="ff05070a">colors/black.png</texture>
-		</control>
+    <defaultcontrol always="true">9000</defaultcontrol>
+    <views>9000</views>
 
-		<!-- 2. Großer OEM Audi Top-Header (Höher gesetzt, fett & präsent) -->
-		<control type="group">
-			<top>15</top>
-			<left>40</left>
-			<right>40</right>
-			<!-- Trennlinie Links -->
-			<control type="image">
-				<left>10</left>
-				<top>75</top>
-				<width>300</width>
-				<height>4</height>
-				<texture colordiffuse="88ffffff">colors/white.png</texture>
-			</control>
-			<!-- Titel: Audi Multimedia Interface -->
-			<control type="label">
-				<left>0</left>
-				<right>0</right>
-				<top>0</top>
-				<height>75</height>
-				<align>center</align>
-				<font>font45</font>
-				<textcolor>ffd90429</textcolor>
-				<label>[B]Audi Multimedia Interface[/B]</label>
-			</control>
-			<!-- Trennlinie Rechts -->
-			<control type="image">
-				<right>10</right>
-				<top>75</top>
-				<width>300</width>
-				<height>4</height>
-				<texture colordiffuse="88ffffff">colors/white.png</texture>
-			</control>
-		</control>
+    <controls>
 
-		<!-- 3. MMI Kachel-Karussell (Horizontales Durchscrollen mit fester Mitte) -->
-		<control type="fixedlist" id="9000">
-			<left>0</left>
-			<top>140</top>
-			<width>100%</width>
-			<height>520</height>
-			<orientation>horizontal</orientation>
-			<!-- Drehrad-Navigation -->
-			<onup>Control.Move(9000,-1)</onup>
-			<ondown>Control.Move(9000,1)</ondown>
-			<onleft>Control.Move(9000,-1)</onleft>
-			<onright>Control.Move(9000,1)</onright>
-			<!-- Feste mittlere Fokus-Position -->
-			<focusposition>1</focusposition>
-			<movement>0</movement>
-			<scrolltime tween="cubic" ease="out">180</scrolltime>
+        <!-- =========================================================
+             AUDI HOME v3
+             Modern MMI / RNS-E inspired interface
+             ========================================================= -->
 
-			<!-- Inaktive Kacheln -->
-			<itemlayout width="600" height="500">
-				<control type="group">
-					<left>60</left>
-					<top>30</top>
-					<control type="image">
-						<width>480</width>
-						<height>360</height>
-						<texture colordiffuse="ff0f131a">colors/black.png</texture>
-					</control>
-					<control type="image">
-						<width>480</width>
-						<height>360</height>
-						<texture border="4" colordiffuse="338d99ae">colors/white.png</texture>
-					</control>
-					<control type="image">
-						<left>165</left>
-						<top>55</top>
-						<width>150</width>
-						<height>150</height>
-						<aspectratio>keep</aspectratio>
-						<texture colordiffuse="ff8d99ae">$INFO[ListItem.Icon]</texture>
-					</control>
-					<control type="label">
-						<left>20</left>
-						<top>230</top>
-						<width>440</width>
-						<height>50</height>
-						<align>center</align>
-						<font>font30_title</font>
-						<textcolor>ff8d99ae</textcolor>
-						<label>$INFO[ListItem.Label]</label>
-					</control>
-				</control>
-			</itemlayout>
 
-			<!-- Aktive fokussierte Kachel (Mitte) -->
-			<focusedlayout width="720" height="500">
-				<control type="group">
-					<left>20</left>
-					<top>10</top>
-					<control type="image">
-						<width>680</width>
-						<height>430</height>
-						<texture colordiffuse="ff141923">colors/black.png</texture>
-					</control>
-					<control type="image">
-						<width>680</width>
-						<height>430</height>
-						<texture border="10" colordiffuse="ffff6b00">colors/white.png</texture>
-					</control>
-					<control type="image">
-						<left>230</left>
-						<top>50</top>
-						<width>220</width>
-						<height>220</height>
-						<aspectratio>keep</aspectratio>
-						<texture colordiffuse="ffffffff">$INFO[ListItem.Icon]</texture>
-					</control>
-					<control type="label">
-						<left>20</left>
-						<top>285</top>
-						<width>640</width>
-						<height>65</height>
-						<align>center</align>
-						<font>font45</font>
-						<textcolor>ffffffff</textcolor>
-						<label>$INFO[ListItem.Label]</label>
-					</control>
-				</control>
-			</focusedlayout>
+        <!-- BACKGROUND -->
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>1920</width>
+            <height>1080</height>
+            <texture colordiffuse="ff05070a">colors/black.png</texture>
+        </control>
 
-			<!-- Menüeinträge -->
-			<content>
-				<!-- 1. LIVE TV -->
-				<item>
-					<label>Fernsehen</label>
-					<icon>DefaultVideo.png</icon>
-					<onclick>ActivateWindow(TVChannels)</onclick>
-				</item>
-				<!-- 2. YOUTUBE -->
-				<item>
-					<label>YouTube</label>
-					<icon>DefaultAddonVideo.png</icon>
-                                        <onclick>ActivateWindow(Videos,plugin://plugin.video.youtube/special/recommendations?category_label=Recommendations,return)</onclick>
-				</item>
-				<!-- 3. TWITCH -->
-				<item>
-					<label>Twitch</label>
-					<icon>DefaultAddonVideo.png</icon>
-                                        <onclick>ActivateWindow(Videos,plugin://plugin.video.twitch/?content=live&amp;mode=followed,return)</onclick>
-				</item>
-				<!-- 4. RADIO.DE -->
-				<item>
-					<label>Radio</label>
-					<icon>DefaultAudio.png</icon>
-					<onclick>ActivateWindow(10502,&quot;plugin://plugin.audio.radiode/?data=%7b%22name%22%3a%20%22Local%20stations%22%7d&amp;mode=get_local_stations&quot;,return)</onclick>
-				</item>
-				<!-- 5. WETTER -->
-				<item>
-					<label>Wetter</label>
-					<icon>DefaultAddonWeather.png</icon>
-					<onclick>ActivateWindow(Weather)</onclick>
-				</item>
-			</content>
-		</control>
 
-<!-- 4. MAXIMALES NOW-PLAYING WIDGET -->
-		<control type="group">
-			<left>40</left>
-			<right>40</right>
-			<bottom>145</bottom>
-			<height>210</height>
-			<visible>Player.HasMedia</visible>
+        <!-- =========================================================
+             HEADER
+             ========================================================= -->
 
-			<!-- Hintergrundbox -->
-			<control type="image">
-				<width>100%</width>
-				<height>210</height>
-				<texture colordiffuse="f80e121a">colors/black.png</texture>
-			</control>
-			<control type="image">
-				<width>100%</width>
-				<height>210</height>
-				<texture border="5" colordiffuse="778d99ae">colors/white.png</texture>
-			</control>
+        <control type="group">
+            <left>30</left>
+            <right>30</right>
+            <top>18</top>
+            <height>105</height>
 
-			<!-- Senderlogo / Album Art -->
-			<control type="image">
-				<left>10</left>
-				<top>10</top>
-				<width>190</width>
-				<height>190</height>
-				<aspectratio>keep</aspectratio>
-				<texture>$INFO[Player.Art(thumb)]</texture>
-			</control>
+            <!-- linke MMI-Linie: gleiche Position wie in den Apps -->
+            <control type="image">
+                <left>0</left>
+                <top>82</top>
+                <width>525</width>
+                <height>3</height>
+                <texture colordiffuse="99ffffff">colors/white.png</texture>
+            </control>
 
-			<!-- Zeile 1: Sendername / Interpret (Weiß) - Primär über Artist -->
-			<control type="label">
-				<left>225</left>
-				<top>30</top>
-				<right>30</right>
-				<height>65</height>
-				<font>font45</font>
-				<textcolor>ffffffff</textcolor>
-				<visible>!String.IsEmpty(MusicPlayer.Artist)</visible>
-				<label>[B]$INFO[MusicPlayer.Artist][/B]</label>
-			</control>
-			<!-- Zeile 1 Fallback: Falls Artist leer ist, nimm ChannelName -->
-			<control type="label">
-				<left>225</left>
-				<top>30</top>
-				<right>30</right>
-				<height>65</height>
-				<font>font45</font>
-				<textcolor>ffffffff</textcolor>
-				<visible>String.IsEmpty(MusicPlayer.Artist)</visible>
-				<label>[B]$INFO[MusicPlayer.ChannelName][/B]</label>
-			</control>
+            <!-- Haupttitel -->
+            <control type="label">
+                <left>540</left>
+                <top>0</top>
+                <width>780</width>
+                <height>100</height>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font60</font>
+                <textcolor>ffd90429</textcolor>
+                <label>[B]Hauptmenü[/B]</label>
+            </control>
 
-			<!-- Zeile 2: Songtitel / Track (Audi-Orange) - Primär über MusicPlayer.Title -->
-			<control type="label">
-				<left>225</left>
-				<top>105</top>
-				<right>30</right>
-				<height>60</height>
-				<font>font36_title</font>
-				<textcolor>ffff6b00</textcolor>
-				<visible>!String.IsEmpty(MusicPlayer.Title)</visible>
-				<label>$INFO[MusicPlayer.Title]</label>
-			</control>
-			<!-- Zeile 2 Fallback: Falls MusicPlayer.Title leer ist, nimm Player.Title -->
-			<control type="label">
-				<left>225</left>
-				<top>105</top>
-				<right>30</right>
-				<height>60</height>
-				<font>font36_title</font>
-				<textcolor>ffff6b00</textcolor>
-				<visible>String.IsEmpty(MusicPlayer.Title)</visible>
-				<label>$INFO[Player.Title]</label>
-			</control>
-		</control>
+            <!-- rechte MMI-Linie: gleiche Position wie in den Apps -->
+            <control type="image">
+                <right>0</right>
+                <top>82</top>
+                <width>525</width>
+                <height>3</height>
+                <texture colordiffuse="99ffffff">colors/white.png</texture>
+            </control>
 
-		<!-- 5. OEM Audi Bottom-Bar (Vergrößert, 6px Trennlinie & exakte Grundlinie) -->
-		<control type="group">
-			<bottom>15</bottom>
-			<left>40</left>
-			<right>40</right>
-			<height>120</height>
+        </control>
 
-			<!-- Weiße Trennlinie -->
-			<control type="image">
-				<left>0</left>
-				<top>0</top>
-				<width>100%</width>
-				<height>6</height>
-				<texture colordiffuse="99ffffff">colors/white.png</texture>
-			</control>
 
-			<!-- Unten Links: Einstellungen -->
-			<control type="label">
-				<left>20</left>
-				<top>30</top>
-				<width>420</width>
-				<height>65</height>
-				<font>font45</font>
-				<textcolor>fff0f2f5</textcolor>
-				<label>[B]Einstellungen[/B]</label>
-			</control>
+        <!-- =========================================================
+             HAUPTKARUSSELL
 
-			<!-- Unten Mitte: Wetter & Digitaluhr (Exakt zentriert & auf gleicher Baseline) -->
-			<control type="group">
-				<left>0</left>
-				<right>0</right>
-				<top>25</top>
-				<height>75</height>
+             240 px linker Rand
+             1440 px Nutzbreite
+             480 px je Element
+             Fokusposition 1 = Bildschirmmitte bei X=960
+             ========================================================= -->
 
-				<control type="group">
-					<left>700</left>
-					<top>0</top>
-					<width>520</width>
-					<height>75</height>
+        <control type="wraplist" id="9000">
 
-					<!-- Wetter-Icon -->
-					<control type="image">
-						<left>0</left>
-						<top>8</top>
-						<width>65</width>
-						<height>65</height>
-						<aspectratio>keep</aspectratio>
-						<texture>$INFO[Weather.ConditionsIcon]</texture>
-					</control>
+            <left>80</left>
+            <top>165</top>
+            <top condition="Player.HasMedia">155</top>
 
-					<!-- Temperatur -->
-					<control type="label">
-						<left>80</left>
-						<top>0</top>
-						<width>170</width>
-						<height>75</height>
-						<font>font45</font>
-						<textcolor>fff0f2f5</textcolor>
-						<label>[B]$INFO[Weather.Temperature][/B]</label>
-					</control>
+            <width>1760</width>
 
-					<!-- Digitaluhr -->
-					<control type="label">
-						<left>265</left>
-						<top>0</top>
-						<width>255</width>
-						<height>75</height>
-						<font>font45</font>
-						<textcolor>fff0f2f5</textcolor>
-						<label>[B]$INFO[System.Time(hh:mm)][/B]</label>
-					</control>
-				</control>
-			</control>
-		</control>
-	</controls>
+            <height>700</height>
+            <height condition="Player.HasMedia">575</height>
+
+            <orientation>horizontal</orientation>
+
+            <onleft>Control.Move(9000,-1)</onleft>
+            <onright>Control.Move(9000,1)</onright>
+
+            <!-- vorerst weiterhin kompatibel mit bisheriger Bedienung -->
+            <onup>Control.Move(9000,-1)</onup>
+            <ondown>Control.Move(9000,1)</ondown>
+
+            <focusposition>2</focusposition>
+            <movement>0</movement>
+
+            <scrolltime tween="cubic" ease="out">220</scrolltime>
+
+
+            <!-- =============================================
+                 NICHT AUSGEWÄHLTE APP
+                 kleiner / weiter hinten
+                 ============================================= -->
+
+            <itemlayout width="352" height="560">
+
+                <control type="group">
+                    <left>6</left>
+                    <top>62</top>
+
+                    <!-- dezente Tiefenfläche -->
+                    <control type="image">
+                        <left>20</left>
+                        <top>35</top>
+                        <width>300</width>
+                        <height>300</height>
+                        <texture colordiffuse="1019222b">colors/white.png</texture>
+                    </control>
+
+                    <!-- Icon -->
+                    <control type="image">
+                        <left>55</left>
+                        <top>55</top>
+                        <width>230</width>
+                        <height>230</height>
+                        <aspectratio>keep</aspectratio>
+                        <texture colordiffuse="bfc8cfd8">$INFO[ListItem.Icon]</texture>
+                    </control>
+
+                    <!-- Name -->
+                    <control type="label">
+                        <left>0</left>
+                        <top>315</top>
+                        <width>340</width>
+                        <height>78</height>
+                        <align>center</align>
+                        <aligny>center</aligny>
+                        <font>font45</font>
+                        <textcolor>e0e8ebef</textcolor>
+                        <label>[B]$INFO[ListItem.Label][/B]</label>
+                    </control>
+                </control>
+
+            </itemlayout>
+
+
+            <!-- =============================================
+                 AUSGEWÄHLTE APP
+                 moderne MMI-Karte mit Tiefenwirkung
+                 ============================================= -->
+
+            <focusedlayout width="352" height="560">
+
+                <control type="group">
+                    <left>-34</left>
+                    <top>0</top>
+
+                    <!-- Schatten -->
+                    <control type="image">
+                        <left>12</left>
+                        <top>22</top>
+                        <width>410</width>
+                        <height>505</height>
+                        <texture colordiffuse="aa000000">colors/black.png</texture>
+                    </control>
+
+                    <!-- Tiefenlayer -->
+                    <control type="image">
+                        <left>4</left>
+                        <top>12</top>
+                        <width>410</width>
+                        <height>500</height>
+                        <texture colordiffuse="55182028">colors/white.png</texture>
+                    </control>
+
+                    <!-- Hauptkarte -->
+                    <control type="image">
+                        <left>12</left>
+                        <top>20</top>
+                        <width>394</width>
+                        <height>480</height>
+                        <texture colordiffuse="f0121820">colors/white.png</texture>
+                    </control>
+
+                    <!-- Lichtkante -->
+                    <control type="image">
+                        <left>14</left>
+                        <top>21</top>
+                        <width>390</width>
+                        <height>4</height>
+                        <texture colordiffuse="66ffffff">colors/white.png</texture>
+                    </control>
+
+                    <!-- innere Fläche -->
+                    <control type="image">
+                        <left>32</left>
+                        <top>42</top>
+                        <width>354</width>
+                        <height>300</height>
+                        <texture colordiffuse="1e26323f">colors/white.png</texture>
+                    </control>
+
+                    <!-- Icon -->
+                    <control type="image">
+                        <left>62</left>
+                        <top>52</top>
+                        <width>295</width>
+                        <height>295</height>
+                        <aspectratio>keep</aspectratio>
+                        <texture colordiffuse="ffffffff">$INFO[ListItem.Icon]</texture>
+                    </control>
+
+                    <!-- Name -->
+                    <control type="label">
+                        <left>10</left>
+                        <top>365</top>
+                        <width>395</width>
+                        <height>85</height>
+                        <align>center</align>
+                        <aligny>center</aligny>
+                        <font>font60</font>
+                        <textcolor>ffffffff</textcolor>
+                        <label>[B]$INFO[ListItem.Label][/B]</label>
+                    </control>
+
+                    <!-- Fokuslinie -->
+                    <control type="image">
+                        <left>92</left>
+                        <top>475</top>
+                        <width>235</width>
+                        <height>7</height>
+                        <texture colordiffuse="ffff6b00">colors/white.png</texture>
+                    </control>
+
+                </control>
+
+            </focusedlayout>
+
+
+            <!-- =====================================================
+                 APPS
+                 Funktionspfade bewusst aus funktionierendem Stand
+                 übernommen
+                 ===================================================== -->
+
+            <content>
+
+                <item>
+                    <label>Fernsehen</label>
+                    <icon>home/tv.png</icon>
+                    <onclick>ActivateWindow(TVChannels)</onclick>
+                </item>
+
+                <item>
+                    <label>YouTube</label>
+                    <icon>home/youtube.png</icon>
+                    <onclick>ActivateWindow(Videos,plugin://plugin.video.youtube/special/recommendations?category_label=Recommendations,return)</onclick>
+                </item>
+
+                <item>
+                    <label>Twitch</label>
+                    <icon>home/twitch.png</icon>
+                    <onclick>ActivateWindow(Videos,plugin://plugin.video.twitch/?content=live&amp;mode=followed,return)</onclick>
+                </item>
+
+                <item>
+                    <label>Radio</label>
+                    <icon>home/radio.png</icon>
+                    <onclick>ActivateWindow(10502,&quot;plugin://plugin.audio.radiode/?data=%7b%22name%22%3a%20%22Local%20stations%22%7d&amp;mode=get_local_stations&quot;,return)</onclick>
+                </item>
+
+                <item>
+                    <label>Wetter</label>
+                    <icon>home/weather.png</icon>
+                    <onclick>ActivateWindow(Weather)</onclick>
+                </item>
+
+                <item>
+                    <label>Spiele</label>
+                    <icon>home/games.png</icon>
+                    <onclick>RunScript(script.audi.games)</onclick>
+                </item>
+
+            </content>
+
+        </control>
+
+
+        <!-- =========================================================
+             NOW PLAYING
+             große Automotive-Informationszone
+             ========================================================= -->
+
+        <control type="group">
+
+            <left>30</left>
+            <right>30</right>
+            <bottom>175</bottom>
+            <height>250</height>
+
+            <visible>Player.HasMedia</visible>
+
+            <!-- Schatten -->
+            <control type="image">
+                <left>5</left>
+                <top>7</top>
+                <width>100%</width>
+                <height>230</height>
+                <texture colordiffuse="99000000">colors/black.png</texture>
+            </control>
+
+            <!-- Hauptfläche -->
+            <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>225</height>
+                <texture colordiffuse="f20b1016">colors/white.png</texture>
+            </control>
+
+            <!-- obere Lichtkante -->
+            <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>4</height>
+                <texture colordiffuse="668d99ae">colors/white.png</texture>
+            </control>
+
+            <!-- Audi-Orange links -->
+            <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>8</width>
+                <height>225</height>
+                <texture colordiffuse="ffff6b00">colors/white.png</texture>
+            </control>
+
+            <!-- Cover / Senderlogo -->
+            <control type="image">
+                <left>22</left>
+                <top>20</top>
+                <width>195</width>
+                <height>195</height>
+                <aspectratio>keep</aspectratio>
+                <texture>$INFO[Player.Art(thumb)]</texture>
+            </control>
+
+            <!-- METADATEN MITTE -->
+
+            <!-- Artist -->
+            <control type="label">
+                <left>255</left>
+                <top>46</top>
+                <width>980</width>
+                <height>70</height>
+                <font>font45</font>
+                <textcolor>ffffffff</textcolor>
+                <visible>!String.IsEmpty(MusicPlayer.Artist)</visible>
+                <label>[B]$INFO[MusicPlayer.Artist][/B]</label>
+            </control>
+
+            <!-- Sender-Fallback -->
+            <control type="label">
+                <left>255</left>
+                <top>46</top>
+                <width>980</width>
+                <height>70</height>
+                <font>font45</font>
+                <textcolor>ffffffff</textcolor>
+                <visible>String.IsEmpty(MusicPlayer.Artist)</visible>
+                <label>[B]$INFO[MusicPlayer.ChannelName][/B]</label>
+            </control>
+
+            <!-- Titel -->
+            <control type="label">
+                <left>255</left>
+                <top>122</top>
+                <width>980</width>
+                <height>70</height>
+                <font>font45</font>
+                <textcolor>ffff8a32</textcolor>
+                <visible>!String.IsEmpty(MusicPlayer.Title)</visible>
+                <label>[B]$INFO[MusicPlayer.Title][/B]</label>
+            </control>
+
+            <!-- Titel-Fallback -->
+            <control type="label">
+                <left>255</left>
+                <top>122</top>
+                <width>980</width>
+                <height>70</height>
+                <font>font45</font>
+                <textcolor>ffff8a32</textcolor>
+                <visible>String.IsEmpty(MusicPlayer.Title)</visible>
+                <label>[B]$INFO[Player.Title][/B]</label>
+            </control>
+
+
+            <!-- RECHTE STATUSZONE -->
+
+            <!-- vertikale Trennung -->
+            <control type="image">
+                <left>1325</left>
+                <top>24</top>
+                <width>3</width>
+                <height>178</height>
+                <texture colordiffuse="668d99ae">colors/white.png</texture>
+            </control>
+
+            <!-- Überschrift -->
+            <control type="label">
+                <left>1365</left>
+                <top>30</top>
+                <width>400</width>
+                <height>45</height>
+                <font>font30_title</font>
+                <textcolor>ff9da6b2</textcolor>
+                <label>QUELLE</label>
+            </control>
+
+            <!-- echter Sendername, falls vorhanden -->
+            <control type="label">
+                <left>1365</left>
+                <top>72</top>
+                <width>430</width>
+                <height>65</height>
+                <font>font45</font>
+                <textcolor>ffffffff</textcolor>
+                <visible>!String.IsEmpty(MusicPlayer.ChannelName)</visible>
+                <label>[B]$INFO[MusicPlayer.ChannelName][/B]</label>
+            </control>
+
+            <!-- Radio.de Fallback -->
+            <control type="label">
+                <left>1365</left>
+                <top>72</top>
+                <width>430</width>
+                <height>65</height>
+                <font>font45</font>
+                <textcolor>ffffffff</textcolor>
+                <visible>String.IsEmpty(MusicPlayer.ChannelName) + String.Contains(Player.FilenameAndPath,plugin.audio.radiode)</visible>
+                <label>[B]RADIO.DE[/B]</label>
+            </control>
+
+            <!-- generischer Fallback -->
+            <control type="label">
+                <left>1365</left>
+                <top>72</top>
+                <width>430</width>
+                <height>65</height>
+                <font>font45</font>
+                <textcolor>ffffffff</textcolor>
+                <visible>String.IsEmpty(MusicPlayer.ChannelName) + !String.Contains(Player.FilenameAndPath,plugin.audio.radiode)</visible>
+                <label>[B]MEDIA[/B]</label>
+            </control>
+
+            <!-- LIVE bei Streams ohne bekannte Gesamtdauer -->
+            <control type="label">
+                <left>1365</left>
+                <top>145</top>
+                <width>430</width>
+                <height>50</height>
+                <font>font36_title</font>
+                <textcolor>ffff8a32</textcolor>
+                <visible>String.IsEmpty(Player.Duration)</visible>
+                <label>[B]LIVE[/B]</label>
+            </control>
+
+            <!-- Laufzeit bei normalen Medien -->
+            <control type="label">
+                <left>1365</left>
+                <top>145</top>
+                <width>430</width>
+                <height>50</height>
+                <font>font30_title</font>
+                <textcolor>ffd5dae0</textcolor>
+                <visible>!String.IsEmpty(Player.Duration)</visible>
+                <label>$INFO[Player.Time]  /  $INFO[Player.Duration]</label>
+            </control>
+
+            <!-- untere Akzentlinie -->
+            <control type="image">
+                <left>255</left>
+                <top>205</top>
+                <width>930</width>
+                <height>3</height>
+                <texture colordiffuse="338d99ae">colors/white.png</texture>
+            </control>
+
+        </control>
+
+
+        <!-- =========================================================
+             FOOTER
+             ========================================================= -->
+
+        <control type="group">
+
+            <left>30</left>
+            <right>30</right>
+            <bottom>18</bottom>
+            <height>124</height>
+
+
+            <!-- obere MMI Linie -->
+            <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>5</height>
+                <texture colordiffuse="aaffffff">colors/white.png</texture>
+            </control>
+
+
+            <!-- Einstellungen links: sichtbares Label -->
+            <control type="label">
+                <left>15</left>
+                <top>20</top>
+                <width>500</width>
+                <height>82</height>
+                <aligny>center</aligny>
+                <font>font45</font>
+                <textcolor>fff0f2f5</textcolor>
+                <label>[B]Einstellungen[/B]</label>
+            </control>
+
+            <!-- Unsichtbares Fokus-Control -->
+            <control type="button" id="9100">
+                <left>15</left>
+                <top>20</top>
+                <width>500</width>
+                <height>82</height>
+
+                <label></label>
+                <texturefocus>-</texturefocus>
+                <texturenofocus>-</texturenofocus>
+
+                <onup>9100</onup>
+                <ondown>9100</ondown>
+                <onleft>9100</onleft>
+                <onright>9100</onright>
+
+                <onclick>ActivateWindow(Settings)</onclick>
+            </control>
+
+            <!-- Fokuslinie -->
+            <control type="image">
+                <left>15</left>
+                <top>100</top>
+                <width>250</width>
+                <height>4</height>
+                <texture colordiffuse="ffff8800">colors/white.png</texture>
+                <visible>Control.HasFocus(9100)</visible>
+            </control>
+
+
+            <!-- EXAKT ZENTRIERTER Statusblock
+                 520px breit, Bildschirmmitte 960:
+                 960 - 260 - 30 Gruppenoffset = 670
+            -->
+
+            <control type="group">
+
+                <left>720</left>
+                <top>20</top>
+                <width>430</width>
+                <height>82</height>
+
+
+                <!-- Wettericon -->
+                <control type="image">
+                    <left>0</left>
+                    <top>11</top>
+                    <width>54</width>
+                    <height>54</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture>$INFO[Weather.ConditionsIcon]</texture>
+                </control>
+
+
+                <!-- Temperatur -->
+                <control type="label">
+                    <left>68</left>
+                    <top>0</top>
+                    <width>120</width>
+                    <height>82</height>
+                    <aligny>center</aligny>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <label>[B]$INFO[Weather.Temperature][/B]</label>
+                </control>
+
+                <!-- kleine Trennung -->
+                <control type="image">
+                    <left>195</left>
+                    <top>16</top>
+                    <width>2</width>
+                    <height>48</height>
+                    <texture colordiffuse="55ffffff">colors/white.png</texture>
+                </control>
+
+                <!-- Uhrzeit -->
+                <control type="label">
+                    <left>220</left>
+                    <top>0</top>
+                    <width>170</width>
+                    <height>82</height>
+                    <aligny>center</aligny>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <label>[B]$INFO[System.Time(hh:mm)][/B]</label>
+                </control>
+
+            </control>
+
+        </control>
+
+    </controls>
 </window>

@@ -12,9 +12,12 @@
       <!-- Return-Taste = Zurück -->
       <escape>Back</escape>
 
+      <!-- RNS-E SETUP kurz = globale Kodi/System-Einstellungen -->
+      <m>ActivateWindow(Settings)</m>
+
       <!-- Steuerkreuz links: Up = PageUp / Down = PageDown -->
-      <up>PageUp</up>
-      <down>PageDown</down>
+      <up>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,up)</up>
+      <down>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,down)</down>
 
       <!-- Track-Tasten global = Links / Rechts -->
       <left>Left</left>
@@ -27,14 +30,21 @@
   <!-- EXKLUSIV IM HOMESCREEN -->
   <Home>
     <keyboard>
-      <!-- Taste unten links öffnet Settings -->
-      <down>ActivateWindow(Settings)</down>
-      
-      <!-- Track-Tasten & Pfeile links/rechts schalten aktiv durch -->
+
+      <!--
+        RNS-E linkes Steuerkreuz:
+        oben  = Content / Karussell
+        unten = Footer
+      -->
+      <up>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,up)</up>
+      <down>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,down)</down>
+
+      <!-- Track-Tasten vorerst wie bisher -->
       <left>PlayerControl(Previous)</left>
       <right>PlayerControl(Next)</right>
       <prev_track>PlayerControl(Previous)</prev_track>
       <next_track>PlayerControl(Next)</next_track>
+
     </keyboard>
   </Home>
 
