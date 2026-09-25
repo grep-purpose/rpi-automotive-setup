@@ -6133,44 +6133,138 @@ async def process_canid_353_35B(msg):
 
 current_app = "hudiy"
 
+# Verhindert, dass zwei SETUP-Long-Press-Ereignisse gleichzeitig
+# zwei Kodi-Instanzen starten.
+toggle_hudiy_kodi_lock = asyncio.Lock()
+
+
 async def toggle_hudiy_kodi():
     global current_app
 
-    check_kodi = await run_command("pgrep -x kodi.bin || pgrep -x kodi")
-    kodi_running = bool(check_kodi["stdout"].strip())
+    async with toggle_hudiy_kodi_lock:
 
-    if kodi_running or current_app == "kodi":
+        # Tatsächlichen Kodi-Zustand immer zuerst prüfen.
+        check_kodi = await run_command("pgrep -x kodi.bin")
+        kodi_running = bool(check_kodi["stdout"].strip())
+
+        # ----------------------------------------------------
+        # Kodi -> HUDIY
+        # ----------------------------------------------------
+        if kodi_running or current_app == "kodi":
+
+            if ENABLE_LOGGING:
+                logger.info(
+                    "Switcher: Beende Kodi -> Starte Hudiy..."
+                )
+
+            # Kodi vollständig beenden.
+            # Auch eventuell alte kodi-standalone.orig-Wrapper
+            # werden entfernt, damit sie Kodi nicht neu starten.
+            await run_command(
+                "pkill -9 -x kodi.bin 2>/dev/null || true; "
+                "pkill -9 -f '/usr/bin/kodi --standalone' "
+                "2>/dev/null || true; "
+                "pkill -9 -f '/usr/bin/kodi-standalone.orig' "
+                "2>/dev/null || true"
+            )
+
+            await asyncio.sleep(0.5)
+
+            # HUDIY Access Point wieder aktivieren.
+            await run_command(
+                "sudo nmcli connection up "
+                "'Hudiy AccessPoint' 2>/dev/null || true"
+            )
+
+            current_app = "hudiy"
+
+            # Display-Manager neu starten.
+            # Labwc startet danach HUDIY über seinen Autostart.
+            await run_command(
+                "sudo systemctl restart display-manager"
+            )
+
+            return
+
+        # ----------------------------------------------------
+        # HUDIY -> Kodi
+        # ----------------------------------------------------
+
         if ENABLE_LOGGING:
-            logger.info("Switcher: Beende Kodi -> Starte Hudiy...")
+            logger.info(
+                "Switcher: Beende Hudiy -> "
+                "Schalte WLAN um & starte Kodi..."
+            )
 
-        # 1. Kodi hart beenden
-        await run_command("killall -9 kodi.bin kodi kodi-standalone 2>/dev/null")
-        await asyncio.sleep(0.3)
+        # HUDIY vollständig beenden.
+        await run_command(
+            "killall -9 hudiy QtWebEngineProcess "
+            "hudiy_run.sh 2>/dev/null"
+        )
 
-        # 2. Access Point für HUDIY / Wireless Android Auto wieder starten
-        await run_command("sudo nmcli connection up 'Hudiy AccessPoint' 2>/dev/null || true")
-
-        # 3. Display-Manager restarten
-        current_app = "hudiy"
-        await run_command("sudo systemctl restart display-manager")
-
-    else:
-        if ENABLE_LOGGING:
-            logger.info("Switcher: Beende Hudiy -> Schalte WLAN um & starte Kodi...")
-
-        # 1. Hudiy vollstaendig beenden
-        await run_command("killall -9 hudiy QtWebEngineProcess hudiy_run.sh 2>/dev/null")
         await asyncio.sleep(0.5)
 
-        # 2. Hudiy AP sofort stoppen & Client-WLAN verbinden
-        await run_command("sudo nmcli connection down 'Hudiy AccessPoint' 2>/dev/null || true")
-        await run_command("sudo nmcli connection up 'Vodafone-9904' 2>/dev/null || sudo nmcli connection up 'S24 von Sebastian' 2>/dev/null || true")
+        # HUDIY Access Point stoppen.
+        await run_command(
+            "sudo nmcli connection down "
+            "'Hudiy AccessPoint' 2>/dev/null || true"
+        )
 
-        # 3. Kodi im Standalone-Modus starten
-        env_exp = "export DISPLAY=:0; export XDG_RUNTIME_DIR=/run/user/1000;"
-        kodi_cmd = f"setsid bash -c '{env_exp} exec kodi-standalone' >/dev/null 2>&1 &"
+        # Client-WLAN im Hintergrund verbinden.
+        # Kodi soll NICHT darauf warten, bis nmcli fertig ist.
+        wifi_cmd = (
+            "sudo nmcli connection up 'Vodafone-9904' "
+            "2>/dev/null || "
+            "sudo nmcli connection up 'S24 von Sebastian' "
+            "2>/dev/null || true"
+        )
+
+        await asyncio.create_subprocess_shell(
+            wifi_cmd,
+            stdout=asyncio.subprocess.DEVNULL,
+            stderr=asyncio.subprocess.DEVNULL,
+        )
+
+        # Noch einmal unmittelbar vor dem Start prüfen.
+        # Falls Kodi inzwischen bereits läuft:
+        # KEINE zweite Instanz starten.
+        check_kodi = await run_command("pgrep -x kodi.bin")
+
+        if check_kodi["stdout"].strip():
+
+            if ENABLE_LOGGING:
+                logger.warning(
+                    "Switcher: Kodi läuft bereits - "
+                    "kein zweiter Start."
+                )
+
+            current_app = "kodi"
+            return
+
+        env_exp = (
+            "export HOME=/home/pi; "
+            "export DISPLAY=:0; "
+            "export XDG_RUNTIME_DIR=/run/user/1000;"
+        )
+
+        # WICHTIG:
+        # Direkt /usr/bin/kodi starten.
+        # NICHT kodi-standalone, da dessen Wrapper Kodi
+        # nach einem harten Beenden erneut starten kann.
+        kodi_cmd = (
+            f"setsid bash -c "
+            f"'{env_exp} exec /usr/bin/kodi --standalone' "
+            f">/dev/null 2>&1 &"
+        )
+
         await asyncio.create_subprocess_shell(kodi_cmd)
+
         current_app = "kodi"
+
+        if ENABLE_LOGGING:
+            logger.info(
+                "Switcher: Kodi direkt gestartet."
+            )
 
 
 @handle_errors
@@ -6276,8 +6370,20 @@ async def process_canid_461(msg):
         # NEXT TRACK Release
         elif msg == '373004020000' and nextbtn > 0:
             if nextbtn <= 4:
-                device.emit(uinput.KEY_F8, 1)
-                device.emit(uinput.KEY_F8, 0)
+                logger.info("RNS-E TRACK NEXT kurz: nextbtn=%s -> Kodi UDP next", nextbtn)
+                try:
+                    import socket
+                    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+                        sock.sendto(
+                            b"next",
+                            ("127.0.0.1", 23457)
+                        )
+                    logger.info("RNS-E TRACK NEXT: Kodi UDP next gesendet")
+                except Exception as error:
+                    logger.exception(
+                        "RNS-E TRACK NEXT: Kodi UDP next fehlgeschlagen: %s",
+                        error
+                    )
             elif nextbtn > 4:
                 device.emit(uinput.KEY_RIGHT, 1)
                 device.emit(uinput.KEY_RIGHT, 0)
@@ -6288,8 +6394,20 @@ async def process_canid_461(msg):
         # PREV TRACK Release
         elif msg == '373004010000' and prev > 0:
             if prev <= 4:
-                device.emit(uinput.KEY_F7, 1)
-                device.emit(uinput.KEY_F7, 0)
+                logger.info("RNS-E TRACK PREV kurz: prev=%s -> Kodi UDP previous", prev)
+                try:
+                    import socket
+                    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+                        sock.sendto(
+                            b"previous",
+                            ("127.0.0.1", 23457)
+                        )
+                    logger.info("RNS-E TRACK PREV: Kodi UDP previous gesendet")
+                except Exception as error:
+                    logger.exception(
+                        "RNS-E TRACK PREV: Kodi UDP previous fehlgeschlagen: %s",
+                        error
+                    )
             elif 4 < prev <= 16:
                 device.emit(uinput.KEY_LEFT, 1)
                 device.emit(uinput.KEY_LEFT, 0)
