@@ -136,38 +136,43 @@ def resolve_location_schema(lat, lon):
 
     # 2. Yahoo Search Assist
     #
-    # Yahoo Search Assist liefert gelegentlich gecachte/falsche
-    # Ergebnisse. Deshalb:
-    # - vollständigen Ortsnamen verwenden
-    # - Cache-Buster anhängen
-    # - nur passende Stadt/Land-Kombination akzeptieren
-    # - niemals irgendeinen fremden ersten Treffer übernehmen
+    # Yahoo liefert gelegentlich falsche/gecachte Suchergebnisse
+    # und verwendet teilweise andere Ortsnamen
+    # (z.B. Kleve -> Cleves, Lissabon -> Lisbon).
+    #
+    # Deshalb prüfen wir nicht primär den Namen, sondern die
+    # geografische Entfernung des Yahoo-Treffers zu den echten
+    # GPS-Koordinaten.
 
+    import math
     import time
+
+    def distance_km(lat1, lon1, lat2, lon2):
+        radius = 6371.0
+
+        p1 = math.radians(lat1)
+        p2 = math.radians(lat2)
+
+        dp = math.radians(lat2 - lat1)
+        dl = math.radians(lon2 - lon1)
+
+        a = (
+            math.sin(dp / 2) ** 2
+            + math.cos(p1)
+            * math.cos(p2)
+            * math.sin(dl / 2) ** 2
+        )
+
+        return 2 * radius * math.asin(math.sqrt(a))
 
     yahoo_match_found = False
 
-    # Für übersetzte Ortsnamen wie
-    # "Lissabon" -> "Lisbon":
-    # Ein nicht exakt gleich geschriebener Treffer muss zweimal
-    # hintereinander mit derselben WOEID erscheinen.
-    pending_woeid = None
-    pending_count = 0
-
     for attempt in range(5):
         try:
-            # Sichtbarer Name bleibt deutsch.
-            # Yahoo bekommt lediglich intern eine eindeutigere Suche,
-            # z.B. "Lissabon Portugal".
-            # Yahoo Search Assist reagiert auf zusätzliche
-            # Landes-/Regionsbegriffe teilweise sehr unzuverlässig.
-            # Deshalb ausschließlich nach dem Ortsnamen suchen.
-            search_text = town
+            # Nur den Ortsnamen suchen.
+            # Zusätze wie Land/Region verschlechtern Yahoo Search Assist.
+            safe_query = urllib.parse.quote(town)
 
-            safe_query = urllib.parse.quote(search_text)
-
-            # Cache-Buster, damit Yahoo/CDN nicht eine alte
-            # Suchantwort eines vorherigen Ortes zurückliefert.
             cache_buster = int(time.time() * 1000)
 
             y_url = (
@@ -195,62 +200,64 @@ def resolve_location_schema(lat, lon):
 
             suggestions = data.get("suggestions", [])
 
-            wanted_town = town.strip().lower()
-            wanted_country = country_code.strip().lower()
-
             best = None
+            best_distance = None
 
             for suggestion in suggestions:
-                loc = suggestion.get("location", {})
-
-                candidate_town = (
-                    loc.get("town", {})
-                    .get("name", "")
-                    .strip()
-                    .lower()
-                )
+                loc_data = suggestion.get("location", {})
 
                 candidate_country = (
-                    loc.get("country", {})
+                    loc_data.get("country", {})
                     .get("code", "")
                     .strip()
                     .lower()
                 )
 
-                # Land muss zwingend stimmen.
-                if candidate_country != wanted_country:
+                # Falsches Land sofort verwerfen.
+                if candidate_country != country_code.lower():
                     continue
 
-                # Exakter Ortsname + richtiges Land:
-                # sofort akzeptieren.
-                if candidate_town == wanted_town:
+                town_data = loc_data.get("town", {})
+
+                candidate_lat = town_data.get("latitude")
+                candidate_lon = town_data.get("longitude")
+                candidate_woeid = town_data.get("woeid", 0)
+
+                if (
+                    candidate_lat is None
+                    or candidate_lon is None
+                    or not candidate_woeid
+                ):
+                    continue
+
+                try:
+                    dist = distance_km(
+                        float(lat),
+                        float(lon),
+                        float(candidate_lat),
+                        float(candidate_lon)
+                    )
+                except Exception:
+                    continue
+
+                if (
+                    best_distance is None
+                    or dist < best_distance
+                ):
                     best = suggestion
-                    break
+                    best_distance = dist
 
-                # Der Ortsname kann übersetzt sein:
-                # Lissabon -> Lisbon, München -> Munich usw.
-                # Solche Treffer akzeptieren wir nicht sofort,
-                # sondern erst nach zwei identischen Ergebnissen.
-                candidate_woeid = (
-                    loc.get("town", {})
-                    .get("woeid", 0)
-                )
-
-                if candidate_woeid:
-                    if candidate_woeid == pending_woeid:
-                        pending_count += 1
-                    else:
-                        pending_woeid = candidate_woeid
-                        pending_count = 1
-
-                    if pending_count >= 2:
-                        best = suggestion
-                        break
-
-            if best is None:
+            # Ein Yahoo-Ort muss geografisch plausibel sein.
+            # 80 km lässt etwas Spielraum bei Stadt-/Regionszentren,
+            # verhindert aber völlig falsche Treffer.
+            if (
+                best is None
+                or best_distance is None
+                or best_distance > 80
+            ):
                 print(
                     f"[YAHOO] Versuch {attempt + 1}: "
-                    f"kein passender Treffer fuer "
+                    f"kein geografisch passender Treffer fuer "
                     f"{full_name!r}",
                     flush=True
                 )
@@ -258,39 +265,32 @@ def resolve_location_schema(lat, lon):
                 time.sleep(0.4)
                 continue
 
-            loc = best.get("location", {})
+            loc_data = best.get("location", {})
 
             yc_code = (
-                loc.get("country", {})
+                loc_data.get("country", {})
                 .get("code", country_code)
                 .lower()
             )
 
             yr_name = (
-                loc.get("region", {})
+                loc_data.get("region", {})
                 .get("name", region or "")
                 .lower()
                 .replace(" ", "-")
             )
 
             yt_name = (
-                loc.get("town", {})
+                loc_data.get("town", {})
                 .get("name", town)
                 .lower()
                 .replace(" ", "-")
             )
 
             w_id = (
-                loc.get("town", {})
+                loc_data.get("town", {})
                 .get("woeid", 0)
             )
-
-            if not w_id:
-                print(
-                    "[YAHOO] Passender Ort, aber keine WOEID.",
-                    flush=True
-                )
-                continue
 
             if yr_name:
                 url_slug = (
@@ -306,9 +306,10 @@ def resolve_location_schema(lat, lon):
             yahoo_match_found = True
 
             print(
-                f"[YAHOO] Match: "
+                f"[YAHOO] Geo-Match: "
                 f"{yt_name}, {yc_code.upper()} "
-                f"WOEID={woeid}",
+                f"WOEID={woeid}, "
+                f"Distanz={best_distance:.1f} km",
                 flush=True
             )
 
@@ -325,9 +326,9 @@ def resolve_location_schema(lat, lon):
 
     if not yahoo_match_found:
         print(
-            f"[YAHOO] Kein sicherer Match fuer "
+            f"[YAHOO] Kein sicherer Geo-Match fuer "
             f"{full_name!r}; "
-            f"verwende keinen fremden Yahoo-Ort.",
+            f"behalte letzte gueltige Wetterdaten.",
             flush=True
         )
 
