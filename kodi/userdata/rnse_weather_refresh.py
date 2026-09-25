@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import signal
 import xbmc
 
 STATE_FILE = os.path.expanduser(
@@ -20,16 +21,29 @@ if mode == "live":
     # Live-/Mock-GPS:
     # Worker sofort aufwecken. Er liest den aktuellen Standort,
     # schreibt weather.multi neu, aktualisiert Wetter und Radar.
-    subprocess.run(
-        [
-            "pkill",
-            "-USR1",
-            "-f",
-            "live_sync_worker.py"
-        ],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
-    )
+    try:
+        pid = subprocess.check_output(
+            [
+                "systemctl",
+                "show",
+                "-p",
+                "MainPID",
+                "--value",
+                "weather-sync.service"
+            ],
+            text=True
+        ).strip()
+
+        if pid and pid != "0":
+            os.kill(
+                int(pid),
+                signal.SIGUSR1
+            )
+    except Exception as e:
+        xbmc.log(
+            f"[RNSE WEATHER] Worker-Trigger fehlgeschlagen: {e}",
+            xbmc.LOGERROR
+        )
 
     xbmc.executebuiltin(
         'Notification(Wetter,"Live-Standort wird aktualisiert...",2000)'

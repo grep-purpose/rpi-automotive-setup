@@ -10,10 +10,63 @@ class Weather():
         set_property('Current.Location'            , '%s, %s' % (data['location']['town'],data['location']['country']))
         set_property('Current.Condition'           , data['location']['outlook'])
         set_property('Current.Temperature'         , convert_temp(data['location']['temperature'], 'F', 'C'))
-        if  data['conditions']['conditions']['uv']:
-            set_property('Current.UVIndex'             , str(data['conditions']['conditions']['uv']['value']))
-        else:
-            set_property('Current.UVIndex'              , '')
+        # Yahoo liefert beim UV-Index teilweise auch nachts noch
+        # einen Tages-/Forecastwert. Deshalb bestimmen wir UV
+        # unabhängig vom Wetterzustand anhand von Sunrise/Sunset.
+        yahoo_uv = ''
+        if data['conditions']['conditions']['uv']:
+            yahoo_uv = str(
+                data['conditions']['conditions']['uv']['value']
+            )
+
+        uv_now = yahoo_uv
+
+        try:
+            # Aktuelle Ortszeit grob aus dem ersten echten Hourly-Eintrag ableiten.
+            uv_approxtime = None
+
+            if len(data['forecasts'][0]['conditionsForecasts']) > 1:
+                for uv_item in data['forecasts'][0]['conditionsForecasts']:
+                    if (
+                        uv_item['time'] == 'Now'
+                        or uv_item['text'] == 'Sunrise'
+                        or uv_item['text'] == 'Sunset'
+                    ):
+                        continue
+
+                    uv_approxtime = uv_item['time']
+                    break
+
+            if uv_approxtime:
+                if uv_approxtime == 'Midnight':
+                    uv_approxtime = '12 AM'
+                elif uv_approxtime == 'Noon':
+                    uv_approxtime = '12 PM'
+
+                uv_hour = (
+                    time.strptime(
+                        uv_approxtime,
+                        '%I %p'
+                    ).tm_hour - 1
+                ) % 24
+
+                uv_sunrise = time.strptime(
+                    data['location']['sunrise'],
+                    '%I:%M %p'
+                ).tm_hour
+
+                uv_sunset = time.strptime(
+                    data['location']['sunset'],
+                    '%I:%M %p'
+                ).tm_hour
+
+                if uv_hour < uv_sunrise or uv_hour >= uv_sunset:
+                    uv_now = '0'
+
+        except Exception:
+            pass
+
+        set_property('Current.UVIndex', uv_now)
         if  data['conditions']['conditions']['airQuality']:
             set_property('Current.AirQuality'          , data['conditions']['conditions']['airQuality']['value'] + ' UAQI')
         else:
@@ -86,6 +139,168 @@ class Weather():
     #today - extended
         set_property('Today.Sunrise'               , convert_datetime(data['location']['sunrise'], 'ampm', None, None))
         set_property('Today.Sunset'                , convert_datetime(data['location']['sunset'], 'ampm', None, None))
+
+
+        # RNSE: Sonnenaufgang / Sonnenuntergang als Sonderkarte
+        #
+        # Nur anzeigen, wenn das naechste Ereignis maximal
+        # ca. 3 Stunden entfernt ist.
+        set_property('Today.SunEvent.Visible', '')
+        set_property('Today.SunEvent.Type', '')
+        set_property('Today.SunEvent.Label', '')
+        set_property('Today.SunEvent.Time', '')
+        set_property('Today.SunEvent.Slot', '')
+        set_property('Today.SunEvent.Icon', '')
+
+        try:
+            # Yahoo liefert keine direkte aktuelle Ortszeit.
+            # Deshalb nehmen wir den ersten echten Hourly-Eintrag
+            # und ziehen eine Stunde ab.
+            next_hour = None
+
+            for sun_item in data['forecasts'][0]['conditionsForecasts']:
+                if (
+                    sun_item['time'] == 'Now'
+                    or sun_item['text'] == 'Sunrise'
+                    or sun_item['text'] == 'Sunset'
+                ):
+                    continue
+
+                next_hour = sun_item['time']
+                break
+
+            # Spaet nachts kann heute nur noch "Now" vorhanden sein.
+            if not next_hour:
+                for sun_item in data['forecasts'][1]['conditionsForecasts']:
+                    if sun_item['text'] in ['Sunrise', 'Sunset']:
+                        continue
+
+                    next_hour = sun_item['time']
+                    break
+
+            if next_hour:
+
+                if next_hour == 'Midnight':
+                    next_hour = '12 AM'
+                elif next_hour == 'Noon':
+                    next_hour = '12 PM'
+
+                parsed_next = time.strptime(next_hour, '%I %p')
+
+                current_minutes = (
+                    parsed_next.tm_hour * 60
+                    - 60
+                ) % 1440
+
+                def parse_sun_minutes(value):
+                    parsed = time.strptime(value, '%I:%M %p')
+                    return parsed.tm_hour * 60 + parsed.tm_min
+
+                sunrise_minutes = parse_sun_minutes(
+                    data['location']['sunrise']
+                )
+
+                sunset_minutes = parse_sun_minutes(
+                    data['location']['sunset']
+                )
+
+                candidates = []
+
+                for event_type, event_minutes in [
+                    ('Sunrise', sunrise_minutes),
+                    ('Sunset', sunset_minutes)
+                ]:
+                    delta = (
+                        event_minutes - current_minutes
+                    ) % 1440
+
+                    if 0 < delta <= 180:
+                        candidates.append(
+                            (
+                                delta,
+                                event_type
+                            )
+                        )
+
+                if candidates:
+                    candidates.sort()
+                    delta, event_type = candidates[0]
+
+                    if delta <= 60:
+                        slot = 2
+                    elif delta <= 120:
+                        slot = 3
+                    else:
+                        slot = 4
+
+                    if event_type == 'Sunrise':
+                        label = '↑ Sonne'
+                        event_time = convert_datetime(
+                            data['location']['sunrise'],
+                            'ampm',
+                            None,
+                            None
+                        )
+
+                        # Platzhalter: Sonne
+                        icon = '32.png'
+
+                    else:
+                        label = '↓ Sonne'
+                        event_time = convert_datetime(
+                            data['location']['sunset'],
+                            'ampm',
+                            None,
+                            None
+                        )
+
+                        # Platzhalter: Mond
+                        icon = '31.png'
+
+                    set_property(
+                        'Today.SunEvent.Visible',
+                        'true'
+                    )
+
+                    set_property(
+                        'Today.SunEvent.Type',
+                        event_type
+                    )
+
+                    set_property(
+                        'Today.SunEvent.Label',
+                        label
+                    )
+
+                    set_property(
+                        'Today.SunEvent.Time',
+                        event_time
+                    )
+
+                    set_property(
+                        'Today.SunEvent.Slot',
+                        str(slot)
+                    )
+
+                    set_property(
+                        'Today.SunEvent.Icon',
+                        icon
+                    )
+
+                    log(
+                        'RNSE SunEvent: '
+                        + label
+                        + ' '
+                        + event_time
+                        + ' slot '
+                        + str(slot)
+                    )
+
+        except Exception as e:
+            log(
+                'RNSE SunEvent Fehler: '
+                + str(e)
+            )
         set_property('Today.Moonphase'             , MOONPHASE[data['conditions']['conditions']['moon']['title'].lower()])
         set_property('Today.MoonphaseIcon'         , data['conditions']['conditions']['moon']['icon'])
         set_property('Today.IsFetched'             , 'true')
