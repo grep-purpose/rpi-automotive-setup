@@ -80,6 +80,7 @@ def resolve_location_schema(lat, lon):
     town = None
     region = None
     country_code = "de"
+    country_name = "Deutschland"
 
     # 1. Reverse Geocoding via BigDataCloud (bevorzugt Deutsch)
     try:
@@ -90,6 +91,10 @@ def resolve_location_schema(lat, lon):
             town = data.get("city") or data.get("locality") or data.get("principalSubdivision")
             region = data.get("principalSubdivision")
             country_code = data.get("countryCode", "de").lower()
+            country_name = (
+                data.get("countryName")
+                or country_code.upper()
+            )
     except Exception as e:
         print(f"[GEO] BDC: {e}", flush=True)
 
@@ -104,6 +109,10 @@ def resolve_location_schema(lat, lon):
                 town = addr.get("city") or addr.get("town") or addr.get("municipality") or addr.get("village")
                 region = addr.get("state") or addr.get("county")
                 country_code = addr.get("country_code", "de").lower()
+                country_name = (
+                    addr.get("country")
+                    or country_code.upper()
+                )
         except Exception as e:
             print(f"[GEO] Nominatim: {e}", flush=True)
 
@@ -126,26 +135,171 @@ def resolve_location_schema(lat, lon):
     woeid = 0
 
     # 2. Yahoo Search Assist
-    try:
-        safe_query = urllib.parse.quote(town)
-        y_url = LCURL % safe_query
-        y_req = urllib.request.Request(y_url, headers=HEADERS)
-        with urllib.request.urlopen(y_req, timeout=5, context=ctx) as resp:
-            data = json.loads(resp.read().decode())
-            sugg = data.get("suggestions", [])
-            if sugg:
-                loc = sugg[0].get("location", {})
-                yc_code = loc.get("country", {}).get("code", country_code).lower()
-                yr_name = loc.get("region", {}).get("name", region or "").lower().replace(" ", "-")
-                yt_name = loc.get("town", {}).get("name", town).lower().replace(" ", "-")
-                w_id = loc.get("town", {}).get("woeid", 0)
+    #
+    # Yahoo Search Assist liefert gelegentlich gecachte/falsche
+    # Ergebnisse. Deshalb:
+    # - vollständigen Ortsnamen verwenden
+    # - Cache-Buster anhängen
+    # - nur passende Stadt/Land-Kombination akzeptieren
+    # - niemals irgendeinen fremden ersten Treffer übernehmen
 
-                if yr_name:
-                    url_slug = f"{yc_code}/{yr_name}/{yt_name}-{w_id}"
-                else:
-                    url_slug = f"{yc_code}/{yt_name}-{w_id}"
-                woeid = w_id
-    except Exception as e:
-        print(f"[YAHOO] Assist Error: {e}", flush=True)
+    import time
+
+    yahoo_match_found = False
+
+    for attempt in range(5):
+        try:
+            # Sichtbarer Name bleibt deutsch.
+            # Yahoo bekommt lediglich intern eine eindeutigere Suche,
+            # z.B. "Lissabon Portugal".
+            search_text = f"{town} {country_name}"
+
+            safe_query = urllib.parse.quote(search_text)
+
+            # Cache-Buster, damit Yahoo/CDN nicht eine alte
+            # Suchantwort eines vorherigen Ortes zurückliefert.
+            cache_buster = int(time.time() * 1000)
+
+            y_url = (
+                (LCURL % safe_query)
+                + f"&_rnse={cache_buster}_{attempt}"
+            )
+
+            y_req = urllib.request.Request(
+                y_url,
+                headers={
+                    **HEADERS,
+                    "Cache-Control": "no-cache",
+                    "Pragma": "no-cache"
+                }
+            )
+
+            with urllib.request.urlopen(
+                y_req,
+                timeout=5,
+                context=ctx
+            ) as resp:
+                data = json.loads(
+                    resp.read().decode()
+                )
+
+            suggestions = data.get("suggestions", [])
+
+            wanted_town = town.strip().lower()
+            wanted_country = country_code.strip().lower()
+
+            best = None
+
+            for suggestion in suggestions:
+                loc = suggestion.get("location", {})
+
+                candidate_town = (
+                    loc.get("town", {})
+                    .get("name", "")
+                    .strip()
+                    .lower()
+                )
+
+                candidate_country = (
+                    loc.get("country", {})
+                    .get("code", "")
+                    .strip()
+                    .lower()
+                )
+
+                # Land muss zwingend stimmen.
+                if candidate_country != wanted_country:
+                    continue
+
+                # Die Stadt kann von Yahoo in einer anderen Sprache
+                # geliefert werden, z.B. Lissabon -> Lisbon.
+                # Da wir bereits mit "Stadt + Land" suchen, genügt
+                # hier ein Treffer aus dem richtigen Land.
+                best = suggestion
+                break
+
+            if best is None:
+                print(
+                    f"[YAHOO] Versuch {attempt + 1}: "
+                    f"kein passender Treffer fuer "
+                    f"{full_name!r}",
+                    flush=True
+                )
+
+                time.sleep(0.4)
+                continue
+
+            loc = best.get("location", {})
+
+            yc_code = (
+                loc.get("country", {})
+                .get("code", country_code)
+                .lower()
+            )
+
+            yr_name = (
+                loc.get("region", {})
+                .get("name", region or "")
+                .lower()
+                .replace(" ", "-")
+            )
+
+            yt_name = (
+                loc.get("town", {})
+                .get("name", town)
+                .lower()
+                .replace(" ", "-")
+            )
+
+            w_id = (
+                loc.get("town", {})
+                .get("woeid", 0)
+            )
+
+            if not w_id:
+                print(
+                    "[YAHOO] Passender Ort, aber keine WOEID.",
+                    flush=True
+                )
+                continue
+
+            if yr_name:
+                url_slug = (
+                    f"{yc_code}/{yr_name}/"
+                    f"{yt_name}-{w_id}"
+                )
+            else:
+                url_slug = (
+                    f"{yc_code}/{yt_name}-{w_id}"
+                )
+
+            woeid = w_id
+            yahoo_match_found = True
+
+            print(
+                f"[YAHOO] Match: "
+                f"{yt_name}, {yc_code.upper()} "
+                f"WOEID={woeid}",
+                flush=True
+            )
+
+            break
+
+        except Exception as e:
+            print(
+                f"[YAHOO] Versuch {attempt + 1} "
+                f"fehlgeschlagen: {e}",
+                flush=True
+            )
+
+            time.sleep(0.4)
+
+    if not yahoo_match_found:
+        print(
+            f"[YAHOO] Kein sicherer Match fuer "
+            f"{full_name!r}; "
+            f"verwende keinen fremden Yahoo-Ort.",
+            flush=True
+        )
 
     return town, full_name, url_slug, woeid

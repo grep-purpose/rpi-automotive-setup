@@ -3,13 +3,17 @@ import time
 import os
 import sys
 import json
+import base64
 import urllib.request
 import subprocess
 import signal
 import threading
 import xml.etree.ElementTree as ET
 
-sys.path.append(os.path.expanduser("~/.kodi/userdata"))
+sys.path.insert(
+    0,
+    os.path.expanduser("~/.kodi/userdata")
+)
 from gps_nmea_provider import get_live_gps, resolve_location_schema
 
 STATE_FILE = os.path.expanduser("~/.kodi/userdata/weather_location_state.txt")
@@ -69,8 +73,9 @@ def run_sync():
         except Exception:
             is_live = True
 
-    # Reiner Live-Modus aktiv
-    pass
+    # Nur im Live-Modus arbeiten.
+    if not is_live:
+        return
 
     coords = get_live_gps()
     if not coords:
@@ -79,6 +84,24 @@ def run_sync():
 
     lat, lon = coords
     town, full_name, url, woeid = resolve_location_schema(lat, lon)
+
+    if not woeid:
+        print(
+            f"[WORKER] Kein sicherer Yahoo-Wetterort fuer "
+            f"{full_name!r}. Behalte letzte gueltige Wetterdaten.",
+            flush=True
+        )
+        return
+
+    print(
+        f"[WORKER] Resolver: "
+        f"town={town!r}, "
+        f"name={full_name!r}, "
+        f"url={url!r}, "
+        f"woeid={woeid!r}",
+        flush=True
+    )
+
     print(f"[WORKER] Live-Standort: {full_name} ({lat}, {lon})", flush=True)
 
     # settings.xml aktualisieren (Slot 1)
