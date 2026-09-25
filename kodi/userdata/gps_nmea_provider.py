@@ -147,12 +147,22 @@ def resolve_location_schema(lat, lon):
 
     yahoo_match_found = False
 
+    # Für übersetzte Ortsnamen wie
+    # "Lissabon" -> "Lisbon":
+    # Ein nicht exakt gleich geschriebener Treffer muss zweimal
+    # hintereinander mit derselben WOEID erscheinen.
+    pending_woeid = None
+    pending_count = 0
+
     for attempt in range(5):
         try:
             # Sichtbarer Name bleibt deutsch.
             # Yahoo bekommt lediglich intern eine eindeutigere Suche,
             # z.B. "Lissabon Portugal".
-            search_text = f"{town} {country_name}"
+            # Yahoo Search Assist reagiert auf zusätzliche
+            # Landes-/Regionsbegriffe teilweise sehr unzuverlässig.
+            # Deshalb ausschließlich nach dem Ortsnamen suchen.
+            search_text = town
 
             safe_query = urllib.parse.quote(search_text)
 
@@ -211,12 +221,31 @@ def resolve_location_schema(lat, lon):
                 if candidate_country != wanted_country:
                     continue
 
-                # Die Stadt kann von Yahoo in einer anderen Sprache
-                # geliefert werden, z.B. Lissabon -> Lisbon.
-                # Da wir bereits mit "Stadt + Land" suchen, genügt
-                # hier ein Treffer aus dem richtigen Land.
-                best = suggestion
-                break
+                # Exakter Ortsname + richtiges Land:
+                # sofort akzeptieren.
+                if candidate_town == wanted_town:
+                    best = suggestion
+                    break
+
+                # Der Ortsname kann übersetzt sein:
+                # Lissabon -> Lisbon, München -> Munich usw.
+                # Solche Treffer akzeptieren wir nicht sofort,
+                # sondern erst nach zwei identischen Ergebnissen.
+                candidate_woeid = (
+                    loc.get("town", {})
+                    .get("woeid", 0)
+                )
+
+                if candidate_woeid:
+                    if candidate_woeid == pending_woeid:
+                        pending_count += 1
+                    else:
+                        pending_woeid = candidate_woeid
+                        pending_count = 1
+
+                    if pending_count >= 2:
+                        best = suggestion
+                        break
 
             if best is None:
                 print(

@@ -30,7 +30,7 @@
             <texturefocus />
             <texturenofocus />
             
-            <onclick>Weather.Refresh</onclick>
+            <onclick>RunScript(/home/pi/.kodi/userdata/rnse_weather_refresh.py)</onclick>
             
             <ondown>200</ondown>
             <onright>200</onright>
