@@ -5,6 +5,10 @@ import sys
 import urllib.parse
 
 import xbmc
+import xbmcgui
+
+HOME = xbmcgui.Window(10000)
+
 
 RADIO_DIRECTORY = (
     "plugin://plugin.audio.radiode/"
@@ -58,12 +62,50 @@ def get_current_radio():
         }
     )
 
-    plugin_url = result.get("result", {}).get(
+    player_path = result.get("result", {}).get(
         "Player.FilenameAndPath",
         ""
     )
 
-    return decode_radio_data(plugin_url)
+    # Fall 1:
+    # Sender wurde normal über radio.de gestartet.
+    data = decode_radio_data(player_path)
+
+    if data:
+        return data
+
+    # Fall 2:
+    # Sender wurde durch unseren RNS-E-Router
+    # als Direktstream gestartet.
+    station_id = HOME.getProperty(
+        "RNSE.RadioStationId"
+    ).strip()
+
+    station_name = HOME.getProperty(
+        "RNSE.RadioStation"
+    ).strip()
+
+    stream_url = HOME.getProperty(
+        "RNSE.RadioStreamUrl"
+    ).strip()
+
+    icon_url = HOME.getProperty(
+        "RNSE.RadioLogo"
+    ).strip()
+
+    if (
+        station_id
+        and stream_url
+        and player_path == stream_url
+    ):
+        return {
+            "id": station_id,
+            "name": station_name,
+            "stream_url": stream_url,
+            "icon_url": icon_url,
+        }
+
+    return None
 
 
 def get_radio_stations():
@@ -105,6 +147,8 @@ def get_radio_stations():
                 "id": station_id,
                 "name": data.get("name") or item.get("label", station_id),
                 "plugin_url": plugin_url,
+                "stream_url": data.get("stream_url", ""),
+                "icon_url": data.get("icon_url", ""),
             }
         )
 
@@ -159,13 +203,70 @@ def switch_radio(direction):
         xbmc.LOGINFO
     )
 
-    plugin_url = target_station["plugin_url"]
+    stream_url = target_station.get("stream_url", "")
+    icon_url = target_station.get("icon_url", "")
+    station_name = target_station["name"]
 
-    # Entscheidender Unterschied:
-    # Kodi soll den Plugin-Eintrag wirklich ABSPIELEN,
-    # nicht als Fenster/Verzeichnis öffnen.
-    xbmc.executebuiltin(
-        f'PlayMedia("{plugin_url}",1)'
+    if not stream_url:
+        xbmc.log(
+            f"RNS-E Radio Direktstream fehlt: {station_name}",
+            xbmc.LOGERROR
+        )
+        return True
+
+    item = xbmcgui.ListItem(
+        label=station_name,
+        path=stream_url
+    )
+
+    item.setArt({
+        "thumb": icon_url,
+        "icon": icon_url,
+    })
+
+    item.setInfo(
+        "music",
+        {
+            "title": station_name,
+            "artist": station_name,
+        }
+    )
+
+    # Aktuellen Sender für Home.xml, Metadata-Service
+    # und den nächsten NEXT/PREV-Aufruf speichern.
+    HOME.setProperty(
+        "RNSE.RadioStation",
+        station_name
+    )
+
+    HOME.setProperty(
+        "RNSE.RadioStationId",
+        target_station["id"]
+    )
+
+    HOME.setProperty(
+        "RNSE.RadioProvider",
+        "radio.de"
+    )
+
+    HOME.setProperty(
+        "RNSE.RadioLogo",
+        icon_url
+    )
+
+    HOME.setProperty(
+        "RNSE.RadioStreamUrl",
+        stream_url
+    )
+
+    xbmc.log(
+        f"RNS-E Radio Direktstream: {station_name} -> {stream_url}",
+        xbmc.LOGINFO
+    )
+
+    xbmc.Player().play(
+        stream_url,
+        item
     )
 
     return True

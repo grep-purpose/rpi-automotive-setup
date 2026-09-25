@@ -1,0 +1,19 @@
+{
+    "applications": [
+        {
+            "identifier": "rns_camera_lines",
+            "name": "RNS Camera",
+            "url": "http://127.0.0.1:44408/camera_web_with_lines.html",
+            "icon": "",
+            "visibility": "ALWAYS",
+            "fullscreen": true
+        },
+        {
+            "action": "kodi_switch",
+            "url": "http://127.0.0.1:44409/kodi",
+            "controlAudioFocus": false,
+            "audioStreamCategory": "NONE",
+            "allowBackground": false
+        }
+    ]
+}

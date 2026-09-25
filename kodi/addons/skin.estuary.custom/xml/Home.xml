@@ -263,13 +263,19 @@
                 <item>
                     <label>Twitch</label>
                     <icon>home/twitch.png</icon>
-                    <onclick>ActivateWindow(Videos,plugin://plugin.video.twitch/?content=live&amp;mode=followed,return)</onclick>
+                    <onclick>ActivateWindow(10025,&quot;plugin://plugin.video.twitch/?content=live&amp;mode=followed&quot;,return)</onclick>
                 </item>
 
                 <item>
                     <label>Radio</label>
                     <icon>home/radio.png</icon>
                     <onclick>ActivateWindow(10502,&quot;plugin://plugin.audio.radiode/?data=%7b%22name%22%3a%20%22Local%20stations%22%7d&amp;mode=get_local_stations&quot;,return)</onclick>
+                </item>
+
+                <item>
+                    <label>Android Auto</label>
+                    <icon>home/android_auto.png</icon>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/android_auto_toggle.py)</onclick>
                 </item>
 
                 <item>
@@ -411,7 +417,13 @@
                 <texture colordiffuse="668d99ae">colors/white.png</texture>
             </control>
 
-            <!-- Überschrift -->
+            <!-- =====================================================
+                 RECHTE STATUSZONE
+                 Radio: Sender / Provider / Live
+                 Andere Medien: bisherige Quellenanzeige
+                 ===================================================== -->
+
+            <!-- Radio: Überschrift -->
             <control type="label">
                 <left>1365</left>
                 <top>30</top>
@@ -419,10 +431,23 @@
                 <height>45</height>
                 <font>font30_title</font>
                 <textcolor>ff9da6b2</textcolor>
+                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation))</visible>
+                <label>SENDER</label>
+            </control>
+
+            <!-- Andere Medien: Überschrift -->
+            <control type="label">
+                <left>1365</left>
+                <top>30</top>
+                <width>400</width>
+                <height>45</height>
+                <font>font30_title</font>
+                <textcolor>ff9da6b2</textcolor>
+                <visible>String.IsEmpty(Window(Home).Property(RNSE.RadioStation))</visible>
                 <label>QUELLE</label>
             </control>
 
-            <!-- echter Sendername, falls vorhanden -->
+            <!-- Radio: echter Sendername aus Metadata Service -->
             <control type="label">
                 <left>1365</left>
                 <top>72</top>
@@ -430,11 +455,59 @@
                 <height>65</height>
                 <font>font45</font>
                 <textcolor>ffffffff</textcolor>
-                <visible>!String.IsEmpty(MusicPlayer.ChannelName)</visible>
+                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation))</visible>
+                <label>[B]$INFO[Window(Home).Property(RNSE.RadioStation)][/B]</label>
+            </control>
+
+            <!-- Radio: Provider -->
+            <control type="label">
+                <left>1365</left>
+                <top>145</top>
+                <width>190</width>
+                <height>50</height>
+                <font>font30_title</font>
+                <textcolor>ffd5dae0</textcolor>
+                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation))</visible>
+                <label>RADIO.DE</label>
+            </control>
+
+            <!-- Radio: Trenner -->
+            <control type="label">
+                <left>1535</left>
+                <top>145</top>
+                <width>35</width>
+                <height>50</height>
+                <font>font30_title</font>
+                <textcolor>ff7f8790</textcolor>
+                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation))</visible>
+                <label>·</label>
+            </control>
+
+            <!-- Radio: Live-Status -->
+            <control type="label">
+                <left>1570</left>
+                <top>145</top>
+                <width>150</width>
+                <height>50</height>
+                <font>font30_title</font>
+                <textcolor>ffff8a32</textcolor>
+                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation))</visible>
+                <label>[B]LIVE[/B]</label>
+            </control>
+
+            <!-- Andere Medien: echter ChannelName, falls vorhanden -->
+            <control type="label">
+                <left>1365</left>
+                <top>72</top>
+                <width>430</width>
+                <height>65</height>
+                <font>font45</font>
+                <textcolor>ffffffff</textcolor>
+                <visible>String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEmpty(MusicPlayer.ChannelName)</visible>
                 <label>[B]$INFO[MusicPlayer.ChannelName][/B]</label>
             </control>
 
-            <!-- Radio.de Fallback -->
+            <!-- Radio.de Fallback, falls Metadata Service einmal nichts liefert -->
             <control type="label">
                 <left>1365</left>
                 <top>72</top>
@@ -442,11 +515,11 @@
                 <height>65</height>
                 <font>font45</font>
                 <textcolor>ffffffff</textcolor>
-                <visible>String.IsEmpty(MusicPlayer.ChannelName) + String.Contains(Player.FilenameAndPath,plugin.audio.radiode)</visible>
+                <visible>String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + String.IsEmpty(MusicPlayer.ChannelName) + String.Contains(Player.FilenameAndPath,plugin.audio.radiode)</visible>
                 <label>[B]RADIO.DE[/B]</label>
             </control>
 
-            <!-- generischer Fallback -->
+            <!-- Generischer Medien-Fallback -->
             <control type="label">
                 <left>1365</left>
                 <top>72</top>
@@ -454,11 +527,11 @@
                 <height>65</height>
                 <font>font45</font>
                 <textcolor>ffffffff</textcolor>
-                <visible>String.IsEmpty(MusicPlayer.ChannelName) + !String.Contains(Player.FilenameAndPath,plugin.audio.radiode)</visible>
+                <visible>String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + String.IsEmpty(MusicPlayer.ChannelName) + !String.Contains(Player.FilenameAndPath,plugin.audio.radiode)</visible>
                 <label>[B]MEDIA[/B]</label>
             </control>
 
-            <!-- LIVE bei Streams ohne bekannte Gesamtdauer -->
+            <!-- Andere Medien: LIVE bei Streams ohne Dauer -->
             <control type="label">
                 <left>1365</left>
                 <top>145</top>
@@ -466,11 +539,11 @@
                 <height>50</height>
                 <font>font36_title</font>
                 <textcolor>ffff8a32</textcolor>
-                <visible>String.IsEmpty(Player.Duration)</visible>
+                <visible>String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + String.IsEmpty(Player.Duration)</visible>
                 <label>[B]LIVE[/B]</label>
             </control>
 
-            <!-- Laufzeit bei normalen Medien -->
+            <!-- Andere Medien: Laufzeit -->
             <control type="label">
                 <left>1365</left>
                 <top>145</top>
@@ -478,7 +551,7 @@
                 <height>50</height>
                 <font>font30_title</font>
                 <textcolor>ffd5dae0</textcolor>
-                <visible>!String.IsEmpty(Player.Duration)</visible>
+                <visible>String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEmpty(Player.Duration)</visible>
                 <label>$INFO[Player.Time]  /  $INFO[Player.Duration]</label>
             </control>
 

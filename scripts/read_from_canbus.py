@@ -6138,6 +6138,177 @@ current_app = "hudiy"
 toggle_hudiy_kodi_lock = asyncio.Lock()
 
 
+
+async def handle_hudiy_kodi_http(reader, writer):
+    try:
+        request_line = await asyncio.wait_for(
+            reader.readline(),
+            timeout=2.0
+        )
+
+        request = request_line.decode(
+            "utf-8",
+            errors="ignore"
+        ).strip()
+
+        parts = request.split()
+        path = parts[1] if len(parts) >= 2 else "/"
+
+        if path == "/kodi":
+            body = (
+                "<html><body style='background:#000;color:#fff;"
+                "font-family:sans-serif;text-align:center;"
+                "padding-top:120px'>"
+                "<h2>Starte Kodi...</h2>"
+                "</body></html>"
+            )
+
+            response = (
+                "HTTP/1.1 200 OK\r\n"
+                "Content-Type: text/html; charset=utf-8\r\n"
+                f"Content-Length: {len(body.encode('utf-8'))}\r\n"
+                "Connection: close\r\n"
+                "\r\n"
+                + body
+            )
+
+            writer.write(response.encode("utf-8"))
+            await writer.drain()
+
+            if ENABLE_LOGGING:
+                logger.info(
+                    "HUDIY UI: Kodi-Start angefordert"
+                )
+
+            await asyncio.sleep(0.15)
+
+            check_kodi = await run_command(
+                "pgrep -x kodi.bin"
+            )
+
+            kodi_running = bool(
+                check_kodi["stdout"].strip()
+            )
+
+            if not kodi_running:
+                await toggle_hudiy_kodi()
+            elif ENABLE_LOGGING:
+                logger.info(
+                    "HUDIY UI: Kodi läuft bereits, Trigger ignoriert"
+                )
+
+        else:
+            body = "Not Found"
+
+            response = (
+                "HTTP/1.1 404 Not Found\r\n"
+                "Content-Type: text/plain\r\n"
+                f"Content-Length: {len(body)}\r\n"
+                "Connection: close\r\n"
+                "\r\n"
+                + body
+            )
+
+            writer.write(response.encode("utf-8"))
+            await writer.drain()
+
+    except Exception:
+        logger.exception(
+            "HUDIY Kodi HTTP trigger failed"
+        )
+
+    finally:
+        writer.close()
+
+        try:
+            await writer.wait_closed()
+        except Exception:
+            pass
+
+
+async def hudiy_kodi_http_server():
+    server = await asyncio.start_server(
+        handle_hudiy_kodi_http,
+        "127.0.0.1",
+        44409
+    )
+
+    if ENABLE_LOGGING:
+        logger.info(
+            "HUDIY Kodi HTTP trigger listening on "
+            "127.0.0.1:44409"
+        )
+
+    async with server:
+        await server.serve_forever()
+
+
+
+def ensure_kodi_qol_settings():
+    """
+    Erzwingt vor jedem Kodi-Start:
+    - Lautstärke 100 %
+    - Mute aus
+    - Screensaver aus
+    - Display-Off aus
+    """
+    import xml.etree.ElementTree as ET
+
+    settings_path = Path(
+        "/home/pi/.kodi/userdata/guisettings.xml"
+    )
+
+    if not settings_path.exists():
+        if ENABLE_LOGGING:
+            logger.warning(
+                "Kodi QoL: guisettings.xml nicht gefunden."
+            )
+        return
+
+    try:
+        tree = ET.parse(settings_path)
+        root = tree.getroot()
+
+        for setting in root.iter("setting"):
+            setting_id = setting.get("id")
+
+            if setting_id == "screensaver.mode":
+                setting.text = ""
+                setting.attrib.pop("default", None)
+
+            elif setting_id == "screensaver.time":
+                setting.text = "0"
+                setting.attrib.pop("default", None)
+
+            elif setting_id == "powermanagement.displaysoff":
+                setting.text = "0"
+                setting.attrib.pop("default", None)
+
+        for elem in root.iter("mute"):
+            elem.text = "false"
+
+        for elem in root.iter("fvolumelevel"):
+            elem.text = "1.000000"
+
+        tree.write(
+            settings_path,
+            encoding="UTF-8",
+            xml_declaration=True
+        )
+
+        if ENABLE_LOGGING:
+            logger.info(
+                "Kodi QoL: Volume=100%%, Mute=aus, "
+                "Screensaver=aus, Display-Off=aus."
+            )
+
+    except Exception:
+        logger.exception(
+            "Kodi QoL: guisettings.xml konnte "
+            "nicht aktualisiert werden."
+        )
+
+
 async def toggle_hudiy_kodi():
     global current_app
 
@@ -6248,6 +6419,9 @@ async def toggle_hudiy_kodi():
         )
 
         # WICHTIG:
+        # Kodi vor jedem Start in einen definierten Zustand bringen.
+        ensure_kodi_qol_settings()
+
         # Direkt /usr/bin/kodi starten.
         # NICHT kodi-standalone, da dessen Wrapper Kodi
         # nach einem harten Beenden erneut starten kann.
@@ -7933,6 +8107,13 @@ async def main():
             cam_init(reversecamera_guidelines)  # backend-neutraler lokaler Kamera-Warmstart
         #start the remote control task to shutdown other running scripts on startup or via network controll website
         remote_task = track_task(remote_control(), "remote_control")
+
+        # Lokaler Trigger für den HUDIY-Menüpunkt "Kodi".
+        track_task(
+            hudiy_kodi_http_server(),
+            "hudiy_kodi_http_server"
+        )
+
         # conditional tasks
         #start api connection if api features are enabled
         if send_to_api_gauges or (

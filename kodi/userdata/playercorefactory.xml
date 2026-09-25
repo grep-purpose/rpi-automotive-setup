@@ -1,0 +1,17 @@
+<playercorefactory>
+    <rules action="prepend">
+
+        <!--
+        Internet-Radiostreams als MP3 immer mit Kodis PAPlayer öffnen.
+        radio.de löst seine plugin:// URL vor der Player-Auswahl
+        zu einer echten http/https ...stream.mp3 URL auf.
+        -->
+        <rule
+            name="RNS-E Internet Radio MP3"
+            protocols="http|https"
+            filetypes="mp3"
+            player="PAPlayer"
+        />
+
+    </rules>
+</playercorefactory>
