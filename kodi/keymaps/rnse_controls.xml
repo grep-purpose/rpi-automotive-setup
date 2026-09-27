@@ -13,7 +13,7 @@
       <escape>Back</escape>
 
       <!-- RNS-E SETUP kurz = globale Kodi/System-Einstellungen -->
-      <m>ActivateWindow(Settings)</m>
+      <m>ActivateWindow(1150)</m>
 
       <!-- Steuerkreuz links: Up = PageUp / Down = PageDown -->
       <up>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,up)</up>
@@ -24,6 +24,10 @@
       <right>Right</right>
       <prev_track>Left</prev_track>
       <next_track>Right</next_track>
+
+      <!-- RNS-E Track-Tasten: kurzer Druck -->
+      <f7>RunScript(/home/pi/.kodi/userdata/rnse_media_router.py,previous)</f7>
+      <f8>RunScript(/home/pi/.kodi/userdata/rnse_media_router.py,next)</f8>
     </keyboard>
   </global>
 
@@ -73,6 +77,10 @@
       <right>ChannelUp</right>
       <prev_track>ChannelDown</prev_track>
       <next_track>ChannelUp</next_track>
+
+      <!-- RNS-E Track-Tasten: kurzer Druck = Senderwechsel -->
+      <f7>ChannelDown</f7>
+      <f8>ChannelUp</f8>
     </keyboard>
   </FullScreenLiveTV>
 </keymap>
