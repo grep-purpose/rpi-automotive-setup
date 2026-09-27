@@ -1,0 +1,244 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<window id="1152">
+    <defaultcontrol always="true">9300</defaultcontrol>
+    <onload>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,scan)</onload>
+    <controls>
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>1920</width>
+            <height>1080</height>
+            <texture colordiffuse="ff05070a">colors/black.png</texture>
+        </control>
+        <control type="group">
+            <left>30</left>
+            <right>30</right>
+            <top>18</top>
+            <height>105</height>
+            <control type="image">
+                <left>0</left>
+                <top>82</top>
+                <width>525</width>
+                <height>3</height>
+                <texture colordiffuse="99ffffff">colors/white.png</texture>
+            </control>
+            <control type="label">
+                <left>540</left>
+                <top>0</top>
+                <width>780</width>
+                <height>100</height>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font60</font>
+                <textcolor>ffd90429</textcolor>
+                <label>[B]WLAN[/B]</label>
+            </control>
+            <control type="image">
+                <right>0</right>
+                <top>82</top>
+                <width>525</width>
+                <height>3</height>
+                <texture colordiffuse="99ffffff">colors/white.png</texture>
+            </control>
+        </control>
+        <control type="list" id="9300">
+            <left>90</left>
+            <top>135</top>
+            <width>1740</width>
+            <height>790</height>
+            <orientation>vertical</orientation>
+            <onup>Control.Move(9300,-1)</onup>
+            <ondown>Control.Move(9300,1)</ondown>
+            <onleft>Control.Move(9300,-1)</onleft>
+            <onright>Control.Move(9300,1)</onright>
+            <itemlayout width="1740" height="105">
+                <control type="label">
+                    <left>55</left>
+                    <top>2</top>
+                    <width>1120</width>
+                    <height>100</height>
+                    <font>font60</font>
+                    <textcolor>ff8d99ae</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B]$INFO[ListItem.Label][/B]</label>
+                </control>
+                <control type="label">
+                    <left>1160</left>
+                    <top>2</top>
+                    <width>500</width>
+                    <height>100</height>
+                    <font>font45</font>
+                    <textcolor>ff8d99ae</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label2]</label>
+                </control>
+            </itemlayout>
+            <focusedlayout width="1740" height="105">
+                <control type="image">
+                    <left>0</left>
+                    <top>3</top>
+                    <width>1740</width>
+                    <height>99</height>
+                    <texture colordiffuse="ff141923">colors/black.png</texture>
+                </control>
+                <control type="image">
+                    <left>0</left>
+                    <top>8</top>
+                    <width>12</width>
+                    <height>89</height>
+                    <texture colordiffuse="ffff6b00">colors/white.png</texture>
+                </control>
+                <control type="label">
+                    <left>55</left>
+                    <top>2</top>
+                    <width>1120</width>
+                    <height>100</height>
+                    <font>font60</font>
+                    <textcolor>ffffffff</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B]$INFO[ListItem.Label][/B]</label>
+                </control>
+                <control type="label">
+                    <left>1160</left>
+                    <top>2</top>
+                    <width>500</width>
+                    <height>100</height>
+                    <font>font45</font>
+                    <textcolor>ffffffff</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label2]</label>
+                </control>
+            </focusedlayout>
+            <content>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID1)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info1)]</label2>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID1))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,1)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID2)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info2)]</label2>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID2))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,2)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID3)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info3)]</label2>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID3))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,3)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID4)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info4)]</label2>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID4))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,4)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID5)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info5)]</label2>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID5))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,5)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID6)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info6)]</label2>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID6))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,6)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID7)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info7)]</label2>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID7))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,7)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID8)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info8)]</label2>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID8))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,8)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID9)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info9)]</label2>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID9))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,9)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID10)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info10)]</label2>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID10))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,10)</onclick>
+                </item>
+                <item>
+                    <label>Netzwerke neu suchen</label>
+                    <label2 />
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,scan)</onclick>
+                </item>
+            </content>
+        </control>
+        <control type="group">
+            <left>30</left>
+            <control type="image">
+                <left>0</left>
+                <top>20</top>
+                <width>500</width>
+                <height>90</height>
+                <texture colordiffuse="ff05070a">colors/black.png</texture>
+            </control>
+            <right>30</right>
+            <bottom>18</bottom>
+            <height>124</height>
+            <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>5</height>
+                <texture colordiffuse="aaffffff">colors/white.png</texture>
+            </control>
+            <control type="group">
+                <left>720</left>
+                <top>20</top>
+                <width>430</width>
+                <height>82</height>
+                <control type="image">
+                    <left>0</left>
+                    <top>11</top>
+                    <width>54</width>
+                    <height>54</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture>$INFO[Weather.ConditionsIcon]</texture>
+                </control>
+                <control type="label">
+                    <left>68</left>
+                    <top>0</top>
+                    <width>120</width>
+                    <height>82</height>
+                    <aligny>center</aligny>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <label>[B]$INFO[Weather.Temperature][/B]</label>
+                </control>
+                <control type="image">
+                    <left>195</left>
+                    <top>16</top>
+                    <width>2</width>
+                    <height>48</height>
+                    <texture colordiffuse="55ffffff">colors/white.png</texture>
+                </control>
+                <control type="label">
+                    <left>220</left>
+                    <top>0</top>
+                    <width>170</width>
+                    <height>82</height>
+                    <aligny>center</aligny>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <label>[B]$INFO[System.Time(hh:mm)][/B]</label>
+                </control>
+            </control>
+        </control>
+    </controls>
+</window>

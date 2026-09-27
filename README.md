@@ -50,3 +50,8 @@ Zentrales Konfigurations- und Quellcode-Repository für das Raspberry Pi Infotai
 * **`skin/Home.xml`**: Angepasste Startbildschirm- und Menü-Struktur für das Hauptmenü in Kodi.
 * **`keymaps/`**: Tastenbelegungen für die OEM-Steuerung.
 * **`playlists/`**: Angepasste Wiedergabelisten und Stream-Scanner.
+
+## TODO / Further down the road
+
+- **VirtualKeyboard Previous-Track / Backspace:** Die spezielle Kodi-Tastatursteuerung für WLAN funktioniert grundsätzlich gut. Die Previous-Track-Taste lässt sich aktuell jedoch noch nicht zuverlässig als Backspace/Delete nutzen und verhält sich teilweise wie Cursor-Left. Später die RNS-E-/uinput-Tastenlogik noch einmal genauer reverse-engineeren und nur für das aktive VirtualKeyboard sauber auf Backspace abbilden. Niedrige Priorität.
+
