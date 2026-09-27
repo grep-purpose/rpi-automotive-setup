@@ -43,9 +43,9 @@
         </control>
         <control type="list" id="9400">
             <left>90</left>
-            <top>135</top>
+            <top>120</top>
             <width>1740</width>
-            <height>790</height>
+            <height>830</height>
             <orientation>vertical</orientation>
             <onup>9400</onup>
             <ondown>9400</ondown>
@@ -233,6 +233,21 @@
                     <label2>$INFO[Window(Home).Property(RNSE.SysInfo.GitStatus)]</label2>
                 </item>
             </content>
+            <pagecontrol>9640</pagecontrol>
+        </control>
+        <control type="scrollbar" id="9640">
+            <left>1850</left>
+            <top>120</top>
+            <width>12</width>
+            <height>830</height>
+            <orientation>vertical</orientation>
+            <showonepage>false</showonepage>
+            <visible>Container(9400).HasNext | Container(9400).HasPrevious</visible>
+            <texturesliderbackground colordiffuse="443f4650">colors/white.png</texturesliderbackground>
+            <texturesliderbar colordiffuse="ff8d99ae">colors/white.png</texturesliderbar>
+            <texturesliderbarfocus colordiffuse="ffff6b00">colors/white.png</texturesliderbarfocus>
+            <textureslidernib />
+            <textureslidernibfocus />
         </control>
         <control type="group">
             <left>30</left>

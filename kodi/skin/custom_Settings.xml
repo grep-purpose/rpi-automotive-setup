@@ -42,9 +42,9 @@
         </control>
         <control type="list" id="9100">
             <left>90</left>
-            <top>135</top>
+            <top>120</top>
             <width>1740</width>
-            <height>790</height>
+            <height>830</height>
             <orientation>vertical</orientation>
             <onup>9100</onup>
             <ondown>9100</ondown>
@@ -116,6 +116,21 @@
                     <onclick>Notification(Einstellungen,Diagnose - Funktionen folgen,2000)</onclick>
                 </item>
             </content>
+            <pagecontrol>9610</pagecontrol>
+        </control>
+        <control type="scrollbar" id="9610">
+            <left>1850</left>
+            <top>120</top>
+            <width>12</width>
+            <height>830</height>
+            <orientation>vertical</orientation>
+            <showonepage>false</showonepage>
+            <visible>Container(9100).HasNext | Container(9100).HasPrevious</visible>
+            <texturesliderbackground colordiffuse="443f4650">colors/white.png</texturesliderbackground>
+            <texturesliderbar colordiffuse="ff8d99ae">colors/white.png</texturesliderbar>
+            <texturesliderbarfocus colordiffuse="ffff6b00">colors/white.png</texturesliderbarfocus>
+            <textureslidernib />
+            <textureslidernibfocus />
         </control>
         <control type="group">
             <left>30</left>

@@ -6,13 +6,19 @@ from pathlib import Path
 import xbmc
 import xbmcgui
 
+
 WINDOW = xbmcgui.Window(10000)
 
-CACHE = Path(
+NETWORK_CACHE = Path(
     "/home/pi/.kodi/userdata/rnse_wifi_networks.json"
 )
 
+SAVED_CACHE = Path(
+    "/home/pi/.kodi/userdata/rnse_wifi_saved.json"
+)
+
 MAX_NETWORKS = 10
+MAX_SAVED = 15
 
 
 def log(text):
@@ -22,7 +28,7 @@ def log(text):
     )
 
 
-def run(args, timeout=20):
+def run(args, timeout=60):
     try:
         result = subprocess.run(
             args,
@@ -38,6 +44,9 @@ def run(args, timeout=20):
             result.stderr.strip()
         )
 
+    except subprocess.TimeoutExpired:
+        return 124, "", "Zeitüberschreitung"
+
     except Exception as e:
         return 1, "", str(e)
 
@@ -49,7 +58,103 @@ def prop(name, value=""):
     )
 
 
-def clear_properties():
+# ============================================================
+# WLAN EIN / AUS
+# ============================================================
+
+def wifi_enabled():
+    code, out, err = run([
+        "nmcli",
+        "radio",
+        "wifi"
+    ])
+
+    return (
+        code == 0
+        and out.strip().lower() == "enabled"
+    )
+
+
+def sync_wifi_state():
+    if wifi_enabled():
+        prop("EnabledState", "on")
+        return True
+
+    prop("EnabledState", "off")
+    return False
+
+
+def toggle_wifi():
+    if wifi_enabled():
+
+        code, out, err = run([
+            "nmcli",
+            "radio",
+            "wifi",
+            "off"
+        ])
+
+        if code == 0:
+            prop("EnabledState", "off")
+            clear_network_properties()
+
+            xbmcgui.Dialog().notification(
+                "WLAN",
+                "WLAN ausgeschaltet",
+                xbmcgui.NOTIFICATION_INFO,
+                1800
+            )
+
+            xbmc.sleep(300)
+            xbmc.executebuiltin("SetFocus(9300)")
+            xbmc.executebuiltin("Action(FirstPage)")
+
+        else:
+            xbmcgui.Dialog().notification(
+                "WLAN",
+                "WLAN konnte nicht ausgeschaltet werden",
+                xbmcgui.NOTIFICATION_ERROR,
+                2500
+            )
+
+    else:
+
+        code, out, err = run([
+            "nmcli",
+            "radio",
+            "wifi",
+            "on"
+        ])
+
+        if code == 0:
+            prop("EnabledState", "on")
+
+            xbmcgui.Dialog().notification(
+                "WLAN",
+                "WLAN eingeschaltet",
+                xbmcgui.NOTIFICATION_INFO,
+                1500
+            )
+
+            # Funkchip kurz hochkommen lassen
+            xbmc.sleep(1200)
+
+            scan()
+
+        else:
+            xbmcgui.Dialog().notification(
+                "WLAN",
+                "WLAN konnte nicht eingeschaltet werden",
+                xbmcgui.NOTIFICATION_ERROR,
+                2500
+            )
+
+
+# ============================================================
+# WLAN-SCAN
+# ============================================================
+
+def clear_network_properties():
     for i in range(1, MAX_NETWORKS + 1):
         prop("SSID%d" % i, "")
         prop("Info%d" % i, "")
@@ -57,8 +162,28 @@ def clear_properties():
         prop("Active%d" % i, "")
 
 
+def focus_first_network():
+    # Liste selbst fokussieren
+    xbmc.executebuiltin("SetFocus(9300)")
+
+    xbmc.sleep(100)
+
+    # Wirklich ganz nach oben
+    xbmc.executebuiltin("Action(FirstPage)")
+
+    xbmc.sleep(100)
+
+    # Zeile 1 = WLAN-Schalter
+    # Eine Position runter = erstes WLAN-Netzwerk
+    xbmc.executebuiltin("Action(Down)")
+
+
 def scan():
-    clear_properties()
+    clear_network_properties()
+
+    if not sync_wifi_state():
+        log("Scan übersprungen: WLAN ist ausgeschaltet")
+        return
 
     code, out, err = run([
         "nmcli",
@@ -88,15 +213,13 @@ def scan():
 
         return
 
-    # SSID -> stärkster Eintrag
     networks = {}
 
     for raw in out.splitlines():
+
         if not raw.strip():
             continue
 
-        # nmcli liefert:
-        # IN-USE:SSID:SIGNAL:SECURITY
         parts = raw.split(":", 3)
 
         if len(parts) != 4:
@@ -106,7 +229,6 @@ def scan():
 
         ssid = ssid.strip()
 
-        # versteckte/leere SSIDs nicht anzeigen
         if not ssid:
             continue
 
@@ -131,7 +253,6 @@ def scan():
         ):
             networks[ssid] = entry
 
-    # Verbundenes Netz zuerst, danach Signalstärke
     result = sorted(
         networks.values(),
         key=lambda x: (
@@ -143,7 +264,7 @@ def scan():
 
     result = result[:MAX_NETWORKS]
 
-    CACHE.write_text(
+    NETWORK_CACHE.write_text(
         json.dumps(
             result,
             ensure_ascii=False,
@@ -153,6 +274,7 @@ def scan():
     )
 
     for i, network in enumerate(result, 1):
+
         prop(
             "SSID%d" % i,
             network["ssid"]
@@ -183,11 +305,17 @@ def scan():
         % len(result)
     )
 
+    # Dein funktionierender FirstPage-Fix:
+    # nach jedem Scan zum ERSTEN Netzwerk.
+    if result:
+        xbmc.sleep(200)
+        focus_first_network()
 
-def load_cache():
+
+def load_network_cache():
     try:
         return json.loads(
-            CACHE.read_text(
+            NETWORK_CACHE.read_text(
                 encoding="utf-8"
             )
         )
@@ -195,7 +323,12 @@ def load_cache():
         return []
 
 
+# ============================================================
+# PASSWORT
+# ============================================================
+
 def ask_password(ssid):
+
     keyboard = xbmc.Keyboard(
         "",
         "Passwort für %s" % ssid,
@@ -210,17 +343,23 @@ def ask_password(ssid):
     return keyboard.getText()
 
 
+# ============================================================
+# VERBINDEN
+# ============================================================
+
 def refresh_after_connect():
     xbmc.sleep(1000)
     scan()
 
 
 def connect(slot):
-    networks = load_cache()
+
+    networks = load_network_cache()
 
     index = slot - 1
 
     if index < 0 or index >= len(networks):
+
         xbmcgui.Dialog().notification(
             "WLAN",
             "Netzwerk nicht mehr verfügbar",
@@ -238,12 +377,14 @@ def connect(slot):
     active = network.get("active", False)
 
     if active:
+
         xbmcgui.Dialog().notification(
             "WLAN",
             "%s ist bereits verbunden" % ssid,
             xbmcgui.NOTIFICATION_INFO,
             1800
         )
+
         return
 
     xbmcgui.Dialog().notification(
@@ -254,8 +395,8 @@ def connect(slot):
     )
 
     # --------------------------------------------------------
-    # Zuerst ohne Passwort versuchen.
-    # Funktioniert bei bereits gespeicherten Verbindungen.
+    # Erst versuchen, ein bereits gespeichertes Profil zu
+    # verwenden.
     # --------------------------------------------------------
 
     code, out, err = run([
@@ -269,11 +410,12 @@ def connect(slot):
     ])
 
     if code == 0:
+
         xbmcgui.Dialog().notification(
             "WLAN",
             "Mit %s verbunden" % ssid,
             xbmcgui.NOTIFICATION_INFO,
-            2500
+            2200
         )
 
         refresh_after_connect()
@@ -284,18 +426,15 @@ def connect(slot):
         % err
     )
 
-    # --------------------------------------------------------
-    # Offenes Netz?
-    # Dann gibt es nichts weiter zu fragen.
-    # --------------------------------------------------------
-
     security_upper = security.upper()
 
+    # Offenes Netz
     if (
         not security_upper
         or security_upper == "--"
         or security_upper == "NONE"
     ):
+
         xbmcgui.Dialog().notification(
             "WLAN",
             "Verbindung fehlgeschlagen",
@@ -305,17 +444,14 @@ def connect(slot):
 
         return
 
-    # --------------------------------------------------------
-    # Neues geschütztes Netz:
-    # Kodi-Bildschirmtastatur öffnen
-    # --------------------------------------------------------
-
+    # Geschütztes neues Netz
     password = ask_password(ssid)
 
     if password is None:
         return
 
     if not password:
+
         xbmcgui.Dialog().notification(
             "WLAN",
             "Kein Passwort eingegeben",
@@ -337,10 +473,10 @@ def connect(slot):
         "wlan0"
     ])
 
-    # Passwort danach nicht weiter behalten
     password = None
 
     if code == 0:
+
         xbmcgui.Dialog().notification(
             "WLAN",
             "Mit %s verbunden" % ssid,
@@ -351,18 +487,248 @@ def connect(slot):
         refresh_after_connect()
 
     else:
+
         log(
             "Verbindung fehlgeschlagen: %s"
             % err
         )
 
+        message = "Verbindung fehlgeschlagen"
+
+        if "timeout" in err.lower():
+            message = "Zeitüberschreitung bei Verbindung"
+
+        elif "secret" in err.lower():
+            message = "Authentifizierung fehlgeschlagen"
+
         xbmcgui.Dialog().notification(
             "WLAN",
-            "Verbindung mit %s fehlgeschlagen" % ssid,
+            message,
             xbmcgui.NOTIFICATION_ERROR,
             3000
         )
 
+
+# ============================================================
+# GESPEICHERTE WLAN-NETZE
+# ============================================================
+
+def clear_saved_properties():
+
+    for i in range(1, MAX_SAVED + 1):
+
+        prop(
+            "SavedName%d" % i,
+            ""
+        )
+
+        prop(
+            "SavedInfo%d" % i,
+            ""
+        )
+
+
+def saved_networks():
+
+    clear_saved_properties()
+
+    code, out, err = run([
+        "nmcli",
+        "-t",
+        "-f",
+        "NAME,UUID,TYPE",
+        "connection",
+        "show"
+    ])
+
+    if code != 0:
+
+        log(
+            "Gespeicherte Netzwerke konnten nicht gelesen werden: %s"
+            % err
+        )
+
+        return
+
+    result = []
+
+    for line in out.splitlines():
+
+        if not line.strip():
+            continue
+
+        parts = line.split(":")
+
+        if len(parts) < 3:
+            continue
+
+        name = parts[0]
+        uuid = parts[1]
+        conn_type = parts[2]
+
+        if conn_type != "802-11-wireless" and conn_type != "wifi":
+            continue
+
+        # AP-/Hotspot-Profile nicht als normales WLAN anzeigen
+        mode_code, mode_out, mode_err = run([
+            "nmcli",
+            "-g",
+            "802-11-wireless.mode",
+            "connection",
+            "show",
+            "uuid",
+            uuid
+        ])
+
+        mode = mode_out.strip().lower()
+
+        if mode in ("ap", "adhoc"):
+            continue
+
+        ssid_code, ssid_out, ssid_err = run([
+            "nmcli",
+            "-g",
+            "802-11-wireless.ssid",
+            "connection",
+            "show",
+            "uuid",
+            uuid
+        ])
+
+        ssid = ssid_out.strip() or name
+
+        result.append({
+            "name": name,
+            "ssid": ssid,
+            "uuid": uuid
+        })
+
+    # Doppelte Profile mit gleicher SSID nicht mehrfach anzeigen
+    unique = {}
+
+    for entry in result:
+        unique[entry["uuid"]] = entry
+
+    result = sorted(
+        unique.values(),
+        key=lambda x: x["ssid"].lower()
+    )
+
+    result = result[:MAX_SAVED]
+
+    SAVED_CACHE.write_text(
+        json.dumps(
+            result,
+            ensure_ascii=False,
+            indent=2
+        ),
+        encoding="utf-8"
+    )
+
+    for i, entry in enumerate(result, 1):
+
+        prop(
+            "SavedName%d" % i,
+            entry["ssid"]
+        )
+
+        prop(
+            "SavedInfo%d" % i,
+            "gespeichert"
+        )
+
+    xbmc.sleep(150)
+
+    xbmc.executebuiltin(
+        "SetFocus(9500)"
+    )
+
+    xbmc.sleep(100)
+
+    xbmc.executebuiltin(
+        "Action(FirstPage)"
+    )
+
+
+def load_saved_cache():
+
+    try:
+        return json.loads(
+            SAVED_CACHE.read_text(
+                encoding="utf-8"
+            )
+        )
+
+    except Exception:
+        return []
+
+
+def forget(slot):
+
+    networks = load_saved_cache()
+
+    index = slot - 1
+
+    if (
+        index < 0
+        or index >= len(networks)
+    ):
+        saved_networks()
+        return
+
+    network = networks[index]
+
+    ssid = network["ssid"]
+    uuid = network["uuid"]
+
+    confirmed = xbmcgui.Dialog().yesno(
+        "WLAN",
+        "Netzwerk '%s' wirklich vergessen?"
+        % ssid
+    )
+
+    if not confirmed:
+        return
+
+    code, out, err = run([
+        "nmcli",
+        "connection",
+        "delete",
+        "uuid",
+        uuid
+    ])
+
+    if code == 0:
+
+        xbmcgui.Dialog().notification(
+            "WLAN",
+            "%s wurde vergessen" % ssid,
+            xbmcgui.NOTIFICATION_INFO,
+            2200
+        )
+
+        xbmc.sleep(400)
+
+        saved_networks()
+
+    else:
+
+        log(
+            "Vergessen fehlgeschlagen: %s"
+            % err
+        )
+
+        xbmcgui.Dialog().notification(
+            "WLAN",
+            "Netzwerk konnte nicht vergessen werden",
+            xbmcgui.NOTIFICATION_ERROR,
+            2500
+        )
+
+
+# ============================================================
+# START
+# ============================================================
 
 mode = (
     sys.argv[1]
@@ -370,13 +736,42 @@ mode = (
     else "scan"
 )
 
+
 if mode == "scan":
+
     scan()
 
+
 elif mode == "connect":
+
     try:
         slot = int(sys.argv[2])
     except Exception:
         slot = 0
 
     connect(slot)
+
+
+elif mode == "toggle_wifi":
+
+    toggle_wifi()
+
+
+elif mode == "sync_wifi":
+
+    sync_wifi_state()
+
+
+elif mode == "saved":
+
+    saved_networks()
+
+
+elif mode == "forget":
+
+    try:
+        slot = int(sys.argv[2])
+    except Exception:
+        slot = 0
+
+    forget(slot)
