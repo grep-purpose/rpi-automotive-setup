@@ -321,18 +321,11 @@ class Weather():
         # Stunden hier selbst lückenlos von 1 bis 24.
 
         hourly_index = 1
+        # RNSE:
+        # Today.SunEvent.* wurde bereits weiter oben intelligent
+        # für das sichtbare 3-Stunden-Fenster berechnet.
+        # Hier NICHT erneut überschreiben.
 
-        # Optionales Sonnenereignis für unsere OEM-Wetteransicht.
-        #
-        # Yahoo liefert Sunrise/Sunset direkt zwischen den normalen
-        # Stundenwerten. Wir lassen die Hourly-Liste trotzdem
-        # lückenlos und merken uns stattdessen die chronologische
-        # Position des nächsten Sonnenereignisses separat.
-        set_property('Today.SunEvent.Type', '')
-        set_property('Today.SunEvent.Time', '')
-        set_property('Today.SunEvent.Position', '')
-
-        sun_event_found = False
 
         for day_index in range(2):
 
@@ -341,45 +334,11 @@ class Weather():
             wind = data['forecasts'][day_index]['windForecasts']
 
             for source_index, item in enumerate(conditions):
-
                 if item['text'] in ['Sunrise', 'Sunset']:
-                    # Nur das nächste Ereignis des heutigen Tages
-                    # interessiert die kompakte Hourly-Anzeige.
-                    if day_index == 0 and not sun_event_found:
-                        set_property(
-                            'Today.SunEvent.Type',
-                            item['text']
-                        )
-                        set_property(
-                            'Today.SunEvent.Time',
-                            convert_datetime(
-                                item['time'],
-                                'ampm',
-                                None,
-                                None
-                            )
-                        )
-                        set_property(
-                            'Today.SunEvent.Position',
-                            str(hourly_index)
-                        )
-                        sun_event_found = True
-
-                        log(
-                            "RNSE SunEvent: "
-                            + item['text']
-                            + " at "
-                            + convert_datetime(
-                                item['time'],
-                                'ampm',
-                                None,
-                                None
-                            )
-                            + " position "
-                            + str(hourly_index)
-                        )
-
+                    # Nicht als normale Wetterstunde darstellen.
+                    # Die Positionierung übernimmt Today.SunEvent.Slot.
                     continue
+
 
                 if hourly_index > 24:
                     break
@@ -552,4 +511,71 @@ class Weather():
                 condition = item['iconLabel']
             set_property('Daily.%i.OutlookIcon'      % (count + 1), '%s.png' % OUTLOOK[condition])
             set_property('Daily.%i.FanartCode'       % (count + 1), OUTLOOK[condition])
+
+            # RNSE: feste deutsche Tagesnamen für die OEM-Anzeige
+            german_days = {
+                'Monday': 'Montag',
+                'Tuesday': 'Dienstag',
+                'Wednesday': 'Mittwoch',
+                'Thursday': 'Donnerstag',
+                'Friday': 'Freitag',
+                'Saturday': 'Samstag',
+                'Sunday': 'Sonntag',
+
+                'Mon': 'Montag',
+                'Tue': 'Dienstag',
+                'Wed': 'Mittwoch',
+                'Thu': 'Donnerstag',
+                'Fri': 'Freitag',
+                'Sat': 'Samstag',
+                'Sun': 'Sonntag'
+            }
+
+            set_property(
+                'Daily.%i.RNSEDay' % (count + 1),
+                german_days.get(day, day)
+            )
+
+            # RNSE: Tages-Regenwahrscheinlichkeit
+            #
+            # Yahoo liefert die Wahrscheinlichkeit stundenweise.
+            # Für die kompakte Tagesansicht verwenden wir den
+            # höchsten Wert des jeweiligen Tages.
+            try:
+                daily_precip = item.get(
+                    'precipitationForecasts',
+                    []
+                )
+
+                probabilities = []
+
+                for precip_item in daily_precip:
+                    try:
+                        probabilities.append(
+                            int(
+                                precip_item.get(
+                                    'probabilityOfPrecipitation',
+                                    0
+                                )
+                            )
+                        )
+                    except Exception:
+                        pass
+
+                if probabilities:
+                    set_property(
+                        'Daily.%i.Precipitation' % (count + 1),
+                        str(int(round(sum(probabilities) / len(probabilities)))) + '%'
+                    )
+                else:
+                    set_property(
+                        'Daily.%i.Precipitation' % (count + 1),
+                        ''
+                    )
+
+            except Exception:
+                set_property(
+                    'Daily.%i.Precipitation' % (count + 1),
+                    ''
+                )
         set_property('Daily.IsFetched'               , 'true')

@@ -1,6 +1,6 @@
 <window id="2600">
-    <defaultcontrol always="true">100</defaultcontrol>
-    <onload>SetProperty(WeatherView,forecast,home)</onload>
+    <defaultcontrol always="true">50</defaultcontrol>
+    <onload>SetProperty(WeatherView,hourly,home)</onload>
     <controls>
         
         <control type="image">
@@ -16,7 +16,7 @@
         
 
         
-        <control type="button" id="100">
+        <control type="button" id="9001">
             <left>45</left>
             <top>18</top>
             <width>400</width>
@@ -31,12 +31,11 @@
             <texturenofocus />
             
             <onclick>RunScript(/home/pi/.kodi/userdata/rnse_weather_refresh.py)</onclick>
-            
-            <ondown>200</ondown>
-            <onright>200</onright>
-            
-            <onup>900</onup>
-            <onleft>900</onleft>
+
+            <onup>9001</onup>
+            <ondown>9001</ondown>
+            <onleft>9001</onleft>
+            <onright>9001</onright>
         </control>
         <control type="image">
             <left>30</left>
@@ -47,38 +46,17 @@
         </control>
 
         
+        <!-- HEADER-TITEL: identisch zum Hauptmenü -->
         <control type="label">
             <left>570</left>
             <top>18</top>
             <width>780</width>
-            <height>82</height>
+            <height>100</height>
             <font>font60</font>
             <textcolor>ffd90429</textcolor>
             <align>center</align>
             <aligny>center</aligny>
             <label>[B]Wetter[/B]</label>
-        </control>
-
-        
-        <control type="button" id="200">
-            <left>1475</left>
-            <top>18</top>
-            <width>400</width>
-            <height>82</height>
-            <font>font45</font>
-            <textcolor>fff0f2f5</textcolor>
-            <focusedcolor>ffff8800</focusedcolor>
-            <label>[B]$VAR[WeatherToggleLabelVar][/B]</label>
-            <align>right</align>
-            <textoffsetx>10</textoffsetx>
-            <texturefocus />
-            <texturenofocus />
-            <onclick condition="String.IsEmpty(Window(home).Property(WeatherView)) | String.IsEqual(Window(home).Property(WeatherView),forecast)">SetProperty(WeatherView,radar,home)</onclick>
-            <onclick condition="String.IsEqual(Window(home).Property(WeatherView),radar)">SetProperty(WeatherView,forecast,home)</onclick>
-            <ondown>910</ondown>
-            <onright>910</onright>
-            <onup>100</onup>
-            <onleft>100</onleft>
         </control>
         <control type="image">
             <left>1365</left>
@@ -250,674 +228,1217 @@
         
         
         
-        <control type="group">
-            <control type="group">
-            <left>0</left>
-            <top>0</top>
-            <width>920</width>
-            <height>220</height>
-            <control type="image">
-                <left>0</left>
-                <top>0</top>
-                <width>920</width>
-                <height>220</height>
-                <texture colordiffuse="26FFFFFF">colors/white.png</texture>
-            </control>
-
-            
-            <control type="group">
-                <left>15</left>
-                <top>0</top>
-                <width>210</width>
-                <height>220</height>
-                <control type="label">
-                    <left>0</left>
-                    <top>14</top>
-                    <width>210</width>
-                    <height>40</height>
-                    <font>font42</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <align>center</align>
-                    <label condition="String.IsEqual(Window(Weather).Property(Hourly.1.Time),Now)">[B]Jetzt[/B]</label>
-                    <label condition="!String.IsEqual(Window(Weather).Property(Hourly.1.Time),Now)">[B]$INFO[Window(Weather).Property(Hourly.1.Time)][/B]</label>
-                </control>
-                <control type="image">
-                    <left>60</left>
-                    <top>56</top>
-                    <width>90</width>
-                    <height>80</height>
-                    <aspectratio>keep</aspectratio>
-                    <texture condition="!String.IsEmpty(Window(Weather).Property(Current.ConditionIcon))">$INFO[Window(Weather).Property(Current.ConditionIcon)]</texture>
-                    <texture condition="String.IsEmpty(Window(Weather).Property(Current.ConditionIcon))">$INFO[Weather.ConditionsIcon]</texture>
-                </control>
-                <control type="label">
-                    <left>0</left>
-                    <top>144</top>
-                    <width>210</width>
-                    <height>45</height>
-                    <font>font45</font>
-                    <textcolor>ffff8800</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Hourly.1.Temperature)][/B]</label>
-                </control>
-            </control>
-
-            
-            <control type="group">
-                <left>235</left>
-                <top>0</top>
-                <width>210</width>
-                <height>220</height>
-                <control type="label">
-                    <left>0</left>
-                    <top>14</top>
-                    <width>210</width>
-                    <height>40</height>
-                    <font>font42</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Hourly.2.Time)][/B]</label>
-                </control>
-                <control type="image">
-                    <left>60</left>
-                    <top>56</top>
-                    <width>90</width>
-                    <height>80</height>
-                    <aspectratio>keep</aspectratio>
-                    <texture condition="!String.IsEmpty(Window(Weather).Property(Hourly.2.OutlookIcon))">resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Hourly.2.OutlookIcon)]</texture>
-                    <texture condition="String.IsEmpty(Window(Weather).Property(Hourly.2.OutlookIcon))">resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Daily.1.OutlookIcon)]</texture>
-                </control>
-                <control type="label">
-                    <left>0</left>
-                    <top>144</top>
-                    <width>210</width>
-                    <height>45</height>
-                    <font>font45</font>
-                    <textcolor>ffff8800</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Hourly.2.Temperature)][/B]</label>
-                </control>
-            </control>
-
-            
-            <control type="group">
-                <left>455</left>
-                <top>0</top>
-                <width>210</width>
-                <height>220</height>
-                <control type="label">
-                    <left>0</left>
-                    <top>14</top>
-                    <width>210</width>
-                    <height>40</height>
-                    <font>font42</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Hourly.3.Time)][/B]</label>
-                </control>
-                <control type="image">
-                    <left>60</left>
-                    <top>56</top>
-                    <width>90</width>
-                    <height>80</height>
-                    <aspectratio>keep</aspectratio>
-                    <texture condition="!String.IsEmpty(Window(Weather).Property(Hourly.3.OutlookIcon))">resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Hourly.3.OutlookIcon)]</texture>
-                    <texture condition="String.IsEmpty(Window(Weather).Property(Hourly.3.OutlookIcon))">resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Daily.1.OutlookIcon)]</texture>
-                </control>
-                <control type="label">
-                    <left>0</left>
-                    <top>144</top>
-                    <width>210</width>
-                    <height>45</height>
-                    <font>font45</font>
-                    <textcolor>ffff8800</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Hourly.3.Temperature)][/B]</label>
-                </control>
-            </control>
-
-            
-            <control type="group">
-                <left>675</left>
-                <top>0</top>
-                <width>210</width>
-                <height>220</height>
-                <control type="label">
-                    <left>0</left>
-                    <top>14</top>
-                    <width>210</width>
-                    <height>40</height>
-                    <font>font42</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Hourly.4.Time)][/B]</label>
-                </control>
-                <control type="image">
-                    <left>60</left>
-                    <top>56</top>
-                    <width>90</width>
-                    <height>80</height>
-                    <aspectratio>keep</aspectratio>
-                    <texture condition="!String.IsEmpty(Window(Weather).Property(Hourly.4.OutlookIcon))">resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Hourly.4.OutlookIcon)]</texture>
-                    <texture condition="String.IsEmpty(Window(Weather).Property(Hourly.4.OutlookIcon))">resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Daily.1.OutlookIcon)]</texture>
-                </control>
-                <control type="label">
-                    <left>0</left>
-                    <top>144</top>
-                    <width>210</width>
-                    <height>45</height>
-                    <font>font45</font>
-                    <textcolor>ffff8800</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Hourly.4.Temperature)][/B]</label>
-                </control>
-            </control>
-
-            <!-- RNSE Sonnenereignis Overlay - Slot 2 -->
-            <control type="group">
-                <left>235</left>
-                <top>0</top>
-                <width>210</width>
-                <height>220</height>
-                <visible>String.IsEqual(Window(Weather).Property(Today.SunEvent.Slot),2)</visible>
-
-                <!-- Bestehende Hourly-Kachel vollständig abdecken -->
-                <control type="image">
-                    <left>0</left>
-                    <top>0</top>
-                    <width>210</width>
-                    <height>220</height>
-                    <texture colordiffuse="FF0A0A0A">colors/black.png</texture>
-                </control>
-
-                <control type="image">
-                    <left>0</left>
-                    <top>0</top>
-                    <width>210</width>
-                    <height>220</height>
-                    <texture colordiffuse="26FFFFFF">colors/white.png</texture>
-                </control>
-
-                <!-- Exakte Uhrzeit -->
-                <control type="label">
-                    <left>0</left>
-                    <top>14</top>
-                    <width>210</width>
-                    <height>40</height>
-                    <font>font42</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Today.Sunrise)][/B]</label>
-                    <visible>String.IsEqual(Window(Weather).Property(Today.SunEvent.Label),↑ Sonne)</visible>
-                </control>
-
-                <control type="label">
-                    <left>0</left>
-                    <top>14</top>
-                    <width>210</width>
-                    <height>40</height>
-                    <font>font42</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Today.Sunset)][/B]</label>
-                    <visible>String.IsEqual(Window(Weather).Property(Today.SunEvent.Label),↓ Sonne)</visible>
-                </control>
-
-                <!-- Platzhalter-Icon: Sonne / Mond -->
-                <control type="image">
-                    <left>60</left>
-                    <top>56</top>
-                    <width>90</width>
-                    <height>80</height>
-                    <aspectratio>keep</aspectratio>
-                    <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Today.SunEvent.Icon)]</texture>
-                </control>
-
-                <control type="label">
-                    <left>0</left>
-                    <top>144</top>
-                    <width>210</width>
-                    <height>45</height>
-                    <font>font45</font>
-                    <textcolor>ffff8800</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Today.SunEvent.Label)][/B]</label>
-                </control>
-            </control>
-
-            <!-- RNSE Sonnenereignis Overlay - Slot 3 -->
-            <control type="group">
-                <left>455</left>
-                <top>0</top>
-                <width>210</width>
-                <height>220</height>
-                <visible>String.IsEqual(Window(Weather).Property(Today.SunEvent.Slot),3)</visible>
-
-                <control type="image">
-                    <left>0</left>
-                    <top>0</top>
-                    <width>210</width>
-                    <height>220</height>
-                    <texture colordiffuse="FF0A0A0A">colors/black.png</texture>
-                </control>
-
-                <control type="image">
-                    <left>0</left>
-                    <top>0</top>
-                    <width>210</width>
-                    <height>220</height>
-                    <texture colordiffuse="26FFFFFF">colors/white.png</texture>
-                </control>
-
-                <control type="label">
-                    <left>0</left>
-                    <top>14</top>
-                    <width>210</width>
-                    <height>40</height>
-                    <font>font42</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Today.Sunrise)][/B]</label>
-                    <visible>String.IsEqual(Window(Weather).Property(Today.SunEvent.Label),↑ Sonne)</visible>
-                </control>
-
-                <control type="label">
-                    <left>0</left>
-                    <top>14</top>
-                    <width>210</width>
-                    <height>40</height>
-                    <font>font42</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Today.Sunset)][/B]</label>
-                    <visible>String.IsEqual(Window(Weather).Property(Today.SunEvent.Label),↓ Sonne)</visible>
-                </control>
-
-                <control type="image">
-                    <left>60</left>
-                    <top>56</top>
-                    <width>90</width>
-                    <height>80</height>
-                    <aspectratio>keep</aspectratio>
-                    <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Today.SunEvent.Icon)]</texture>
-                </control>
-
-                <control type="label">
-                    <left>0</left>
-                    <top>144</top>
-                    <width>210</width>
-                    <height>45</height>
-                    <font>font45</font>
-                    <textcolor>ffff8800</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Today.SunEvent.Label)][/B]</label>
-                </control>
-            </control>
-
-            <!-- RNSE Sonnenereignis Overlay - Slot 4 -->
-            <control type="group">
-                <left>675</left>
-                <top>0</top>
-                <width>210</width>
-                <height>220</height>
-                <visible>String.IsEqual(Window(Weather).Property(Today.SunEvent.Slot),4)</visible>
-
-                <control type="image">
-                    <left>0</left>
-                    <top>0</top>
-                    <width>210</width>
-                    <height>220</height>
-                    <texture colordiffuse="FF0A0A0A">colors/black.png</texture>
-                </control>
-
-                <control type="image">
-                    <left>0</left>
-                    <top>0</top>
-                    <width>210</width>
-                    <height>220</height>
-                    <texture colordiffuse="26FFFFFF">colors/white.png</texture>
-                </control>
-
-                <control type="label">
-                    <left>0</left>
-                    <top>14</top>
-                    <width>210</width>
-                    <height>40</height>
-                    <font>font42</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Today.Sunrise)][/B]</label>
-                    <visible>String.IsEqual(Window(Weather).Property(Today.SunEvent.Label),↑ Sonne)</visible>
-                </control>
-
-                <control type="label">
-                    <left>0</left>
-                    <top>14</top>
-                    <width>210</width>
-                    <height>40</height>
-                    <font>font42</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Today.Sunset)][/B]</label>
-                    <visible>String.IsEqual(Window(Weather).Property(Today.SunEvent.Label),↓ Sonne)</visible>
-                </control>
-
-                <control type="image">
-                    <left>60</left>
-                    <top>56</top>
-                    <width>90</width>
-                    <height>80</height>
-                    <aspectratio>keep</aspectratio>
-                    <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Today.SunEvent.Icon)]</texture>
-                </control>
-
-                <control type="label">
-                    <left>0</left>
-                    <top>144</top>
-                    <width>210</width>
-                    <height>45</height>
-                    <font>font45</font>
-                    <textcolor>ffff8800</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Today.SunEvent.Label)][/B]</label>
-                </control>
-            </control>
+        <!-- =====================================================
+             RNSE WETTER - MAIN CONTENT
+             50 = STÜNDLICH
+             51 = TÄGLICH
+             52 = RADAR
+             ===================================================== -->
 
 
-            <!-- RNSE Hourly Shift nach Sonnenereignis -->
+        <!-- =====================================================
+             Fokussteuerung
+             WICHTIG:
+             Beim Nutzer ist die Drehrichtung logisch vertauscht,
+             deshalb wird Up = nach rechts / Down = nach links benutzt.
+             ===================================================== -->
 
-            <!--
-                Ereignis in Slot 2:
-                Slot 3 zeigt Hourly.2 statt Hourly.3
-            -->
-            <control type="group">
-                <left>455</left>
-                <top>0</top>
-                <width>210</width>
-                <height>220</height>
-                <visible>String.IsEqual(Window(Weather).Property(Today.SunEvent.Slot),2)</visible>
+        <control type="button" id="50">
+            <left>970</left>
+            <top>122</top>
+            <width>300</width>
+            <height>72</height>
 
-                <control type="image">
-                    <left>0</left>
-                    <top>0</top>
-                    <width>210</width>
-                    <height>220</height>
-                    <texture colordiffuse="FF0A0A0A">colors/black.png</texture>
-                </control>
+            <label></label>
+            <font>font30</font>
+            <textcolor>00000000</textcolor>
+            <focusedcolor>00000000</focusedcolor>
+            <disabledcolor>00000000</disabledcolor>
+            <texturefocus />
+            <texturenofocus />
 
-                <control type="image">
-                    <left>0</left>
-                    <top>0</top>
-                    <width>210</width>
-                    <height>220</height>
-                    <texture colordiffuse="26FFFFFF">colors/white.png</texture>
-                </control>
+            <onfocus>SetProperty(WeatherView,hourly,home)</onfocus>
 
-                <control type="label">
-                    <left>0</left>
-                    <top>14</top>
-                    <width>210</width>
-                    <height>40</height>
-                    <font>font42</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Hourly.2.Time)][/B]</label>
-                </control>
+            <!-- Drehregler nach rechts -->
+            <onup>51</onup>
 
-                <control type="image">
-                    <left>60</left>
-                    <top>56</top>
-                    <width>90</width>
-                    <height>80</height>
-                    <aspectratio>keep</aspectratio>
-                    <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Hourly.2.OutlookIcon)]</texture>
-                </control>
+            <!-- Drehregler nach links -->
+            <ondown>52</ondown>
 
-                <control type="label">
-                    <left>0</left>
-                    <top>144</top>
-                    <width>210</width>
-                    <height>45</height>
-                    <font>font45</font>
-                    <textcolor>ffff8800</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Hourly.2.Temperature)][/B]</label>
-                </control>
-            </control>
-
-
-            <!--
-                Ereignis in Slot 2 oder 3:
-                Der letzte sichtbare Slot zeigt Hourly.3.
-            -->
-            <control type="group">
-                <left>675</left>
-                <top>0</top>
-                <width>210</width>
-                <height>220</height>
-                <visible>String.IsEqual(Window(Weather).Property(Today.SunEvent.Slot),2) | String.IsEqual(Window(Weather).Property(Today.SunEvent.Slot),3)</visible>
-
-                <control type="image">
-                    <left>0</left>
-                    <top>0</top>
-                    <width>210</width>
-                    <height>220</height>
-                    <texture colordiffuse="FF0A0A0A">colors/black.png</texture>
-                </control>
-
-                <control type="image">
-                    <left>0</left>
-                    <top>0</top>
-                    <width>210</width>
-                    <height>220</height>
-                    <texture colordiffuse="26FFFFFF">colors/white.png</texture>
-                </control>
-
-                <control type="label">
-                    <left>0</left>
-                    <top>14</top>
-                    <width>210</width>
-                    <height>40</height>
-                    <font>font42</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Hourly.3.Time)][/B]</label>
-                </control>
-
-                <control type="image">
-                    <left>60</left>
-                    <top>56</top>
-                    <width>90</width>
-                    <height>80</height>
-                    <aspectratio>keep</aspectratio>
-                    <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Hourly.3.OutlookIcon)]</texture>
-                </control>
-
-                <control type="label">
-                    <left>0</left>
-                    <top>144</top>
-                    <width>210</width>
-                    <height>45</height>
-                    <font>font45</font>
-                    <textcolor>ffff8800</textcolor>
-                    <align>center</align>
-                    <label>[B]$INFO[Window(Weather).Property(Hourly.3.Temperature)][/B]</label>
-                </control>
-            </control>
-
-        </control>
-    <left>970</left>
-            <top>125</top>
-            <width>920</width>
-            <height>890</height>
-            <visible>!String.IsEqual(Window(home).Property(WeatherView),radar)</visible>
-
-            
-            <control type="group">
-            <left>0</left>
-            <top>227</top>
-            <width>920</width>
-            <height>220</height>
-            <control type="image">
-                <left>0</left>
-                <top>0</top>
-                <width>920</width>
-                <height>220</height>
-                <texture colordiffuse="26FFFFFF">colors/white.png</texture>
-            </control>
-            <control type="label">
-                <left>40</left>
-                <top>0</top>
-                <width>330</width>
-                <height>220</height>
-                <font>font45</font>
-                <textcolor>fff0f2f5</textcolor>
-                <aligny>center</aligny>
-                <label>[B]Morgen[/B]</label>
-            </control>
-            <control type="image">
-                <left>380</left>
-                <top>39</top>
-                <width>142</width>
-                <height>142</height>
-                <aspectratio>keep</aspectratio>
-                <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Daily.2.OutlookIcon)]</texture>
-            </control>
-            <control type="label">
-                <left>540</left>
-                <top>0</top>
-                <width>345</width>
-                <height>220</height>
-                <font>font45</font>
-                <textcolor>ffff8800</textcolor>
-                <align>right</align>
-                <aligny>center</aligny>
-                <label>[B]$INFO[Window(Weather).Property(Daily.2.HighTemperature)]$INFO[Window(Weather).Property(Daily.2.LowTemperature), / ][/B]</label>
-            </control>
+            <onleft>52</onleft>
+            <onright>51</onright>
         </control>
 
-        
-        <control type="group">
-            <left>0</left>
-            <top>454</top>
-            <width>920</width>
-            <height>220</height>
-            <control type="image">
-                <left>0</left>
-                <top>0</top>
-                <width>920</width>
-                <height>220</height>
-                <texture colordiffuse="26FFFFFF">colors/white.png</texture>
-            </control>
-            <control type="label">
-                <left>40</left>
-                <top>0</top>
-                <width>330</width>
-                <height>220</height>
-                <font>font45</font>
-                <textcolor>fff0f2f5</textcolor>
-                <aligny>center</aligny>
-                <label>[B]Übermorgen[/B]</label>
-            </control>
-            <control type="image">
-                <left>380</left>
-                <top>39</top>
-                <width>142</width>
-                <height>142</height>
-                <aspectratio>keep</aspectratio>
-                <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Daily.3.OutlookIcon)]</texture>
-            </control>
-            <control type="label">
-                <left>540</left>
-                <top>0</top>
-                <width>345</width>
-                <height>220</height>
-                <font>font45</font>
-                <textcolor>ffff8800</textcolor>
-                <align>right</align>
-                <aligny>center</aligny>
-                <label>[B]$INFO[Window(Weather).Property(Daily.3.HighTemperature)]$INFO[Window(Weather).Property(Daily.3.LowTemperature), / ][/B]</label>
-            </control>
+
+        <control type="button" id="51">
+            <left>1280</left>
+            <top>122</top>
+            <width>300</width>
+            <height>72</height>
+
+            <label></label>
+            <font>font30</font>
+            <textcolor>00000000</textcolor>
+            <focusedcolor>00000000</focusedcolor>
+            <disabledcolor>00000000</disabledcolor>
+            <texturefocus />
+            <texturenofocus />
+
+            <onfocus>SetProperty(WeatherView,daily,home)</onfocus>
+
+            <!-- rechts -->
+            <onup>52</onup>
+
+            <!-- links -->
+            <ondown>50</ondown>
+
+            <onleft>50</onleft>
+            <onright>52</onright>
         </control>
 
-        
-        <control type="group">
-            <left>0</left>
-            <top>681</top>
-            <width>920</width>
-            <height>220</height>
-            <control type="image">
-                <left>0</left>
-                <top>0</top>
-                <width>920</width>
-                <height>220</height>
-                <texture colordiffuse="26FFFFFF">colors/white.png</texture>
-            </control>
-            <control type="label">
-                <left>40</left>
-                <top>0</top>
-                <width>330</width>
-                <height>220</height>
-                <font>font45</font>
-                <textcolor>fff0f2f5</textcolor>
-                <aligny>center</aligny>
-                <label>[B]$VAR[WeatherDay3Var][/B]</label>
-            </control>
-            <control type="image">
-                <left>380</left>
-                <top>39</top>
-                <width>142</width>
-                <height>142</height>
-                <aspectratio>keep</aspectratio>
-                <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Daily.4.OutlookIcon)]</texture>
-            </control>
-            <control type="label">
-                <left>540</left>
-                <top>0</top>
-                <width>345</width>
-                <height>220</height>
-                <font>font45</font>
-                <textcolor>ffff8800</textcolor>
-                <align>right</align>
-                <aligny>center</aligny>
-                <label>[B]$INFO[Window(Weather).Property(Daily.4.HighTemperature)]$INFO[Window(Weather).Property(Daily.4.LowTemperature), / ][/B]</label>
-            </control>
-        </control>
-    </control>
 
-        
-        
-        
+        <control type="button" id="52">
+            <left>1590</left>
+            <top>122</top>
+            <width>300</width>
+            <height>72</height>
+
+            <label></label>
+            <font>font30</font>
+            <textcolor>00000000</textcolor>
+            <focusedcolor>00000000</focusedcolor>
+            <disabledcolor>00000000</disabledcolor>
+            <texturefocus />
+            <texturenofocus />
+
+            <onfocus>SetProperty(WeatherView,radar,home)</onfocus>
+
+            <!-- rechts -->
+            <onup>50</onup>
+
+            <!-- links -->
+            <ondown>51</ondown>
+
+            <onleft>51</onleft>
+            <onright>50</onright>
+        </control>
+
+
+
+        <!-- =====================================================
+             TAB-LEISTE
+             etwas luftiger, damit nichts clippt
+             ===================================================== -->
+
         <control type="group">
             <left>970</left>
-            <top>125</top>
+            <top>122</top>
             <width>920</width>
-            <height>890</height>
+            <height>68</height>
+
+            <!-- Grundzustand -->
+            <control type="label">
+                <left>0</left>
+                <top>0</top>
+                <width>280</width>
+                <height>58</height>
+                <font>font36</font>
+                <textcolor>ff858d95</textcolor>
+                <align>center</align>
+                <aligny>center</aligny>
+                <label>[B]STÜNDLICH[/B]</label>
+            </control>
+
+            <control type="label">
+                <left>320</left>
+                <top>0</top>
+                <width>280</width>
+                <height>58</height>
+                <font>font36</font>
+                <textcolor>ff858d95</textcolor>
+                <align>center</align>
+                <aligny>center</aligny>
+                <label>[B]TÄGLICH[/B]</label>
+            </control>
+
+            <control type="label">
+                <left>640</left>
+                <top>0</top>
+                <width>280</width>
+                <height>58</height>
+                <font>font36</font>
+                <textcolor>ff858d95</textcolor>
+                <align>center</align>
+                <aligny>center</aligny>
+                <label>[B]RADAR[/B]</label>
+            </control>
+
+
+            <!-- aktiv -->
+            <control type="label">
+                <left>0</left>
+                <top>0</top>
+                <width>280</width>
+                <height>58</height>
+                <font>font36</font>
+                <textcolor>fff0f2f5</textcolor>
+                <align>center</align>
+                <aligny>center</aligny>
+                <label>[B]STÜNDLICH[/B]</label>
+                <visible>String.IsEqual(Window(home).Property(WeatherView),hourly)</visible>
+            </control>
+
+            <control type="label">
+                <left>320</left>
+                <top>0</top>
+                <width>280</width>
+                <height>58</height>
+                <font>font36</font>
+                <textcolor>fff0f2f5</textcolor>
+                <align>center</align>
+                <aligny>center</aligny>
+                <label>[B]TÄGLICH[/B]</label>
+                <visible>String.IsEqual(Window(home).Property(WeatherView),daily)</visible>
+            </control>
+
+            <control type="label">
+                <left>640</left>
+                <top>0</top>
+                <width>280</width>
+                <height>58</height>
+                <font>font36</font>
+                <textcolor>fff0f2f5</textcolor>
+                <align>center</align>
+                <aligny>center</aligny>
+                <label>[B]RADAR[/B]</label>
+                <visible>String.IsEqual(Window(home).Property(WeatherView),radar)</visible>
+            </control>
+
+
+            <!-- rote Linie -->
+            <control type="image">
+                <left>50</left>
+                <top>58</top>
+                <width>180</width>
+                <height>5</height>
+                <texture colordiffuse="ffd90429">colors/white.png</texture>
+                <visible>String.IsEqual(Window(home).Property(WeatherView),hourly)</visible>
+            </control>
+
+            <control type="image">
+                <left>370</left>
+                <top>58</top>
+                <width>180</width>
+                <height>5</height>
+                <texture colordiffuse="ffd90429">colors/white.png</texture>
+                <visible>String.IsEqual(Window(home).Property(WeatherView),daily)</visible>
+            </control>
+
+            <control type="image">
+                <left>690</left>
+                <top>58</top>
+                <width>180</width>
+                <height>5</height>
+                <texture colordiffuse="ffd90429">colors/white.png</texture>
+                <visible>String.IsEqual(Window(home).Property(WeatherView),radar)</visible>
+            </control>
+        </control>
+
+
+
+        <!-- =====================================================
+             STÜNDLICH
+
+             Dynamisches OEM-Slot-System:
+
+             kein Ereignis:
+               Jetzt / H2 / H3 / H4
+
+             Sonne Slot 2:
+               Jetzt / Sonne / H2 / H3
+
+             Sonne Slot 3:
+               Jetzt / H2 / Sonne / H3
+
+             Sonne Slot 4:
+               Jetzt / H2 / H3 / Sonne
+             ===================================================== -->
+
+        <control type="group">
+            <left>970</left>
+            <top>198</top>
+            <width>920</width>
+            <height>817</height>
+
+            <visible>String.IsEqual(Window(home).Property(WeatherView),hourly)</visible>
+
+
+            <!-- ZEILE 1: IMMER JETZT -->
+
+            <control type="group">
+                <left>0</left>
+                <top>0</top>
+                <width>920</width>
+                <height>198</height>
+
+                <control type="image">
+                    <left>0</left>
+                    <top>0</top>
+                    <width>920</width>
+                    <height>198</height>
+                    <texture colordiffuse="26FFFFFF">colors/white.png</texture>
+                </control>
+
+                <control type="label">
+                    <left>26</left>
+                    <top>0</top>
+                    <width>240</width>
+                    <height>198</height>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B]Jetzt[/B]</label>
+                </control>
+
+                <control type="image">
+                    <left>300</left>
+                    <top>34</top>
+                    <width>130</width>
+                    <height>130</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture condition="!String.IsEmpty(Window(Weather).Property(Current.ConditionIcon))">$INFO[Window(Weather).Property(Current.ConditionIcon)]</texture>
+                    <texture condition="String.IsEmpty(Window(Weather).Property(Current.ConditionIcon))">resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Hourly.1.OutlookIcon)]</texture>
+                </control>
+
+                <control type="label">
+                    <left>455</left>
+                    <top>0</top>
+                    <width>155</width>
+                    <height>198</height>
+                    <font>font45</font>
+                    <textcolor>ffff8800</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B]$INFO[Window(Weather).Property(Hourly.1.Temperature)][/B]</label>
+                </control>
+
+                <control type="label">
+                        <left>650</left>
+                        <top>0</top>
+                        <width>115</width>
+                        <height>198</height>
+                        <font>font42</font>
+                        <textcolor>ffbfc7ce</textcolor>
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <label>[B]Regen[/B]</label>
+                    </control>
+
+                    <control type="label">
+                        <left>775</left>
+                        <top>0</top>
+                        <width>105</width>
+                        <height>198</height>
+                        <font>font42</font>
+                        <textcolor>fff0f2f5</textcolor>
+                        <align>left</align>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Hourly.1.Precipitation)][/B]</label>
+                    </control>
+
+            </control>
+
+
+            <!-- ZEILE 2 -->
+
+            <control type="group">
+                <left>0</left>
+                <top>206</top>
+                <width>920</width>
+                <height>198</height>
+
+                <control type="image">
+                    <left>0</left>
+                    <top>0</top>
+                    <width>920</width>
+                    <height>198</height>
+                    <texture colordiffuse="26FFFFFF">colors/white.png</texture>
+                </control>
+
+
+                <!-- Normal: Hourly.2 -->
+
+                <control type="group">
+                    <visible>!String.IsEqual(Window(Weather).Property(Today.SunEvent.Slot),2)</visible>
+
+                    <control type="label">
+                        <left>26</left>
+                        <top>0</top>
+                        <width>240</width>
+                        <height>198</height>
+                        <font>font45</font>
+                        <textcolor>fff0f2f5</textcolor>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Hourly.2.Time)][/B]</label>
+                    </control>
+
+                    <control type="image">
+                        <left>300</left>
+                        <top>34</top>
+                        <width>130</width>
+                        <height>130</height>
+                        <aspectratio>keep</aspectratio>
+                        <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Hourly.2.OutlookIcon)]</texture>
+                    </control>
+
+                    <control type="label">
+                        <left>455</left>
+                        <top>0</top>
+                        <width>155</width>
+                        <height>198</height>
+                        <font>font45</font>
+                        <textcolor>ffff8800</textcolor>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Hourly.2.Temperature)][/B]</label>
+                    </control>
+
+                    <control type="label">
+                        <left>650</left>
+                        <top>0</top>
+                        <width>115</width>
+                        <height>198</height>
+                        <font>font42</font>
+                        <textcolor>ffbfc7ce</textcolor>
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <label>[B]Regen[/B]</label>
+                    </control>
+
+                    <control type="label">
+                        <left>775</left>
+                        <top>0</top>
+                        <width>105</width>
+                        <height>198</height>
+                        <font>font42</font>
+                        <textcolor>fff0f2f5</textcolor>
+                        <align>left</align>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Hourly.2.Precipitation)][/B]</label>
+                    </control>
+
+                </control>
+
+
+                <!-- Slot 2: Sonnenereignis -->
+
+                <control type="group">
+                    <visible>String.IsEqual(Window(Weather).Property(Today.SunEvent.Slot),2)</visible>
+
+                    <control type="label">
+                        <left>26</left>
+                        <top>0</top>
+                        <width>240</width>
+                        <height>198</height>
+                        <font>font45</font>
+                        <textcolor>fff0f2f5</textcolor>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Today.SunEvent.Time)][/B]</label>
+                    </control>
+
+                    <control type="image">
+                        <left>300</left>
+                        <top>34</top>
+                        <width>130</width>
+                        <height>130</height>
+                        <aspectratio>keep</aspectratio>
+                        <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Today.SunEvent.Icon)]</texture>
+                    </control>
+
+                    <control type="label">
+                        <left>455</left>
+                        <top>0</top>
+                        <width>400</width>
+                        <height>198</height>
+                        <font>font45</font>
+                        <textcolor>ffff8800</textcolor>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Today.SunEvent.Label)][/B]</label>
+                    </control>
+
+                </control>
+
+            </control>
+
+
+            <!-- ZEILE 3 -->
+
+            <control type="group">
+                <left>0</left>
+                <top>412</top>
+                <width>920</width>
+                <height>198</height>
+
+                <control type="image">
+                    <left>0</left>
+                    <top>0</top>
+                    <width>920</width>
+                    <height>198</height>
+                    <texture colordiffuse="26FFFFFF">colors/white.png</texture>
+                </control>
+
+
+                <!-- Slot 2 -> Hourly.2 -->
+
+                <control type="group">
+                    <visible>String.IsEqual(Window(Weather).Property(Today.SunEvent.Slot),2)</visible>
+
+                    <control type="label">
+                        <left>26</left>
+                        <top>0</top>
+                        <width>240</width>
+                        <height>198</height>
+                        <font>font45</font>
+                        <textcolor>fff0f2f5</textcolor>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Hourly.2.Time)][/B]</label>
+                    </control>
+
+                    <control type="image">
+                        <left>300</left>
+                        <top>34</top>
+                        <width>130</width>
+                        <height>130</height>
+                        <aspectratio>keep</aspectratio>
+                        <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Hourly.2.OutlookIcon)]</texture>
+                    </control>
+
+                    <control type="label">
+                        <left>455</left>
+                        <top>0</top>
+                        <width>155</width>
+                        <height>198</height>
+                        <font>font45</font>
+                        <textcolor>ffff8800</textcolor>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Hourly.2.Temperature)][/B]</label>
+                    </control>
+
+                    <control type="label">
+                        <left>650</left>
+                        <top>0</top>
+                        <width>115</width>
+                        <height>198</height>
+                        <font>font42</font>
+                        <textcolor>ffbfc7ce</textcolor>
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <label>[B]Regen[/B]</label>
+                    </control>
+
+                    <control type="label">
+                        <left>775</left>
+                        <top>0</top>
+                        <width>105</width>
+                        <height>198</height>
+                        <font>font42</font>
+                        <textcolor>fff0f2f5</textcolor>
+                        <align>left</align>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Hourly.2.Precipitation)][/B]</label>
+                    </control>
+
+                </control>
+
+
+                <!-- Slot 3 -> Sonne -->
+
+                <control type="group">
+                    <visible>String.IsEqual(Window(Weather).Property(Today.SunEvent.Slot),3)</visible>
+
+                    <control type="label">
+                        <left>26</left>
+                        <top>0</top>
+                        <width>240</width>
+                        <height>198</height>
+                        <font>font45</font>
+                        <textcolor>fff0f2f5</textcolor>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Today.SunEvent.Time)][/B]</label>
+                    </control>
+
+                    <control type="image">
+                        <left>300</left>
+                        <top>34</top>
+                        <width>130</width>
+                        <height>130</height>
+                        <aspectratio>keep</aspectratio>
+                        <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Today.SunEvent.Icon)]</texture>
+                    </control>
+
+                    <control type="label">
+                        <left>455</left>
+                        <top>0</top>
+                        <width>400</width>
+                        <height>198</height>
+                        <font>font45</font>
+                        <textcolor>ffff8800</textcolor>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Today.SunEvent.Label)][/B]</label>
+                    </control>
+
+                </control>
+
+
+                <!-- Kein Slot 2/3 -> Hourly.3 -->
+
+                <control type="group">
+                    <visible>String.IsEmpty(Window(Weather).Property(Today.SunEvent.Slot)) | String.IsEqual(Window(Weather).Property(Today.SunEvent.Slot),4)</visible>
+
+                    <control type="label">
+                        <left>26</left>
+                        <top>0</top>
+                        <width>240</width>
+                        <height>198</height>
+                        <font>font45</font>
+                        <textcolor>fff0f2f5</textcolor>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Hourly.3.Time)][/B]</label>
+                    </control>
+
+                    <control type="image">
+                        <left>300</left>
+                        <top>34</top>
+                        <width>130</width>
+                        <height>130</height>
+                        <aspectratio>keep</aspectratio>
+                        <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Hourly.3.OutlookIcon)]</texture>
+                    </control>
+
+                    <control type="label">
+                        <left>455</left>
+                        <top>0</top>
+                        <width>155</width>
+                        <height>198</height>
+                        <font>font45</font>
+                        <textcolor>ffff8800</textcolor>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Hourly.3.Temperature)][/B]</label>
+                    </control>
+
+                    <control type="label">
+                        <left>650</left>
+                        <top>0</top>
+                        <width>115</width>
+                        <height>198</height>
+                        <font>font42</font>
+                        <textcolor>ffbfc7ce</textcolor>
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <label>[B]Regen[/B]</label>
+                    </control>
+
+                    <control type="label">
+                        <left>775</left>
+                        <top>0</top>
+                        <width>105</width>
+                        <height>198</height>
+                        <font>font42</font>
+                        <textcolor>fff0f2f5</textcolor>
+                        <align>left</align>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Hourly.3.Precipitation)][/B]</label>
+                    </control>
+
+                </control>
+
+            </control>
+
+
+            <!-- ZEILE 4 -->
+
+            <control type="group">
+                <left>0</left>
+                <top>618</top>
+                <width>920</width>
+                <height>198</height>
+
+                <control type="image">
+                    <left>0</left>
+                    <top>0</top>
+                    <width>920</width>
+                    <height>198</height>
+                    <texture colordiffuse="26FFFFFF">colors/white.png</texture>
+                </control>
+
+
+                <!-- Slot 2 oder 3 -> Hourly.3 -->
+
+                <control type="group">
+                    <visible>String.IsEqual(Window(Weather).Property(Today.SunEvent.Slot),2) | String.IsEqual(Window(Weather).Property(Today.SunEvent.Slot),3)</visible>
+
+                    <control type="label">
+                        <left>26</left>
+                        <top>0</top>
+                        <width>240</width>
+                        <height>198</height>
+                        <font>font45</font>
+                        <textcolor>fff0f2f5</textcolor>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Hourly.3.Time)][/B]</label>
+                    </control>
+
+                    <control type="image">
+                        <left>300</left>
+                        <top>34</top>
+                        <width>130</width>
+                        <height>130</height>
+                        <aspectratio>keep</aspectratio>
+                        <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Hourly.3.OutlookIcon)]</texture>
+                    </control>
+
+                    <control type="label">
+                        <left>455</left>
+                        <top>0</top>
+                        <width>155</width>
+                        <height>198</height>
+                        <font>font45</font>
+                        <textcolor>ffff8800</textcolor>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Hourly.3.Temperature)][/B]</label>
+                    </control>
+
+                    <control type="label">
+                        <left>650</left>
+                        <top>0</top>
+                        <width>115</width>
+                        <height>198</height>
+                        <font>font42</font>
+                        <textcolor>ffbfc7ce</textcolor>
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <label>[B]Regen[/B]</label>
+                    </control>
+
+                    <control type="label">
+                        <left>775</left>
+                        <top>0</top>
+                        <width>105</width>
+                        <height>198</height>
+                        <font>font42</font>
+                        <textcolor>fff0f2f5</textcolor>
+                        <align>left</align>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Hourly.3.Precipitation)][/B]</label>
+                    </control>
+
+                </control>
+
+
+                <!-- Slot 4 -> Sonne -->
+
+                <control type="group">
+                    <visible>String.IsEqual(Window(Weather).Property(Today.SunEvent.Slot),4)</visible>
+
+                    <control type="label">
+                        <left>26</left>
+                        <top>0</top>
+                        <width>240</width>
+                        <height>198</height>
+                        <font>font45</font>
+                        <textcolor>fff0f2f5</textcolor>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Today.SunEvent.Time)][/B]</label>
+                    </control>
+
+                    <control type="image">
+                        <left>300</left>
+                        <top>34</top>
+                        <width>130</width>
+                        <height>130</height>
+                        <aspectratio>keep</aspectratio>
+                        <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Today.SunEvent.Icon)]</texture>
+                    </control>
+
+                    <control type="label">
+                        <left>455</left>
+                        <top>0</top>
+                        <width>400</width>
+                        <height>198</height>
+                        <font>font45</font>
+                        <textcolor>ffff8800</textcolor>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Today.SunEvent.Label)][/B]</label>
+                    </control>
+
+                </control>
+
+
+                <!-- Kein Sonnenereignis -> Hourly.4 -->
+
+                <control type="group">
+                    <visible>String.IsEmpty(Window(Weather).Property(Today.SunEvent.Slot))</visible>
+
+                    <control type="label">
+                        <left>26</left>
+                        <top>0</top>
+                        <width>240</width>
+                        <height>198</height>
+                        <font>font45</font>
+                        <textcolor>fff0f2f5</textcolor>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Hourly.4.Time)][/B]</label>
+                    </control>
+
+                    <control type="image">
+                        <left>300</left>
+                        <top>34</top>
+                        <width>130</width>
+                        <height>130</height>
+                        <aspectratio>keep</aspectratio>
+                        <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Hourly.4.OutlookIcon)]</texture>
+                    </control>
+
+                    <control type="label">
+                        <left>455</left>
+                        <top>0</top>
+                        <width>155</width>
+                        <height>198</height>
+                        <font>font45</font>
+                        <textcolor>ffff8800</textcolor>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Hourly.4.Temperature)][/B]</label>
+                    </control>
+
+                    <control type="label">
+                        <left>650</left>
+                        <top>0</top>
+                        <width>115</width>
+                        <height>198</height>
+                        <font>font42</font>
+                        <textcolor>ffbfc7ce</textcolor>
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <label>[B]Regen[/B]</label>
+                    </control>
+
+                    <control type="label">
+                        <left>775</left>
+                        <top>0</top>
+                        <width>105</width>
+                        <height>198</height>
+                        <font>font42</font>
+                        <textcolor>fff0f2f5</textcolor>
+                        <align>left</align>
+                        <aligny>center</aligny>
+                        <label>[B]$INFO[Window(Weather).Property(Hourly.4.Precipitation)][/B]</label>
+                    </control>
+
+                </control>
+
+            </control>
+
+        </control>
+
+
+        <!-- =====================================================
+             TÄGLICH
+             Finales ruhiges Kartenlayout
+             ===================================================== -->
+
+        <control type="group">
+            <left>970</left>
+            <top>198</top>
+            <width>920</width>
+            <height>817</height>
+
+            <visible>String.IsEqual(Window(home).Property(WeatherView),daily)</visible>
+
+            <control type="group">
+                <left>0</left>
+                <top>0</top>
+                <width>920</width>
+                <height>198</height>
+
+                <!-- Hintergrund -->
+                <control type="image">
+                    <left>0</left>
+                    <top>0</top>
+                    <width>920</width>
+                    <height>198</height>
+                    <texture colordiffuse="26FFFFFF">colors/white.png</texture>
+                </control>
+
+                <!-- Tages-Header -->
+                <control type="label">
+                    <left>22</left>
+                    <top>7</top>
+                    <width>340</width>
+                    <height>47</height>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B]Heute[/B]</label>
+                </control>
+
+                <!-- Wettericon:
+                     bewusst etwas kleiner + tiefer,
+                     damit der Header Luft bekommt -->
+                <control type="image">
+                    <left>76</left>
+                    <top>68</top>
+                    <width>116</width>
+                    <height>116</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Daily.1.OutlookIcon)]</texture>
+                </control>
+
+                <!-- Max -->
+                <control type="label">
+                    <left>285</left>
+                    <top>67</top>
+                    <width>285</width>
+                    <height>48</height>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B][COLOR fff0f2f5]Max:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Daily.1.HighTemperature)][/COLOR][/B]</label>
+                </control>
+
+                <!-- Min:
+                     jetzt bewusst weiter unter Max -->
+                <control type="label">
+                    <left>285</left>
+                    <top>129</top>
+                    <width>285</width>
+                    <height>48</height>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B][COLOR fff0f2f5]Min:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Daily.1.LowTemperature)][/COLOR][/B]</label>
+                </control>
+
+                <!-- Regen-Label -->
+                <control type="label">
+                    <left>565</left>
+                    <top>98</top>
+                    <width>180</width>
+                    <height>50</height>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>[B]Regen:[/B]</label>
+                </control>
+
+                <control type="label">
+                    <left>755</left>
+                    <top>98</top>
+                    <width>115</width>
+                    <height>50</height>
+                    <font>font45</font>
+                    <textcolor>ff9e9e9e</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>[B]$INFO[Window(Weather).Property(Daily.1.Precipitation)][/B]</label>
+                </control>
+
+            </control>
+
+            <control type="group">
+                <left>0</left>
+                <top>206</top>
+                <width>920</width>
+                <height>198</height>
+
+                <!-- Hintergrund -->
+                <control type="image">
+                    <left>0</left>
+                    <top>0</top>
+                    <width>920</width>
+                    <height>198</height>
+                    <texture colordiffuse="26FFFFFF">colors/white.png</texture>
+                </control>
+
+                <!-- Tages-Header -->
+                <control type="label">
+                    <left>22</left>
+                    <top>7</top>
+                    <width>340</width>
+                    <height>47</height>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B]Morgen[/B]</label>
+                </control>
+
+                <!-- Wettericon:
+                     bewusst etwas kleiner + tiefer,
+                     damit der Header Luft bekommt -->
+                <control type="image">
+                    <left>76</left>
+                    <top>68</top>
+                    <width>116</width>
+                    <height>116</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Daily.2.OutlookIcon)]</texture>
+                </control>
+
+                <!-- Max -->
+                <control type="label">
+                    <left>285</left>
+                    <top>67</top>
+                    <width>285</width>
+                    <height>48</height>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B][COLOR fff0f2f5]Max:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Daily.2.HighTemperature)][/COLOR][/B]</label>
+                </control>
+
+                <!-- Min:
+                     jetzt bewusst weiter unter Max -->
+                <control type="label">
+                    <left>285</left>
+                    <top>129</top>
+                    <width>285</width>
+                    <height>48</height>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B][COLOR fff0f2f5]Min:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Daily.2.LowTemperature)][/COLOR][/B]</label>
+                </control>
+
+                <!-- Regen-Label -->
+                <control type="label">
+                    <left>565</left>
+                    <top>98</top>
+                    <width>180</width>
+                    <height>50</height>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>[B]Regen:[/B]</label>
+                </control>
+
+                <control type="label">
+                    <left>755</left>
+                    <top>98</top>
+                    <width>115</width>
+                    <height>50</height>
+                    <font>font45</font>
+                    <textcolor>ff9e9e9e</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>[B]$INFO[Window(Weather).Property(Daily.2.Precipitation)][/B]</label>
+                </control>
+
+            </control>
+
+            <control type="group">
+                <left>0</left>
+                <top>412</top>
+                <width>920</width>
+                <height>198</height>
+
+                <!-- Hintergrund -->
+                <control type="image">
+                    <left>0</left>
+                    <top>0</top>
+                    <width>920</width>
+                    <height>198</height>
+                    <texture colordiffuse="26FFFFFF">colors/white.png</texture>
+                </control>
+
+                <!-- Tages-Header -->
+                <control type="label">
+                    <left>22</left>
+                    <top>7</top>
+                    <width>340</width>
+                    <height>47</height>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B]$INFO[Window(Weather).Property(Daily.3.RNSEDay)][/B]</label>
+                </control>
+
+                <!-- Wettericon:
+                     bewusst etwas kleiner + tiefer,
+                     damit der Header Luft bekommt -->
+                <control type="image">
+                    <left>76</left>
+                    <top>68</top>
+                    <width>116</width>
+                    <height>116</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Daily.3.OutlookIcon)]</texture>
+                </control>
+
+                <!-- Max -->
+                <control type="label">
+                    <left>285</left>
+                    <top>67</top>
+                    <width>285</width>
+                    <height>48</height>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B][COLOR fff0f2f5]Max:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Daily.3.HighTemperature)][/COLOR][/B]</label>
+                </control>
+
+                <!-- Min:
+                     jetzt bewusst weiter unter Max -->
+                <control type="label">
+                    <left>285</left>
+                    <top>129</top>
+                    <width>285</width>
+                    <height>48</height>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B][COLOR fff0f2f5]Min:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Daily.3.LowTemperature)][/COLOR][/B]</label>
+                </control>
+
+                <!-- Regen-Label -->
+                <control type="label">
+                    <left>565</left>
+                    <top>98</top>
+                    <width>180</width>
+                    <height>50</height>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>[B]Regen:[/B]</label>
+                </control>
+
+                <control type="label">
+                    <left>755</left>
+                    <top>98</top>
+                    <width>115</width>
+                    <height>50</height>
+                    <font>font45</font>
+                    <textcolor>ff9e9e9e</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>[B]$INFO[Window(Weather).Property(Daily.3.Precipitation)][/B]</label>
+                </control>
+
+            </control>
+
+            <control type="group">
+                <left>0</left>
+                <top>618</top>
+                <width>920</width>
+                <height>198</height>
+
+                <!-- Hintergrund -->
+                <control type="image">
+                    <left>0</left>
+                    <top>0</top>
+                    <width>920</width>
+                    <height>198</height>
+                    <texture colordiffuse="26FFFFFF">colors/white.png</texture>
+                </control>
+
+                <!-- Tages-Header -->
+                <control type="label">
+                    <left>22</left>
+                    <top>7</top>
+                    <width>340</width>
+                    <height>47</height>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B]$INFO[Window(Weather).Property(Daily.4.RNSEDay)][/B]</label>
+                </control>
+
+                <!-- Wettericon:
+                     bewusst etwas kleiner + tiefer,
+                     damit der Header Luft bekommt -->
+                <control type="image">
+                    <left>76</left>
+                    <top>68</top>
+                    <width>116</width>
+                    <height>116</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture>resource://resource.images.weathericons.default/$INFO[Window(Weather).Property(Daily.4.OutlookIcon)]</texture>
+                </control>
+
+                <!-- Max -->
+                <control type="label">
+                    <left>285</left>
+                    <top>67</top>
+                    <width>285</width>
+                    <height>48</height>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B][COLOR fff0f2f5]Max:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Daily.4.HighTemperature)][/COLOR][/B]</label>
+                </control>
+
+                <!-- Min:
+                     jetzt bewusst weiter unter Max -->
+                <control type="label">
+                    <left>285</left>
+                    <top>129</top>
+                    <width>285</width>
+                    <height>48</height>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B][COLOR fff0f2f5]Min:[/COLOR] [COLOR ff9e9e9e]$INFO[Window(Weather).Property(Daily.4.LowTemperature)][/COLOR][/B]</label>
+                </control>
+
+                <!-- Regen-Label -->
+                <control type="label">
+                    <left>565</left>
+                    <top>98</top>
+                    <width>180</width>
+                    <height>50</height>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>[B]Regen:[/B]</label>
+                </control>
+
+                <control type="label">
+                    <left>755</left>
+                    <top>98</top>
+                    <width>115</width>
+                    <height>50</height>
+                    <font>font45</font>
+                    <textcolor>ff9e9e9e</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>[B]$INFO[Window(Weather).Property(Daily.4.Precipitation)][/B]</label>
+                </control>
+
+            </control>
+
+        </control>
+
+
+<control type="group">
+            <left>970</left>
+            <top>198</top>
+            <width>920</width>
+            <height>817</height>
             <visible>String.IsEqual(Window(home).Property(WeatherView),radar)</visible>
 
             <control type="image">
                 <left>0</left>
                 <top>0</top>
                 <width>920</width>
-                <height>900</height>
+                <height>817</height>
                 <texture colordiffuse="26FFFFFF">colors/white.png</texture>
             </control>
 
-            <control type="label">
-                <left>40</left>
-                <top>25</top>
-                <width>825</width>
-                <height>55</height>
-                <font>font45_title</font>
-                <textcolor>ffd90429</textcolor>
-                <label>[B]NIEDERSCHLAGSRADAR[/B]</label>
-            </control>
-
             <control type="image">
-                <left>40</left>
-                <top>90</top>
-                <width>825</width>
-                <height>780</height>
+                <left>20</left>
+                <top>20</top>
+                <width>880</width>
+                <height>777</height>
                 <aspectratio align="center" aligny="center">scale</aspectratio>
                 <texture>$VAR[WeatherRadarImageVar]</texture>
             </control>
@@ -941,7 +1462,7 @@
             </control>
 
             
-            <control type="button" id="900">
+            <control type="button" id="9002">
                 <left>15</left>
                 <top>20</top>
                 <width>500</width>
@@ -955,13 +1476,12 @@
                 <texturefocus />
                 <texturenofocus />
                 <onclick>ActivateWindow(servicesettings,weather)</onclick>
-                
-                <ondown>100</ondown>
-                <onright>100</onright>
-                
-                <onup>910</onup>
-                <onleft>910</onleft>
-            </control>
+
+                <onup>9004</onup>
+                <ondown>9004</ondown>
+                <onleft>9004</onleft>
+                <onright>9004</onright>
+        </control>
 
             
             <control type="group">
@@ -1014,7 +1534,7 @@
             </control>
 
             
-            <control type="button" id="910">
+            <control type="button" id="9004">
                 <right>15</right>
                 <top>20</top>
                 <width>500</width>
@@ -1028,13 +1548,12 @@
                 <texturefocus />
                 <texturenofocus />
                 <onclick>ActivateWindow(home)</onclick>
-                
-                <ondown>900</ondown>
-                <onright>900</onright>
-                
-                <onup>200</onup>
-                <onleft>200</onleft>
-            </control>
+
+                <onup>9002</onup>
+                <ondown>9002</ondown>
+                <onleft>9002</onleft>
+                <onright>9002</onright>
+        </control>
         </control>
     </controls>
 </window>
