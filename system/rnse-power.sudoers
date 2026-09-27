@@ -1,0 +1,1 @@
+pi ALL=(root) NOPASSWD: /usr/local/bin/rnse-power reboot, /usr/local/bin/rnse-power poweroff

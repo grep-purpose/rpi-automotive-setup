@@ -98,24 +98,12 @@
                     <onclick>ActivateWindow(1151)</onclick>
                 </item>
                 <item>
-                    <label>Anzeige</label>
-                    <onclick>Notification(Einstellungen,Anzeige - Funktionen folgen,2000)</onclick>
-                </item>
-                <item>
-                    <label>Fahrzeug</label>
-                    <onclick>Notification(Einstellungen,Fahrzeug - Funktionen folgen,2000)</onclick>
-                </item>
-                <item>
                     <label>Android Auto</label>
                     <onclick>Notification(Einstellungen,Android Auto - Funktionen folgen,2000)</onclick>
                 </item>
                 <item>
                     <label>Medien / Kodi</label>
                     <onclick>Notification(Einstellungen,Medien / Kodi - Funktionen folgen,2000)</onclick>
-                </item>
-                <item>
-                    <label>Diagnose</label>
-                    <onclick>Notification(Einstellungen,Diagnose - Funktionen folgen,2000)</onclick>
                 </item>
             </content>
             <pagecontrol>9610</pagecontrol>

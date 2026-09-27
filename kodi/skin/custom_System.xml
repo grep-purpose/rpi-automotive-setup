@@ -169,6 +169,16 @@
                     <onclick>Notification(Kodi,Neustart wird nach DRM/TTY-Test angebunden,2500)</onclick>
                 </item>
                 <item>
+                    <label>Pi neu starten</label>
+                    <property name="RowType">action</property>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/power_control.py,reboot)</onclick>
+                </item>
+                <item>
+                    <label>Pi herunterfahren</label>
+                    <property name="RowType">action</property>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/power_control.py,poweroff)</onclick>
+                </item>
+                <item>
                     <label>Systeminformationen</label>
                     <property name="RowType">submenu</property>
                     <onclick>ActivateWindow(1153)</onclick>
