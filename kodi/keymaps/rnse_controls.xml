@@ -2,8 +2,8 @@
 <keymap>
   <global>
     <keyboard>
-      <one>Up</one>
-      <two>Down</two>
+      <one>Down</one>
+      <two>Up</two>
       <return>Select</return>
       <escape>Back</escape>
       <m>ActivateWindow(1150)</m>
@@ -25,6 +25,8 @@
       <right>PlayerControl(Next)</right>
       <prev_track>PlayerControl(Previous)</prev_track>
       <next_track>PlayerControl(Next)</next_track>
+      <one>Up</one>
+      <two>Down</two>
     </keyboard>
   </Home>
   <FullScreenVideo>
