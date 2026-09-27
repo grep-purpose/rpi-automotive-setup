@@ -15,13 +15,6 @@
             <right>30</right>
             <top>18</top>
             <height>105</height>
-            <control type="image">
-                <left>0</left>
-                <top>82</top>
-                <width>525</width>
-                <height>3</height>
-                <texture colordiffuse="99ffffff">colors/white.png</texture>
-            </control>
             <control type="label">
                 <left>540</left>
                 <top>0</top>
@@ -33,53 +26,45 @@
                 <textcolor>ffd90429</textcolor>
                 <label>[B]Systeminformationen[/B]</label>
             </control>
-            <control type="image">
-                <right>0</right>
-                <top>82</top>
-                <width>525</width>
-                <height>3</height>
-                <texture colordiffuse="99ffffff">colors/white.png</texture>
-            </control>
         </control>
         <control type="list" id="9400">
-            <left>90</left>
-            <top>120</top>
-            <width>1740</width>
-            <height>830</height>
+            <left>60</left>
+            <top>104</top>
+            <width>1760</width>
             <orientation>vertical</orientation>
             <onup>9400</onup>
             <ondown>9400</ondown>
             <onleft>Control.Move(9400,-1)</onleft>
             <onright>Control.Move(9400,1)</onright>
-            <itemlayout width="1740" height="92">
+            <itemlayout width="1760" height="92">
                 <control type="label">
-                    <left>40</left>
-                    <top>2</top>
-                    <width>780</width>
-                    <height>88</height>
-                    <font>font45</font>
+                    <left>35</left>
+                    <top>0</top>
+                    <width>720</width>
+                    <height>92</height>
+                    <font>font60</font>
                     <textcolor>ffb7c0ca</textcolor>
                     <aligny>center</aligny>
                     <label>[B]$INFO[ListItem.Label][/B]</label>
                 </control>
                 <control type="label">
-                    <left>830</left>
-                    <top>2</top>
-                    <width>800</width>
-                    <height>88</height>
-                    <font>font45</font>
+                    <left>790</left>
+                    <top>0</top>
+                    <width>920</width>
+                    <height>92</height>
+                    <font>font60</font>
                     <textcolor>ff8d99ae</textcolor>
                     <align>right</align>
                     <aligny>center</aligny>
-                    <label>$INFO[ListItem.Label2]</label>
+                    <label>[B]$INFO[ListItem.Label2][/B]</label>
                 </control>
             </itemlayout>
-            <focusedlayout width="1740" height="92">
+            <focusedlayout width="1760" height="92">
                 <control type="image">
                     <left>0</left>
-                    <top>3</top>
-                    <width>1740</width>
-                    <height>86</height>
+                    <top>2</top>
+                    <width>1760</width>
+                    <height>88</height>
                     <texture colordiffuse="ff141923">colors/black.png</texture>
                 </control>
                 <control type="image">
@@ -90,25 +75,25 @@
                     <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 </control>
                 <control type="label">
-                    <left>40</left>
-                    <top>2</top>
-                    <width>780</width>
-                    <height>88</height>
-                    <font>font45</font>
+                    <left>35</left>
+                    <top>0</top>
+                    <width>720</width>
+                    <height>92</height>
+                    <font>font60</font>
                     <textcolor>ffffffff</textcolor>
                     <aligny>center</aligny>
                     <label>[B]$INFO[ListItem.Label][/B]</label>
                 </control>
                 <control type="label">
-                    <left>830</left>
-                    <top>2</top>
-                    <width>800</width>
-                    <height>88</height>
-                    <font>font45</font>
+                    <left>790</left>
+                    <top>0</top>
+                    <width>920</width>
+                    <height>92</height>
+                    <font>font60</font>
                     <textcolor>ffffffff</textcolor>
                     <align>right</align>
                     <aligny>center</aligny>
-                    <label>$INFO[ListItem.Label2]</label>
+                    <label>[B]$INFO[ListItem.Label2][/B]</label>
                 </control>
             </focusedlayout>
             <content>
@@ -149,7 +134,7 @@
                     <label2>$INFO[Window(Home).Property(RNSE.SysInfo.CPUFreq)]</label2>
                 </item>
                 <item>
-                    <label>Systemlast 1 / 5 / 15 min</label>
+                    <label>Systemlast 1/5/15 min</label>
                     <label2>$INFO[Window(Home).Property(RNSE.SysInfo.Load)]</label2>
                 </item>
                 <item>
@@ -234,12 +219,12 @@
                 </item>
             </content>
             <pagecontrol>9640</pagecontrol>
+            <bottom>158</bottom>
         </control>
         <control type="scrollbar" id="9640">
-            <left>1850</left>
-            <top>120</top>
-            <width>12</width>
-            <height>830</height>
+            <left>1840</left>
+            <top>104</top>
+            <width>8</width>
             <orientation>vertical</orientation>
             <showonepage>false</showonepage>
             <visible>Container(9400).HasNext | Container(9400).HasPrevious</visible>
@@ -248,6 +233,7 @@
             <texturesliderbarfocus colordiffuse="ffff6b00">colors/white.png</texturesliderbarfocus>
             <textureslidernib />
             <textureslidernibfocus />
+            <bottom>158</bottom>
         </control>
         <control type="group">
             <left>30</left>
