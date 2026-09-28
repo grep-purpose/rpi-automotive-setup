@@ -176,7 +176,9 @@ script_fullpath = os.path.realpath(__file__)
 welcome_active = False
 stop_flag = False
 shutdown_script = False
-script_started = True
+# Startup is not complete until welcome_message() has finished.
+# This also ensures pause_fis1/pause_fis2 are released afterwards.
+script_started = False
 api_is_connected = False
 send_to_dis_tasks_started = False
 
@@ -3027,8 +3029,11 @@ async def start_send_to_dis():
     if not model_info_set:
         return
 
+    # FIS1 behält den bestehenden generischen Sender.
+    # FIS2 wird ausschließlich von den Live-CAN-Handlern bzw.
+    # refresh_fis2_current_value() bedient.
     task_send_fis1 = track_task(send_to_dis(FIS1), "send_to_dis_1")
-    task_send_fis2 = track_task(send_to_dis(FIS2), "send_to_dis_2")
+    task_send_fis2 = None
     send_to_dis_tasks_started = True
 
     if ENABLE_LOGGING:
@@ -4148,6 +4153,16 @@ def define_event_handler_class():
             
             if ENABLE_LOGGING:
                 logger.info(f'Metadata: title={title}, artist={artist}, album={album}')
+
+            # Keep the FIS1 MEDIA renderer alive whenever HUDIY sends fresh metadata.
+            # media_to_dis1() is idempotent: it only creates the carousel task when
+            # no active carousel task already exists.
+            if send_on_canbus and can_functional and toggle_fis1 == 6:
+                fire_and_forget(
+                    self.main_loop,
+                    media_to_dis1(),
+                    'media_to_dis1_metadata'
+                )
 
 
         @log_callback_errors
@@ -5963,13 +5978,11 @@ async def process_canid_351(msg):  # handler as EventHandler-Instance
                 fis_sent = False
                 data = f'{pending_outside_temp_display}{temp_unit}'
 
-                if send_on_canbus and can_functional and send_values_to_dashboard:
-                    if toggle_fis1 == 11 and not show_label and not pause_fis1:
-                        set_fis1(data, "right")
-                        fis_sent = True
-                    if toggle_fis2 == 11 and not pause_fis2:
-                        set_fis2(data, "right")
-                        fis_sent = True
+                # Modus 11 ist im aktuellen OEM-Bedienkonzept TANK.
+                # Die Aussentemperatur wird weiterhin vom CAN gelesen und
+                # fuer API/Hudiy verarbeitet, darf aber FIS1/FIS2 nicht mehr
+                # unter Verwendung von Toggle 11 ueberschreiben.
+                fis_sent = False
 
                 if fis_sent:
                     last_sent_outside_temp = pending_outside_temp_display
@@ -6822,7 +6835,7 @@ async def toggle_fis2_label():
         8: 'COOLANT',
         9: 'CPU/TEMP',
         10: f'{lower_speed}-{upper_speed}',
-        11: 'OUTSIDE',
+        11: 'TANK',
         12: 'BLANK',
         13: 'DISABLE'
     }.get(toggle_fis2, None)
@@ -7033,17 +7046,21 @@ async def refresh_fis1_current_value():
     if not (send_on_canbus and can_functional):
         return
 
-    if toggle_fis1 in (1, 2, 3, 4, 5):
+    # FIS1 mode 6 = MEDIA/NAV carousel
+    if toggle_fis1 == 6:
         if not show_label and not pause_fis1:
             await media_to_dis1()
         return
 
-    if toggle_fis1 == 6:
-        last_sent_speed = None
-        last_speed_send_time = 0.0
-        last_speed = None
-        pending_speed_display = None
-        pending_speed_api = None
+    # FIS1 mode 1 = NAV only.
+    # Navigation bekommt die Topline exklusiv; Medien werden nicht angezeigt.
+    if toggle_fis1 == 1:
+        if not pause_fis1:
+            await nav_to_dis1()
+        return
+
+    # Legacy media slots 2-5 are no longer active FIS1 modes.
+    if toggle_fis1 in (2, 3, 4, 5):
         return
 
     if toggle_fis1 == 7:
@@ -7140,27 +7157,21 @@ async def refresh_fis2_current_value():
         return
 
     if toggle_fis2 == 6:  # SPEED
-        last_sent_speed = None
-        last_speed_send_time = 0.0
-        last_speed = None
-        pending_speed_display = None
-        pending_speed_api = None
+        # Beim Umschalten sofort den zuletzt bekannten CAN-Wert anzeigen.
+        if last_speed is not None and not pause_fis2:
+            set_fis2(f'{int(last_speed)} {speed_unit}', 'right')
         return
 
     if toggle_fis2 == 7:  # RPM
-        last_sent_rpm = None
-        last_rpm_send_time = 0.0
-        last_rpm = None
-        pending_rpm_display = None
-        pending_rpm_api = None
+        # Beim Umschalten sofort den zuletzt bekannten CAN-Wert anzeigen.
+        if last_rpm is not None and not pause_fis2:
+            set_fis2(f'{int(last_rpm)} RPM', 'right')
         return
 
     if toggle_fis2 == 8:  # COOLANT
-        last_sent_coolant = None
-        last_coolant_send_time = 0.0
-        last_coolant = None
-        pending_coolant_display = None
-        pending_coolant_api = None
+        # Beim Umschalten sofort den zuletzt bekannten CAN-Wert anzeigen.
+        if last_coolant is not None and not pause_fis2:
+            set_fis2(f'{int(last_coolant)}{temp_unit}', 'right')
         return
 
     if toggle_fis2 == 9:  # CPU/TEMP
@@ -7193,8 +7204,8 @@ async def refresh_fis2_current_value():
         return
 
     if toggle_fis2 == 11:  # TANK (Reine Literanzeige mit Fallback)
-        level = globals().get('tank_level', None)
-        if level is not None and str(level).strip():
+        level = globals().get('tank_liter', None)
+        if level is not None and int(level) > 0:
             tank_str = f'{int(level)} L'
         else:
             tank_str = '-- L'
@@ -7226,6 +7237,14 @@ async def block_show_value1():
         clear_content(FIS1)
 
     pause_fis1 = False
+
+    # Den neu gewaehlten FIS1-Modus sofort aktivieren.
+    # 6 = MEDIA, 1 = NAV im aktuellen OEM-Bedienkonzept.
+    if toggle_fis1 == 6:
+        await media_to_dis1()
+    else:
+        await refresh_fis1_current_value()
+
     update_toggle_features('toggle_fis1', toggle_fis1)
 
 
@@ -7300,50 +7319,34 @@ def update_toggle_features(toggle_key: str, value: int) -> None:
 
 media_carousel_task: Optional[asyncio.Task] = None
 
-@handle_errors
-async def fis2_render_loop():
-    global fis2_mode, speed, coolant, tank_liter, range_km, stop_flag, pause_fis2, call_incoming
-    global fis2_label_until, welcome_active
-    range_toggle = 0
-    last_range_switch = 0.0
-    
-    while not stop_flag:
-        if pause_fis2 or not (send_on_canbus and can_functional) or call_incoming:
-            await asyncio.sleep(0.3)
-            continue
-        
-        # 0. Begruessungs-Hold unten
-        if welcome_active:
-            set_fis2('Audi A4', 'center')
-            await asyncio.sleep(0.5)
-            continue
-        
-        # Waehrend der deutsche Modus-Titel scrollt, Live-Wert pausieren
-        if time.monotonic() < fis2_label_until:
-            await asyncio.sleep(0.2)
-            continue
-        
-        if fis2_mode == 'SPEED':
-            spd_val = speed if speed is not None else 0
-            set_fis2(f'{int(spd_val)} km/h', 'center')
-            await asyncio.sleep(0.3)
-        elif fis2_mode == 'COOLANT':
-            c_val = coolant if coolant is not None else 0
-            set_fis2(f'{int(c_val)} C', 'center')
-            await asyncio.sleep(0.5)
-        elif fis2_mode == 'RANGE':
-            now_mono = time.monotonic()
-            if now_mono - last_range_switch >= 3.0:
-                range_toggle = 1 - range_toggle
-                last_range_switch = now_mono
-            
-            if range_toggle == 0:
-                t_val = tank_liter if tank_liter > 0 else 55
-                set_fis2(f'{int(t_val)} Liter', 'center')
-            else:
-                r_val = range_km if range_km > 0 else 650
-                set_fis2(f'{int(r_val)} km', 'center')
-            await asyncio.sleep(0.5)
+# FIS2 live values are rendered by the existing CAN handlers according
+# to toggle_fis2.  FIS1 MEDIA has its own independent carousel.
+
+async def nav_to_dis1():
+    """Render FIS1 in dedicated NAV-only mode (toggle_fis1 == 1)."""
+    global nav_active, nav_description, nav_distance
+    global call_incoming
+
+    if pause_fis1 or not (send_on_canbus and can_functional):
+        return
+
+    # Telefon bleibt auch im NAV-only-Modus die hoechste Prioritaet.
+    if call_incoming:
+        await start_scrolling('Anruf', 'FIS1')
+        return
+
+    # Aktive Navigation anzeigen.
+    if nav_active and (nav_description or nav_distance):
+        ndist = nav_distance if nav_distance else ''
+        ndesc = nav_description if nav_description else ''
+        nav_str = f'{ndist}: {ndesc}'.strip(': ')
+
+        if nav_str:
+            await start_scrolling(nav_str, 'FIS1')
+            return
+
+    # Keine aktive Navigation: NAV-Modus kennt bewusst keinen Medien-Fallback.
+    set_fis1('NAV', 'center')
 
 
 async def media_carousel_loop():
@@ -7405,14 +7408,22 @@ async def media_carousel_loop():
             val_time = 3.5 if len(val) <= 8 else (3.5 + (len(val) * 0.3))
             await asyncio.sleep(val_time)
         except Exception as e:
+            logger.exception("MEDIA_CAROUSEL_DEBUG: media_carousel_loop failed: %s", e)
             await asyncio.sleep(1.0)
 
 async def media_to_dis1():
     global media_carousel_task
     loop = asyncio.get_running_loop()
     if media_carousel_task is None or media_carousel_task.done():
+        if ENABLE_LOGGING:
+            logger.info(
+                "MEDIA_CAROUSEL_DEBUG: starting media_carousel_loop "
+                "(toggle_fis1=%s, pause_fis1=%s, title=%r, artist=%r, album=%r)",
+                toggle_fis1, pause_fis1, title, artist, album
+            )
+        # FIS1 MEDIA carousel only.
+        # FIS2 is rendered by the existing CAN value handlers according to toggle_fis2.
         media_carousel_task = fire_and_forget(loop, media_carousel_loop(), "media_carousel_loop")
-        fire_and_forget(loop, fis2_render_loop(), "fis2_render_loop")
 
 @handle_errors
 async def media_to_dis2():
@@ -7541,7 +7552,7 @@ async def _scroll_oem_style(rule1, wait_time, display):
     reset_scroll = True
 
     while True:
-        if (display == FIS1 and toggle_fis1 not in (1, 2, 3, 4, 5)) or (
+        if (display == FIS1 and toggle_fis1 != 6) or (
                 display == FIS2 and toggle_fis2 not in (1, 2, 3, 4, 5)):
             (clear_content(FIS1) if display == FIS1 else clear_content(FIS2))
             return
