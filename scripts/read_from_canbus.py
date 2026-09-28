@@ -877,6 +877,17 @@ if sys.version_info < (3, 0):
 features = load_features(FEATURE_FILE, enable_logging=False)
 globals().update(vars(features))
 
+# Optional runtime CAN-interface override.
+# Normalbetrieb bleibt unverändert bei dem Wert aus features.conf.
+# Debug-Launcher kann z.B. AUTOMOTIVE_CAN_INTERFACE=vcan0 setzen,
+# ohne features.conf auf der Festplatte zu verändern.
+_runtime_can_interface = os.environ.get("AUTOMOTIVE_CAN_INTERFACE", "").strip()
+if _runtime_can_interface:
+    # Die eigentliche Namensvalidierung erfolgt später zentral in
+    # test_can_interface() via validate_can_interface_name().
+    can_interface = _runtime_can_interface
+    features.can_interface = can_interface
+
 logger = setup_logging()
 logger.addFilter(ThreadNameFilter())
 
