@@ -3,8 +3,9 @@
 import os
 import sys
 import subprocess
+from datetime import datetime
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer, QPoint
 from PyQt5.QtGui import (
     QColor,
     QFont,
@@ -16,6 +17,10 @@ from PyQt5.QtWidgets import (
     QOpenGLWidget,
 )
 
+
+# ============================================================
+# Pfade
+# ============================================================
 
 BASE_DIR = os.path.dirname(
     os.path.abspath(__file__)
@@ -32,36 +37,55 @@ KODI_SCRIPT = os.path.join(
 )
 
 
-# -------------------------------------------------
+# ============================================================
 # Farben
-# -------------------------------------------------
+# ============================================================
 
-BACKGROUND = QColor(8, 8, 8)
+BACKGROUND = QColor(
+    8, 8, 8
+)
 
-HEADER_TEXT = QColor(235, 235, 235)
-NORMAL_TEXT = QColor(220, 220, 220)
-SECONDARY_TEXT = QColor(145, 145, 145)
+PANEL = QColor(
+    22, 22, 22
+)
 
-PANEL = QColor(22, 22, 22)
-PANEL_SELECTED = QColor(32, 32, 32)
+PANEL_SELECTED = QColor(
+    30, 30, 30
+)
 
-BORDER = QColor(70, 70, 70)
+PANEL_BORDER = QColor(
+    65, 65, 65
+)
 
-AUDI_ORANGE = QColor(225, 105, 20)
+AUDI_ORANGE = QColor(
+    255, 107, 0
+)
 
-WHITE = QColor(245, 245, 245)
+TEXT_WHITE = QColor(
+    240, 242, 245
+)
 
+TEXT_MUTED = QColor(
+    141, 153, 174
+)
+
+LINE_WHITE = QColor(
+    255, 255, 255, 155
+)
+
+
+# ============================================================
+# Menüeinträge
+# ============================================================
 
 OPTIONS = [
     {
-        "title": "ANDROID AUTO",
-        "subtitle": "HUDIY",
+        "title": "Android Auto",
         "type": "android",
         "script": HUDIY_SCRIPT,
     },
     {
-        "title": "MEDIEN",
-        "subtitle": "KODI",
+        "title": "Medien",
         "type": "media",
         "script": KODI_SCRIPT,
     },
@@ -86,6 +110,7 @@ class AudiLauncher(QOpenGLWidget):
             Qt.WindowStaysOnTopHint
         )
 
+        # Cursor im Launcher unsichtbar
         self.setCursor(
             Qt.BlankCursor
         )
@@ -96,10 +121,21 @@ class AudiLauncher(QOpenGLWidget):
 
         self.setFocus()
 
+        # Uhr aktualisieren
+        self.clock_timer = QTimer(self)
 
-    # =============================================
+        self.clock_timer.timeout.connect(
+            self.update
+        )
+
+        self.clock_timer.start(
+            1000
+        )
+
+
+    # ========================================================
     # OpenGL
-    # =============================================
+    # ========================================================
 
     def initializeGL(self):
 
@@ -115,9 +151,9 @@ class AudiLauncher(QOpenGLWidget):
         )
 
 
-    # =============================================
-    # Zeichnen
-    # =============================================
+    # ========================================================
+    # Hauptzeichnung
+    # ========================================================
 
     def paintGL(self):
 
@@ -128,7 +164,7 @@ class AudiLauncher(QOpenGLWidget):
             True
         )
 
-        # Hintergrund
+        # Tiefschwarzer Audi-Hintergrund
         painter.fillRect(
             0,
             0,
@@ -137,119 +173,90 @@ class AudiLauncher(QOpenGLWidget):
             BACKGROUND
         )
 
-        self.draw_header(painter)
+        self.draw_header(
+            painter
+        )
 
         self.draw_option(
             painter,
             index=0,
-            x=55,
-            y=145,
-            width=330,
-            height=225
+            x=32,
+            y=102,
+            width=354,
+            height=286
         )
 
         self.draw_option(
             painter,
             index=1,
-            x=415,
-            y=145,
-            width=330,
-            height=225
+            x=414,
+            y=102,
+            width=354,
+            height=286
         )
 
-        self.draw_footer(painter)
+        self.draw_footer(
+            painter
+        )
 
         painter.end()
 
 
-    # =============================================
-    # Header
-    # =============================================
+    # ========================================================
+    # HEADER
+    # ========================================================
 
-    def draw_header(self, painter):
+    def draw_header(
+        self,
+        painter
+    ):
 
+        # Große Überschrift
         painter.setPen(
-            HEADER_TEXT
+            TEXT_WHITE
         )
 
         font = QFont(
             "DejaVu Sans",
-            18
+            22
         )
 
-        font.setBold(True)
+        font.setBold(
+            True
+        )
 
-        painter.setFont(font)
+        painter.setFont(
+            font
+        )
 
         painter.drawText(
             38,
-            26,
-            300,
-            35,
-            Qt.AlignLeft |
-            Qt.AlignVCenter,
-            "AUDI INFOTAINMENT"
+            12,
+            724,
+            48,
+            Qt.AlignLeft | Qt.AlignVCenter,
+            "Audi Multimedia Interface"
         )
 
-        painter.setPen(
-            SECONDARY_TEXT
-        )
-
-        font = QFont(
-            "DejaVu Sans",
-            10
-        )
-
-        painter.setFont(font)
-
-        painter.drawText(
-            40,
-            59,
-            300,
-            25,
-            Qt.AlignLeft |
-            Qt.AlignVCenter,
-            "Audi A4"
-        )
-
+        # Weiße Linie direkt unter dem Header
         painter.setPen(
             QPen(
-                QColor(210, 210, 210),
-                1
+                LINE_WHITE,
+                2
             )
         )
 
         painter.drawLine(
-            35,
-            96,
-            765,
-            96
-        )
-
-        painter.setPen(
-            NORMAL_TEXT
-        )
-
-        font = QFont(
-            "DejaVu Sans",
-            15
-        )
-
-        painter.setFont(font)
-
-        painter.drawText(
-            0,
-            106,
-            800,
-            30,
-            Qt.AlignCenter,
-            "System auswählen"
+            17,
+            72,
+            783,
+            72
         )
 
 
-    # =============================================
-    # Auswahlbox
-    # =============================================
+    # ========================================================
+    # KACHELN
+    # ========================================================
 
     def draw_option(
         self,
@@ -265,8 +272,11 @@ class AudiLauncher(QOpenGLWidget):
             index == self.selected
         )
 
-        option = OPTIONS[index]
+        option = OPTIONS[
+            index
+        ]
 
+        # Hintergrund
         painter.fillRect(
             x,
             y,
@@ -277,16 +287,21 @@ class AudiLauncher(QOpenGLWidget):
             else PANEL
         )
 
+        # Rahmen
         painter.setPen(
             QPen(
                 AUDI_ORANGE
                 if selected
-                else BORDER,
+                else PANEL_BORDER,
 
-                4
+                5
                 if selected
                 else 1
             )
+        )
+
+        painter.setBrush(
+            Qt.NoBrush
         )
 
         painter.drawRect(
@@ -300,8 +315,9 @@ class AudiLauncher(QOpenGLWidget):
             x + width // 2
         )
 
+        # Symbolposition
         icon_y = (
-            y + 76
+            y + 105
         )
 
         if option["type"] == "android":
@@ -322,56 +338,37 @@ class AudiLauncher(QOpenGLWidget):
                 selected
             )
 
-        # Haupttitel
+        # Titel
         painter.setPen(
-            WHITE
+            TEXT_WHITE
         )
 
-        font = QFont(
+        title_font = QFont(
             "DejaVu Sans",
-            16
+            20
         )
 
-        font.setBold(True)
+        title_font.setBold(
+            True
+        )
 
-        painter.setFont(font)
+        painter.setFont(
+            title_font
+        )
 
         painter.drawText(
-            x,
-            y + 127,
-            width,
-            34,
+            x + 10,
+            y + 205,
+            width - 20,
+            54,
             Qt.AlignCenter,
             option["title"]
         )
 
-        # Untertitel
-        painter.setPen(
-            AUDI_ORANGE
-            if selected
-            else SECONDARY_TEXT
-        )
 
-        font = QFont(
-            "DejaVu Sans",
-            11
-        )
-
-        painter.setFont(font)
-
-        painter.drawText(
-            x,
-            y + 168,
-            width,
-            30,
-            Qt.AlignCenter,
-            option["subtitle"]
-        )
-
-
-    # =============================================
-    # Android-Auto / Smartphone Symbol
-    # =============================================
+    # ========================================================
+    # Android-Auto-Symbol
+    # ========================================================
 
     def draw_phone_icon(
         self,
@@ -384,13 +381,13 @@ class AudiLauncher(QOpenGLWidget):
         color = (
             AUDI_ORANGE
             if selected
-            else WHITE
+            else TEXT_MUTED
         )
 
         painter.setPen(
             QPen(
                 color,
-                3
+                4
             )
         )
 
@@ -399,25 +396,25 @@ class AudiLauncher(QOpenGLWidget):
         )
 
         painter.drawRoundedRect(
-            cx - 23,
-            cy - 38,
-            46,
-            76,
-            5,
-            5
+            cx - 31,
+            cy - 53,
+            62,
+            106,
+            7,
+            7
         )
 
         painter.drawLine(
-            cx - 8,
-            cy + 28,
-            cx + 8,
-            cy + 28
+            cx - 11,
+            cy + 39,
+            cx + 11,
+            cy + 39
         )
 
 
-    # =============================================
-    # Media Symbol
-    # =============================================
+    # ========================================================
+    # Medien-Symbol
+    # ========================================================
 
     def draw_media_icon(
         self,
@@ -430,13 +427,13 @@ class AudiLauncher(QOpenGLWidget):
         color = (
             AUDI_ORANGE
             if selected
-            else WHITE
+            else TEXT_MUTED
         )
 
         painter.setPen(
             QPen(
                 color,
-                3
+                4
             )
         )
 
@@ -445,67 +442,97 @@ class AudiLauncher(QOpenGLWidget):
         )
 
         points = [
-            (cx - 24, cy - 33),
-            (cx - 24, cy + 33),
-            (cx + 34, cy),
-        ]
-
-        from PyQt5.QtCore import QPoint
-
-        qpoints = [
-            QPoint(x, y)
-            for x, y in points
+            QPoint(
+                cx - 38,
+                cy - 52
+            ),
+            QPoint(
+                cx - 38,
+                cy + 52
+            ),
+            QPoint(
+                cx + 48,
+                cy
+            ),
         ]
 
         painter.drawPolygon(
-            *qpoints
+            *points
         )
 
 
-    # =============================================
-    # Footer
-    # =============================================
+    # ========================================================
+    # KODI-ARTIGER FOOTER
+    # ========================================================
 
-    def draw_footer(self, painter):
+    def draw_footer(
+        self,
+        painter
+    ):
 
+        # Kodi-Skin:
+        # Footer links/rechts eingerückt
+        # weiße kräftige Trennlinie
+        # große helle Typografie
+
+        footer_left = 17
+        footer_right = 783
+
+        line_y = 414
+
+        # Weiße Trennlinie
         painter.setPen(
             QPen(
-                QColor(210, 210, 210),
-                1
+                LINE_WHITE,
+                3
             )
         )
 
         painter.drawLine(
-            35,
-            413,
-            765,
-            413
+            footer_left,
+            line_y,
+            footer_right,
+            line_y
+        )
+
+        # Aktuelle Uhrzeit
+        current_time = datetime.now().strftime(
+            "%H:%M"
         )
 
         painter.setPen(
-            SECONDARY_TEXT
+            TEXT_WHITE
         )
 
-        font = QFont(
+        clock_font = QFont(
             "DejaVu Sans",
-            9
+            22
         )
 
-        painter.setFont(font)
+        clock_font.setBold(
+            True
+        )
 
+        painter.setFont(
+            clock_font
+        )
+
+        # Bewusst nur Uhrzeit.
+        # Wetter folgt erst später über Kodi.
         painter.drawText(
             0,
             425,
             800,
-            35,
-            Qt.AlignCenter,
-            "Auswahl     •     Drücken zum Starten"
+            43,
+            Qt.AlignCenter |
+            Qt.AlignVCenter,
+            current_time
         )
 
 
-    # =============================================
+    # ========================================================
     # Eingabe
-    # =============================================
+    # ========================================================
 
     def keyPressEvent(
         self,
@@ -524,7 +551,14 @@ class AudiLauncher(QOpenGLWidget):
             flush=True
         )
 
-        # LINKS / HOCH
+
+        # ----------------------------------------------------
+        # LINKS
+        #
+        # RNS-E Drehknopf links:
+        # Key 49 / "1"
+        # ----------------------------------------------------
+
         if key in (
             Qt.Key_Left,
             Qt.Key_Up,
@@ -543,7 +577,13 @@ class AudiLauncher(QOpenGLWidget):
             return
 
 
-        # RECHTS / RUNTER / TAB
+        # ----------------------------------------------------
+        # RECHTS
+        #
+        # RNS-E Drehknopf rechts:
+        # Key 50 / "2"
+        # ----------------------------------------------------
+
         if key in (
             Qt.Key_Right,
             Qt.Key_Down,
@@ -553,7 +593,9 @@ class AudiLauncher(QOpenGLWidget):
 
             self.selected += 1
 
-            if self.selected >= len(OPTIONS):
+            if self.selected >= len(
+                OPTIONS
+            ):
                 self.selected = 0
 
             self.update()
@@ -561,7 +603,10 @@ class AudiLauncher(QOpenGLWidget):
             return
 
 
-        # ENTER
+        # ----------------------------------------------------
+        # AUSWÄHLEN
+        # ----------------------------------------------------
+
         if key in (
             Qt.Key_Return,
             Qt.Key_Enter,
@@ -573,17 +618,22 @@ class AudiLauncher(QOpenGLWidget):
             return
 
 
+        # ----------------------------------------------------
         # ESCAPE
+        # ----------------------------------------------------
+
         if key == Qt.Key_Escape:
 
             QApplication.quit()
 
 
-    # =============================================
+    # ========================================================
     # Anwendung starten
-    # =============================================
+    # ========================================================
 
-    def launch_selected(self):
+    def launch_selected(
+        self
+    ):
 
         self.launching = True
 
@@ -601,7 +651,6 @@ class AudiLauncher(QOpenGLWidget):
             flush=True
         )
 
-        # Launcher ausblenden
         self.hide()
 
         QApplication.processEvents()
@@ -621,7 +670,7 @@ class AudiLauncher(QOpenGLWidget):
                 flush=True
             )
 
-        # Launcher wieder anzeigen
+        # Nach Beenden wieder zum Launcher
         self.showFullScreen()
 
         self.raise_()
@@ -639,6 +688,11 @@ def main():
 
     app = QApplication(
         sys.argv
+    )
+
+    # Cursor zusätzlich global verstecken
+    QApplication.setOverrideCursor(
+        Qt.BlankCursor
     )
 
     print(
