@@ -20,6 +20,7 @@ except ImportError:
 import binascii, configparser, contextlib, importlib, importlib.util, inspect, io, logging, os, re, shutil
 import socket, struct, subprocess, sys, sysconfig, tempfile, textwrap, threading, time, traceback, zipfile
 import json, asyncio, shlex
+from nav_icon_decoder import classify_nav_icon
 from datetime import datetime
 from functools import wraps, partial
 from pathlib import Path
@@ -34,7 +35,18 @@ fis1_mode = 'MEDIA'  # 'MEDIA' oder 'NAV'
 nav_active = False
 nav_description = ''
 nav_distance = ''
+
+# Zusätzliche HUDIY-Navigationsdaten.
+# Zunächst nur erfassen/loggen; Darstellung im FIS folgt separat.
+nav_maneuver_type = None
+nav_maneuver_side = None
+nav_maneuver_angle = None
+nav_maneuver_icon = b''
 last_nav_display_text = ''
+NAV_FIS2_THRESHOLD_M = 500.0
+nav_fis2_overlay = False
+nav_fis2_normal = {}
+
 
 
 
@@ -3247,8 +3259,12 @@ def set_fis1(text, align=None, trace=None):
     event.set()
 
 
-def set_fis2(text, align=None, trace=None):
+def set_fis2(text, align=None, trace=None, nav_overlay=False):
     global fis2_pending
+    if not nav_overlay:
+        nav_fis2_normal[toggle_fis2] = (text, align, trace)
+        if nav_fis2_overlay:
+            return
 
     if align is None:
         align = "right"
@@ -4178,27 +4194,143 @@ def define_event_handler_class():
 
         @log_callback_errors
         def on_navigation_status(self, _client, message):
-            global nav_active
-            # state 1 = ACTIVE, state 2 = INACTIVE
+            global nav_active, nav_distance
+
+            # HUDIY:
+            # state 1 = ACTIVE
+            # state 2 = INACTIVE
             new_state = (message.state == 1)
+
+            # Nur auf einen echten Zustandswechsel reagieren.
+            # Laufende Maneuver-Updates duerfen eine manuelle MEDIA-Auswahl
+            # spaeter nicht wieder auf NAV zurueckschalten.
             if new_state != nav_active:
                 nav_active = new_state
+                nav_distance = ''
+
                 if ENABLE_LOGGING:
                     logger.info(f'🧭 NavigationStatus active: {nav_active}')
 
+                fire_and_forget(
+                    self.main_loop,
+                    handle_navigation_state_change(nav_active),
+                    'navigation_state_change'
+                )
+
         @log_callback_errors
         def on_navigation_maneuver_details(self, _client, message):
-            global nav_description
-            nav_description = message.description.strip()
-            if ENABLE_LOGGING:
-                logger.info(f'🧭 Maneuver details: {nav_description}')
+            global nav_description, nav_distance
+            global nav_maneuver_type, nav_maneuver_side, nav_maneuver_angle
+            global nav_maneuver_icon
+
+            new_description = (getattr(message, 'description', '') or '').strip()
+            new_icon = bytes(getattr(message, 'icon', b'') or b'')
+
+            try:
+                new_type = (
+                    message.maneuver_type
+                    if message.HasField('maneuver_type')
+                    else None
+                )
+            except Exception:
+                new_type = getattr(message, 'maneuver_type', None)
+
+            try:
+                new_side = (
+                    message.maneuver_side
+                    if message.HasField('maneuver_side')
+                    else None
+                )
+            except Exception:
+                new_side = getattr(message, 'maneuver_side', None)
+
+            try:
+                new_angle = (
+                    message.maneuver_angle
+                    if message.HasField('maneuver_angle')
+                    else None
+                )
+            except Exception:
+                new_angle = getattr(message, 'maneuver_angle', None)
+
+            changed = (
+                new_description,
+                new_type,
+                new_side,
+                new_angle,
+                new_icon
+            ) != (
+                nav_description,
+                nav_maneuver_type,
+                nav_maneuver_side,
+                nav_maneuver_angle,
+                nav_maneuver_icon
+            )
+
+            if changed:
+                nav_distance = ''
+
+            nav_description = new_description
+            nav_maneuver_type = new_type
+            nav_maneuver_side = new_side
+            nav_maneuver_angle = new_angle
+            nav_maneuver_icon = new_icon
+
+            # HUDIY sendet identische Maneuver-Details regelmaessig erneut.
+            # Nur echte Aenderungen duerfen den laufenden FIS-Scroller
+            # neu starten.
+            if changed:
+                if ENABLE_LOGGING:
+                    icon_head = nav_maneuver_icon[:32].hex().upper()
+
+                    try:
+                        protobuf_raw = message.SerializeToString().hex().upper()
+                    except Exception:
+                        protobuf_raw = '<nicht verfügbar>'
+
+                    logger.info(
+                        '🧭 Maneuver changed: description=%r type=%r side=%r '
+                        'angle=%r icon_len=%d icon_head=%s',
+                        nav_description,
+                        nav_maneuver_type,
+                        nav_maneuver_side,
+                        nav_maneuver_angle,
+                        len(nav_maneuver_icon),
+                        icon_head
+                    )
+
+                    logger.info(
+                        '🧭 Maneuver protobuf raw: %s',
+                        protobuf_raw
+                    )
+
+                if nav_active and toggle_fis1 == 1 and send_on_canbus and can_functional:
+                    fire_and_forget(
+                        self.main_loop,
+                        nav_to_dis1(),
+                        'nav_refresh_details'
+                    )
 
         @log_callback_errors
         def on_navigation_maneuver_distance(self, _client, message):
             global nav_distance
-            nav_distance = message.label.strip()
-            if ENABLE_LOGGING:
-                logger.info(f'🧭 Maneuver distance: {nav_distance}')
+
+            new_distance = (getattr(message, 'label', '') or '').strip()
+            changed = (new_distance != nav_distance)
+
+            nav_distance = new_distance
+
+            # Auch die Distanz nur bei einer echten Aenderung neu rendern.
+            if changed:
+                if ENABLE_LOGGING:
+                    logger.info(f'🧭 Maneuver distance changed: {nav_distance}')
+
+                if nav_active and toggle_fis1 == 1 and send_on_canbus and can_functional:
+                    fire_and_forget(
+                        self.main_loop,
+                        nav_to_dis1(),
+                        'nav_refresh_distance'
+                    )
 
         @log_callback_errors
         @log_callback_errors
@@ -7232,6 +7364,79 @@ async def refresh_fis2_current_value():
         return
 
 
+async def handle_navigation_state_change(active):
+    global toggle_fis1, pause_fis1
+
+    # Eine neu gestartete Route bekommt einmalig Vorrang.
+    #
+    # Wichtig:
+    # Danach entscheiden NICHT die laufenden Maneuver-Updates ueber den Modus.
+    # Der Benutzer kann deshalb per Long Press wieder auf MEDIA schalten.
+    if active:
+        if toggle_fis1 == 6:
+            toggle_fis1 = 1
+
+            if ENABLE_LOGGING:
+                logger.info(
+                    '🧭 Navigation gestartet -> FIS1 automatisch auf NAV'
+                )
+
+            if send_on_canbus and can_functional:
+                await show_fis1_mode_label('NAV')
+
+            pause_fis1 = False
+
+            if send_on_canbus and can_functional:
+                await nav_to_dis1()
+
+        return
+
+    # Route beendet:
+    # Wenn NAV angezeigt wird, wieder zum Medienkarussell wechseln.
+    if toggle_fis1 == 1:
+        toggle_fis1 = 6
+
+        if ENABLE_LOGGING:
+            logger.info(
+                '🧭 Navigation beendet -> FIS1 automatisch auf MEDIA'
+            )
+
+        if send_on_canbus and can_functional:
+            await show_fis1_mode_label('MEDIA')
+
+        pause_fis1 = False
+
+        if send_on_canbus and can_functional:
+            await media_to_dis1()
+
+
+async def show_fis1_mode_label(label):
+    global pause_fis1, scroll_task_fis1
+
+    # FIS1 fuer die kurze Modus-Bestaetigung exklusiv reservieren.
+    pause_fis1 = True
+
+    # Ein bereits laufender Scroll-Task kann sonst MEDIA/NAV sofort
+    # wieder ueberschreiben.
+    if scroll_task_fis1 is not None and not scroll_task_fis1.done():
+        scroll_task_fis1.cancel()
+        try:
+            await scroll_task_fis1
+        except asyncio.CancelledError:
+            pass
+        except Exception:
+            pass
+        scroll_task_fis1 = None
+
+    clear_content(FIS1)
+    set_fis1(label, 'center')
+
+    # Kurze OEM-artige Quittierung.
+    await asyncio.sleep(1.0)
+
+    clear_content(FIS1)
+
+
 async def block_show_value1():
     global toggle_fis1, pause_fis1
 
@@ -7243,9 +7448,7 @@ async def block_show_value1():
         logger.info(f'toggle_fis1 gewechselt auf: {label}')
 
     if send_on_canbus and can_functional:
-        set_fis1(label, 'center')
-        await asyncio.sleep(1.2)
-        clear_content(FIS1)
+        await show_fis1_mode_label(label)
 
     pause_fis1 = False
 
@@ -7329,35 +7532,213 @@ def update_toggle_features(toggle_key: str, value: int) -> None:
 
 
 media_carousel_task: Optional[asyncio.Task] = None
+nav_carousel_task: Optional[asyncio.Task] = None
 
 # FIS2 live values are rendered by the existing CAN handlers according
-# to toggle_fis2.  FIS1 MEDIA has its own independent carousel.
+# to toggle_fis2. FIS1 MEDIA and NAV each have their own persistent loop.
+
+
+
+def nav_distance_metres(label):
+    import re
+    match = re.fullmatch(
+        r'\s*(\d+(?:[.,]\d+)?)\s*(m|km)\s*',
+        str(label), re.I
+    )
+    if not match:
+        return None
+    value = float(match.group(1).replace(',', '.'))
+    value *= 1000 if match.group(2).lower() == 'km' else 1
+    return value if 0 < value < float('inf') else None
+
+
+def nav_fis2_text():
+    metres = nav_distance_metres(nav_distance)
+    if (
+        nav_active
+        and api_is_connected
+        and toggle_fis1 == 1
+        and send_on_canbus
+        and can_functional
+        and not (
+            pause_fis1 or pause_fis2
+            or call_incoming or welcome_active
+        )
+        and not show_label
+        and metres is not None
+        and metres <= NAV_FIS2_THRESHOLD_M
+    ):
+        return '{} m'.format(max(1, round(metres)))
+    return ''
+
+
+def nav_content_text():
+    import re
+
+    text = ' '.join((nav_description or '').split())
+
+    # --------------------------------------------------
+    # 1. HUDIY-Seiteninformation hat immer Vorrang.
+    # --------------------------------------------------
+    direction = {
+        1: 'links',
+        2: 'rechts'
+    }.get(nav_maneuver_side, '')
+
+    # --------------------------------------------------
+    # 2. Falls HUDIY keine Seite liefert:
+    #    Manöver-PNG live analysieren.
+    #
+    # Kreisverkehr-Manöver werden bewusst ausgeschlossen,
+    # damit ein Kreisverkehr-Icon nicht versehentlich als
+    # normales Links-/Rechts-Manöver interpretiert wird.
+    # --------------------------------------------------
+    if (
+        not direction
+        and nav_maneuver_icon
+        and nav_maneuver_type not in (11, 12, 13)
+    ):
+        try:
+            direction = classify_nav_icon(nav_maneuver_icon) or ''
+        except Exception:
+            direction = ''
+
+    # --------------------------------------------------
+    # Kreisverkehr behält seine eigene Beschreibung.
+    # --------------------------------------------------
+    if nav_maneuver_type == 13:
+        if 'kreisverkehr' not in text.lower():
+            text = ('Kreisverkehr ' + text).strip()
+
+    # --------------------------------------------------
+    # Richtung nur ergänzen, wenn sie noch nicht im
+    # Beschreibungstext vorhanden ist.
+    # --------------------------------------------------
+    elif direction and not re.search(
+        r'\b(links|rechts)(?:\s+halten)?\b',
+        text,
+        re.I
+    ):
+        text = (direction + ' ' + text).strip()
+
+    return text
+
+
+async def nav_update_fis2():
+    global nav_fis2_overlay
+
+    distance = nav_fis2_text()
+    previous = nav_fis2_overlay
+    nav_fis2_overlay = bool(distance)
+
+    if distance:
+        set_fis2(
+            distance, 'right',
+            trace='nav_distance',
+            nav_overlay=True
+        )
+    elif previous:
+        cached = nav_fis2_normal.get(toggle_fis2)
+        set_fis2(*(
+            cached if cached is not None
+            else ('', 'right', None)
+        ))
+
+        # Modus 10 nicht neu initialisieren:
+        # Das würde eine laufende Zeitmessung zurücksetzen.
+        if not pause_fis2 and toggle_fis2 != 10:
+            await refresh_fis2_current_value()
+
+    return bool(distance)
+
+
+async def nav_carousel_loop():
+    """Live-FIS2-Distanz mit unabhängigen FIS1-Scroll-Durchläufen."""
+    last_key = None
+    next_scroll = 0.0
+    loop = asyncio.get_running_loop()
+
+    while not stop_flag:
+        try:
+            overlay = await nav_update_fis2()
+
+            if (
+                pause_fis1
+                or show_label
+                or toggle_fis1 != 1
+                or not (send_on_canbus and can_functional)
+            ):
+                last_key = None
+                await asyncio.sleep(0.1)
+                continue
+
+            content = nav_content_text() if nav_active else ''
+            distance = ''
+
+            if (
+                nav_active
+                and not overlay
+                and nav_distance_metres(nav_distance) is not None
+            ):
+                distance = ' '.join(nav_distance.split())
+
+            text = ' '.join(
+                part for part in (distance, content) if part
+            ) or 'NAV'
+
+            if call_incoming:
+                text = 'Anruf'
+
+            # Eine neue Distanz allein unterbricht den Scroller nicht.
+            # Neue Manöver und die FIS2-Übernahme wirken sofort.
+            key = (
+                nav_active, call_incoming, overlay, content,
+                nav_maneuver_type, nav_maneuver_side,
+                bool(distance)
+            )
+
+            now = loop.time()
+            if key != last_key or now >= next_scroll:
+                await start_scrolling(text, 'FIS1')
+                last_key = key
+                next_scroll = now + (
+                    3.5 if len(text) <= 8
+                    else 3.5 + len(text) * 0.3
+                )
+
+            await asyncio.sleep(0.1)
+
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            logger.exception('NAV distance display update failed')
+            await asyncio.sleep(0.5)
+
 
 async def nav_to_dis1():
-    """Render FIS1 in dedicated NAV-only mode (toggle_fis1 == 1)."""
-    global nav_active, nav_description, nav_distance
-    global call_incoming
+    """Ensure that the persistent FIS1 NAV loop is running."""
+    global nav_carousel_task
 
-    if pause_fis1 or not (send_on_canbus and can_functional):
-        return
+    loop = asyncio.get_running_loop()
 
-    # Telefon bleibt auch im NAV-only-Modus die hoechste Prioritaet.
-    if call_incoming:
-        await start_scrolling('Anruf', 'FIS1')
-        return
+    if nav_carousel_task is None or nav_carousel_task.done():
+        if ENABLE_LOGGING:
+            logger.info(
+                "NAV_CAROUSEL_DEBUG: starting nav_carousel_loop "
+                "(toggle_fis1=%s, pause_fis1=%s, "
+                "nav_active=%s, distance=%r, description=%r)",
+                toggle_fis1,
+                pause_fis1,
+                nav_active,
+                nav_distance,
+                nav_description
+            )
 
-    # Aktive Navigation anzeigen.
-    if nav_active and (nav_description or nav_distance):
-        ndist = nav_distance if nav_distance else ''
-        ndesc = nav_description if nav_description else ''
-        nav_str = f'{ndist}: {ndesc}'.strip(': ')
-
-        if nav_str:
-            await start_scrolling(nav_str, 'FIS1')
-            return
-
-    # Keine aktive Navigation: NAV-Modus kennt bewusst keinen Medien-Fallback.
-    set_fis1('NAV', 'center')
+        nav_carousel_task = fire_and_forget(
+            loop,
+            nav_carousel_loop(),
+            "nav_carousel_loop"
+        )
 
 
 async def media_carousel_loop():
@@ -7382,21 +7763,23 @@ async def media_carousel_loop():
                 await asyncio.sleep(1.5)
                 continue
 
-            # 2. Prio: Navigation aktiv
-            if nav_active and (nav_description or nav_distance):
-                ndist = nav_distance if nav_distance else ''
-                ndesc = nav_description if nav_description else ''
-                nav_str = f'{ndist}: {ndesc}'.strip(': ')
-                if nav_str:
-                    await start_scrolling(nav_str, 'FIS1')
-                    scroll_time = 3.5 if len(nav_str) <= 8 else (3.5 + (len(nav_str) * 0.3))
-                    await asyncio.sleep(scroll_time)
-                    continue
+            # Modus 6 ist bewusst ein reiner MEDIA-Modus.
+            #
+            # Navigation wird ausschliesslich in FIS1-Modus 1 dargestellt.
+            # Dadurch kann der Benutzer auch waehrend einer aktiven Route
+            # per Long Press frei zwischen NAV und MEDIA wechseln.
 
-            # 3. Prio: Medienkarussell
+            # Medienkarussell
             current_title = (title or '').strip()
             current_artist = (artist or '').strip()
             current_album = (album or '').strip()
+
+            # Android Auto/HUDIY can append the audio quality to the artist,
+            # e.g. "Grimes • Lossless". Keep the raw HUDIY metadata untouched
+            # and remove only an exact trailing "• Lossless" for the FIS.
+            artist_parts = current_artist.rsplit('•', 1)
+            if len(artist_parts) == 2 and artist_parts[1].strip().casefold() == 'lossless':
+                current_artist = artist_parts[0].rstrip()
 
             if current_title != last_seen_title:
                 last_seen_title = current_title
