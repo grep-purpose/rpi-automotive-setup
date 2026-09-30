@@ -527,7 +527,8 @@ class AudiLauncher(QOpenGLWidget):
         # LINKS / HOCH
         if key in (
             Qt.Key_Left,
-            Qt.Key_Up
+            Qt.Key_Up,
+            Qt.Key_1
         ):
 
             self.selected -= 1
@@ -546,7 +547,8 @@ class AudiLauncher(QOpenGLWidget):
         if key in (
             Qt.Key_Right,
             Qt.Key_Down,
-            Qt.Key_Tab
+            Qt.Key_Tab,
+            Qt.Key_2
         ):
 
             self.selected += 1
