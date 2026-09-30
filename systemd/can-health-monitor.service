@@ -1,13 +1,11 @@
 [Unit]
-Description=Raspberry Pi Automotive CAN Health Monitor
+Description=Passive Raspberry Pi Automotive CAN Health Monitor
 After=can_handler.service can_keyboard_control.service
-Wants=can_handler.service can_keyboard_control.service
 
 [Service]
 Type=simple
 User=root
 Environment=PYTHONUNBUFFERED=1
-Environment=CAN_HEALTH_MODE=AUTO
 ExecStart=/usr/bin/python3 /home/pi/rpi-automotive-setup/scripts/can_health_monitor.py
 Restart=always
 RestartSec=3

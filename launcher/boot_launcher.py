@@ -1,3 +1,4 @@
+import json
 #!/usr/bin/env python3
 
 import os
@@ -198,6 +199,8 @@ class AudiLauncher(QOpenGLWidget):
         self.draw_footer(
             painter
         )
+
+        self.draw_can_health(painter)
 
         painter.end()
 
@@ -533,6 +536,87 @@ class AudiLauncher(QOpenGLWidget):
     # ========================================================
     # Eingabe
     # ========================================================
+
+
+    def draw_can_health(self, painter):
+
+        """Zeigt ausschließlich den passiv gelesenen CAN-Zustand."""
+
+        status = "red"
+
+        interface = None
+
+
+        try:
+
+            with open("/run/rpi-automotive/can-health.json", "r") as f:
+
+                health = json.load(f)
+
+
+            status = health.get("status", "red")
+
+            interface = health.get("interface")
+
+        except Exception:
+
+            pass
+
+
+        colors = {
+
+            "green": (55, 190, 95),
+
+            "yellow": (225, 175, 45),
+
+            "red": (210, 65, 65),
+
+        }
+
+
+        color = colors.get(status, colors["red"])
+
+
+        painter.save()
+
+        painter.setPen(Qt.NoPen)
+
+        painter.setBrush(QColor(*color))
+
+        painter.drawEllipse(748, 31, 10, 10)
+
+
+        if interface == "vcan0":
+
+            font = painter.font()
+
+            font.setPointSize(9)
+
+            font.setBold(True)
+
+            painter.setFont(font)
+
+            painter.setPen(QColor(220, 220, 220))
+
+            painter.drawText(
+
+                763,
+
+                24,
+
+                20,
+
+                24,
+
+                Qt.AlignCenter,
+
+                "V",
+
+            )
+
+
+        painter.restore()
+
 
     def keyPressEvent(
         self,
