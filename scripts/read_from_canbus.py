@@ -1900,6 +1900,22 @@ async def handle_client(reader, writer):
                 "toggle_hudiy_kodi_from_remote"
             )
 
+        elif command == 'fis1_toggle':
+            logger.info("RNS-E Bridge: FIS1 Long Press empfangen.")
+            fire_and_forget(
+                asyncio.get_running_loop(),
+                block_show_value1(),
+                "fis1_toggle_from_keyboard_bridge"
+            )
+
+        elif command == 'fis2_toggle':
+            logger.info("RNS-E Bridge: FIS2 Long Press empfangen.")
+            fire_and_forget(
+                asyncio.get_running_loop(),
+                block_show_value2(),
+                "fis2_toggle_from_keyboard_bridge"
+            )
+
         else:
             logger.warning(f"Unknown command received: {command}")
             # Optional: still respond for unknown command
@@ -3058,6 +3074,32 @@ async def start_send_to_dis():
     task_send_fis1 = track_task(send_to_dis(FIS1), "send_to_dis_1")
     task_send_fis2 = None
     send_to_dis_tasks_started = True
+
+    # RNSE_MEDIA_CAROUSEL_AUTOSTART_V1
+    #
+    # Das Medienkarussell gehoert zum FIS und nicht zu HUDIY.
+    # Dadurch kann Kodi-Radio auch dann sofort Metadaten anzeigen,
+    # wenn HUDIY seit dem Start von read_from_canbus.py noch nie
+    # Medienmetadaten geliefert hat.
+    fire_and_forget(
+        asyncio.get_running_loop(),
+        media_to_dis1(),
+        "media_carousel_startup"
+    )
+
+    # Kodi-Radiosenderwechsel unabhängig vom eigentlichen
+    # Carousel beobachten. Dadurch können lange Radiotexte
+    # bei einem Senderwechsel sofort abgebrochen werden.
+    global kodi_station_watch_task
+
+    if (
+        kodi_station_watch_task is None
+        or kodi_station_watch_task.done()
+    ):
+        kodi_station_watch_task = track_task(
+            kodi_radio_station_watch_loop(),
+            "kodi_radio_station_watch"
+        )
 
     if ENABLE_LOGGING:
         logger.info("send_to_dis tasks started with FIS1=%s and FIS2=%s", FIS1, FIS2)
@@ -6467,6 +6509,15 @@ def ensure_kodi_qol_settings():
 
 async def toggle_hudiy_kodi():
     global current_app
+    global title, artist, album, playing, source
+    global position, duration
+    global nav_active, nav_description, nav_distance
+    global nav_maneuver_type, nav_maneuver_side
+    global nav_maneuver_angle, nav_maneuver_icon
+    global last_nav_display_text
+    global nav_fis2_overlay
+    global scroll_task_fis1
+    global toggle_fis1
 
     async with toggle_hudiy_kodi_lock:
 
@@ -6521,6 +6572,55 @@ async def toggle_hudiy_kodi():
             logger.info(
                 "Switcher: Beende Hudiy -> "
                 "Schalte WLAN um & starte Kodi..."
+            )
+
+        # ----------------------------------------------------
+        # HUDIY -> Kodi: alten HUDIY-FIS-Zustand vollständig
+        # verwerfen, BEVOR Kodi übernimmt.
+        # ----------------------------------------------------
+
+        title = ""
+        artist = ""
+        album = ""
+        playing = ""
+        source = ""
+        position = ""
+        duration = ""
+
+        nav_active = False
+        nav_description = ""
+        nav_distance = ""
+
+        nav_maneuver_type = None
+        nav_maneuver_side = None
+        nav_maneuver_angle = None
+        nav_maneuver_icon = b""
+        last_nav_display_text = ""
+
+        nav_fis2_overlay = False
+
+        # Kodi besitzt FIS1 als Medienquelle.
+        toggle_fis1 = 6
+
+        # Eventuell laufenden FIS1-Scrolltext sofort stoppen.
+        if (
+            scroll_task_fis1 is not None
+            and not scroll_task_fis1.done()
+        ):
+            scroll_task_fis1.cancel()
+
+        if send_on_canbus and can_functional:
+            clear_content(FIS1)
+
+            fire_and_forget(
+                asyncio.get_running_loop(),
+                refresh_fis2_current_value(),
+                "restore_fis2_before_kodi"
+            )
+
+        if ENABLE_LOGGING:
+            logger.info(
+                "HUDIY -> Kodi: Media/NAV FIS state cleared."
             )
 
         # HUDIY vollständig beenden.
@@ -7652,14 +7752,78 @@ async def nav_update_fis2():
     return bool(distance)
 
 
+# RNSE_NAV_DISTANCE_CAROUSEL_V1
+#
+# Oberhalb der bestehenden 500-m-Grenze:
+#
+#   DISTANZ ca. 15 Sekunden
+#       ->
+#   ANWEISUNG genau einmal
+#       ->
+#   DISTANZ ...
+#
+# Unterhalb 500 m bleibt die bestehende FIS2-Overlay-Logik
+# vollständig erhalten.
+NAV_FIS1_DISTANCE_SECONDS = 15.0
+
+# Wird bei einem neuen HUDIY-Maneuver gesetzt, damit eine neue
+# Navigationsanweisung sofort Vorrang vor der laufenden
+# Distanzphase bekommt.
+nav_force_instruction_once = False
+
+
 async def nav_carousel_loop():
-    """Live-FIS2-Distanz mit unabhängigen FIS1-Scroll-Durchläufen."""
-    last_key = None
-    next_scroll = 0.0
+    """
+    OEM-artige NAV-Darstellung.
+
+    >= 500 m:
+        FIS1:
+            Distanz ca. 15 Sekunden, live aktualisiert
+            -> Anweisung einmal
+            -> zurück zur Distanz
+
+        FIS2:
+            normaler Fahrzeugwert
+
+    < 500 m:
+        Bestehendes Verhalten bleibt erhalten:
+            FIS1 = Navigationsanweisung
+            FIS2 = dynamisches Distanz-Overlay
+
+    Ein echtes neues Maneuver hat immer Vorrang und darf
+    einen laufenden Distanz-/Scroll-Zyklus sofort unterbrechen.
+    """
+
+    global nav_force_instruction_once
+
     loop = asyncio.get_running_loop()
+
+    phase = "distance"
+    phase_until = 0.0
+
+    last_distance_text = None
+    last_instruction_key = None
+    instruction_started = False
+
+    # RNSE_NAV_OVERLAY_FIS1_FALLBACK_V1
+    #
+    # Merkt, ob die <500-m-FIS2-Übernahme im vorherigen
+    # Loop-Durchlauf aktiv war.
+    #
+    # Wichtig für den Übergang:
+    #   >500 m: FIS1 zeigt Distanz
+    #   <500 m: FIS2 übernimmt Distanz
+    #           FIS1 muss SOFORT Manöver zeigen
+    last_overlay = False
 
     while not stop_flag:
         try:
+            # ------------------------------------------------
+            # Bestehende <500-m-Logik.
+            #
+            # nav_update_fis2() entscheidet weiterhin selbst,
+            # wann FIS2 die Navigationsdistanz übernimmt.
+            # ------------------------------------------------
             overlay = await nav_update_fis2()
 
             if (
@@ -7668,50 +7832,244 @@ async def nav_carousel_loop():
                 or toggle_fis1 != 1
                 or not (send_on_canbus and can_functional)
             ):
-                last_key = None
+                phase = "distance"
+                phase_until = 0.0
+                last_distance_text = None
+                last_instruction_key = None
+                instruction_started = False
+
                 await asyncio.sleep(0.1)
                 continue
 
-            content = nav_content_text() if nav_active else ''
-            distance = ''
-
-            if (
-                nav_active
-                and not overlay
-                and nav_distance_metres(nav_distance) is not None
-            ):
-                distance = ' '.join(nav_distance.split())
-
-            text = ' '.join(
-                part for part in (distance, content) if part
-            ) or 'NAV'
-
+            # ------------------------------------------------
+            # Eingehender Anruf bleibt höchste Priorität.
+            # ------------------------------------------------
             if call_incoming:
-                text = 'Anruf'
+                await start_scrolling("Anruf", "FIS1")
 
-            # Eine neue Distanz allein unterbricht den Scroller nicht.
-            # Neue Manöver und die FIS2-Übernahme wirken sofort.
-            key = (
-                nav_active, call_incoming, overlay, content,
-                nav_maneuver_type, nav_maneuver_side,
-                bool(distance)
+                await asyncio.sleep(0.1)
+                continue
+
+            if not nav_active:
+                phase = "distance"
+                phase_until = 0.0
+                last_distance_text = None
+                last_instruction_key = None
+                instruction_started = False
+
+                await asyncio.sleep(0.1)
+                continue
+
+            content = nav_content_text() or ""
+
+            instruction_key = (
+                content,
+                nav_maneuver_type,
+                nav_maneuver_side,
+                bytes(nav_maneuver_icon or b""),
             )
 
-            now = loop.time()
-            if key != last_key or now >= next_scroll:
-                await start_scrolling(text, 'FIS1')
-                last_key = key
-                next_scroll = now + (
-                    3.5 if len(text) <= 8
-                    else 3.5 + len(text) * 0.3
+            # =================================================
+            # < 500 m:
+            #
+            # FIS2 besitzt die Distanz.
+            # FIS1 zeigt ausschließlich die Anweisung.
+            #
+            # Die bereits vorhandene Umschaltfunktion wird
+            # dadurch NICHT verändert.
+            # =================================================
+            if overlay:
+                # ------------------------------------------------
+                # <500 m:
+                #
+                # FIS2 übernimmt die Distanz.
+                #
+                # Beim ERSTEN Eintritt in diesen Zustand muss die
+                # eventuell noch oben stehende Distanz SOFORT weg
+                # und durch die aktuelle Manöver-Anweisung ersetzt
+                # werden.
+                # ------------------------------------------------
+                overlay_just_activated = not last_overlay
+                last_overlay = True
+
+                phase = "instruction"
+                phase_until = 0.0
+                last_distance_text = None
+
+                if overlay_just_activated:
+                    if (
+                        scroll_task_fis1 is not None
+                        and not scroll_task_fis1.done()
+                    ):
+                        scroll_task_fis1.cancel()
+
+                    clear_content(FIS1)
+
+                if (
+                    overlay_just_activated
+                    or instruction_key != last_instruction_key
+                    or nav_force_instruction_once
+                ):
+                    nav_force_instruction_once = False
+                    last_instruction_key = instruction_key
+
+                    if content:
+                        await start_scrolling(
+                            content,
+                            "FIS1"
+                        )
+                    else:
+                        set_fis1(
+                            "NAV",
+                            "center"
+                        )
+
+                await asyncio.sleep(0.1)
+                continue
+
+            # Overlay ist NICHT aktiv:
+            # wir befinden uns wieder im >500-m-Bereich.
+            last_overlay = False
+
+            # =================================================
+            # >= 500 m:
+            #
+            # Distanz bleibt oben in FIS1.
+            # =================================================
+            distance_metres = nav_distance_metres(
+                nav_distance
+            )
+
+            distance_text = ""
+
+            if distance_metres is not None:
+                distance_text = " ".join(
+                    str(nav_distance).split()
                 )
 
-            await asyncio.sleep(0.1)
+            now = loop.time()
+
+            # -------------------------------------------------
+            # Neues Maneuver:
+            # sofort die Anweisung anzeigen.
+            # -------------------------------------------------
+            if nav_force_instruction_once:
+                nav_force_instruction_once = False
+
+                phase = "instruction"
+                instruction_started = False
+                phase_until = 0.0
+
+            # Falls kein externer Immediate-Handler vorhanden
+            # ist, erkennen wir ein neues Maneuver zusätzlich
+            # direkt hier.
+            elif (
+                last_instruction_key is not None
+                and instruction_key != last_instruction_key
+            ):
+                phase = "instruction"
+                instruction_started = False
+                phase_until = 0.0
+
+            last_instruction_key = instruction_key
+
+            # =================================================
+            # DISTANZPHASE
+            # =================================================
+            if phase == "distance":
+
+                if phase_until <= 0.0:
+                    phase_until = (
+                        now
+                        + NAV_FIS1_DISTANCE_SECONDS
+                    )
+
+                # Distanz verändert sich laufend.
+                #
+                # Nur bei tatsächlicher Änderung neu senden;
+                # dadurch bleibt die Anzeige ruhig, aber live.
+                if (
+                    distance_text
+                    and distance_text
+                    != last_distance_text
+                ):
+                    last_distance_text = distance_text
+
+                    # Eventuell noch laufenden langen
+                    # Anweisungs-Scroll stoppen.
+                    if (
+                        scroll_task_fis1 is not None
+                        and not scroll_task_fis1.done()
+                    ):
+                        scroll_task_fis1.cancel()
+
+                    set_fis1(
+                        distance_text,
+                        "center"
+                    )
+
+                elif not distance_text:
+                    # Falls HUDIY kurzfristig noch keine
+                    # Distanz liefert, Anweisung verwenden.
+                    if content:
+                        await start_scrolling(
+                            content,
+                            "FIS1"
+                        )
+
+                # Nach 15 Sekunden einmal zur Anweisung.
+                if now >= phase_until:
+                    phase = "instruction"
+                    instruction_started = False
+                    phase_until = 0.0
+
+                await asyncio.sleep(0.1)
+                continue
+
+            # =================================================
+            # ANWEISUNGSPHASE
+            # =================================================
+            if phase == "instruction":
+
+                if not instruction_started:
+                    instruction_started = True
+
+                    if content:
+                        await start_scrolling(
+                            content,
+                            "FIS1"
+                        )
+
+                        # Genug Zeit für genau einen kompletten
+                        # bestehenden Scroll-Durchlauf.
+                        phase_until = now + (
+                            3.5
+                            if len(content) <= 8
+                            else (
+                                3.5
+                                + len(content) * 0.3
+                            )
+                        )
+
+                    else:
+                        phase_until = now + 2.0
+
+                if now >= phase_until:
+                    phase = "distance"
+                    phase_until = 0.0
+                    instruction_started = False
+                    last_distance_text = None
+
+                await asyncio.sleep(0.1)
+                continue
 
         except asyncio.CancelledError:
             raise
+
         except Exception:
-            logger.exception('NAV distance display update failed')
+            logger.exception(
+                "NAV distance carousel update failed"
+            )
             await asyncio.sleep(0.5)
 
 
@@ -7741,12 +8099,381 @@ async def nav_to_dis1():
         )
 
 
+# RNSE_KODI_RADIO_CAROUSEL_V1
+KODI_RADIO_METADATA_PATH = Path(
+    "/run/user/1000/rnse_kodi_radio_metadata.json"
+)
+
+KODI_RADIO_METADATA_MAX_AGE = 2.0
+
+# RNSE_KODI_RADIO_STATION_INTRO_V1
+#
+# Beim Senderwechsel wird der Sender einmal bewusst eingeblendet.
+# Danach zeigt das Karussell nur noch Programminhalt / Titel /
+# Interpret. Dadurch entstehen keine redundanten Schleifen wie:
+#
+#   WDR 4 Ruhrgebiet -> WDR 4 mit Carina Vogt
+#
+KODI_RADIO_STATION_INTRO_SECONDS = 8.0
+
+kodi_radio_last_station = ""
+kodi_radio_station_intro_until = 0.0
+
+
+# RNSE_KODI_PROCESS_SOURCE_V1
+def kodi_process_running():
+    """
+    Erkennt Kodi anhand des tatsächlich laufenden kodi.bin-Prozesses.
+
+    Dadurch ist die FIS-Medienquelle nicht davon abhängig,
+    ob current_app seit dem Start von read_from_canbus.py schon
+    durch den HUDIY/Kodi-Switcher aktualisiert wurde.
+    """
+    try:
+        for proc_path in Path("/proc").iterdir():
+            if not proc_path.name.isdigit():
+                continue
+
+            try:
+                comm = (
+                    proc_path / "comm"
+                ).read_text(
+                    encoding="utf-8",
+                    errors="ignore"
+                ).strip()
+
+                if comm == "kodi.bin":
+                    return True
+
+            except (
+                FileNotFoundError,
+                PermissionError,
+                ProcessLookupError,
+                OSError,
+            ):
+                continue
+
+    except Exception:
+        pass
+
+    return False
+
+
+def get_kodi_radio_carousel_items():
+    """
+    OEM-artige Kodi-Radio-Darstellung.
+
+    Neuer Sender:
+        8 Sekunden nur Sendername.
+
+    Danach:
+        echter Musiktitel:
+            Titel -> Interpret
+
+        Radiotext / Sendungsinfo:
+            nur Radiotext
+
+        keine weiteren Daten:
+            Sendername bleibt sichtbar.
+    """
+
+    global kodi_radio_last_station
+    global kodi_radio_station_intro_until
+
+    try:
+        if not KODI_RADIO_METADATA_PATH.is_file():
+            kodi_radio_last_station = ""
+            kodi_radio_station_intro_until = 0.0
+            return []
+
+        payload = json.loads(
+            KODI_RADIO_METADATA_PATH.read_text(
+                encoding="utf-8"
+            )
+        )
+
+        if payload.get("source") != "kodi_radio":
+            return []
+
+        if not bool(payload.get("active")):
+            kodi_radio_last_station = ""
+            kodi_radio_station_intro_until = 0.0
+            return []
+
+        timestamp = float(
+            payload.get("timestamp", 0.0)
+        )
+
+        if (
+            timestamp <= 0.0
+            or (
+                time.time() - timestamp
+            ) > KODI_RADIO_METADATA_MAX_AGE
+        ):
+            return []
+
+        station = str(
+            payload.get("station", "")
+        ).strip()
+
+        radio_title = str(
+            payload.get("title", "")
+        ).strip()
+
+        radio_artist = str(
+            payload.get("artist", "")
+        ).strip()
+
+        if not station:
+            return []
+
+        now = time.monotonic()
+
+        # ----------------------------------------------------
+        # Neuer Sender:
+        # Intro neu starten.
+        # ----------------------------------------------------
+        if (
+            station.casefold()
+            != kodi_radio_last_station.casefold()
+        ):
+            kodi_radio_last_station = station
+
+            kodi_radio_station_intro_until = (
+                now
+                + KODI_RADIO_STATION_INTRO_SECONDS
+            )
+
+            if ENABLE_LOGGING:
+                logger.info(
+                    "KODI_RADIO_FIS: neuer Sender %r "
+                    "-> %.1fs Sender-Intro",
+                    station,
+                    KODI_RADIO_STATION_INTRO_SECONDS
+                )
+
+        # Während des Intros ausschließlich Sendername.
+        #
+        # Das verhindert gleichzeitig, dass kurzzeitig alte
+        # Metadaten des vorherigen Senders sichtbar werden.
+        if now < kodi_radio_station_intro_until:
+            return [station]
+
+        # Kodi liefert beim Start häufig:
+        #
+        # station = "1LIVE"
+        # title   = "1LIVE"
+        #
+        # Das ist kein sinnvoller zusätzlicher Inhalt.
+        title_is_station = (
+            bool(radio_title)
+            and radio_title.casefold()
+            == station.casefold()
+        )
+
+        artist_is_station = (
+            bool(radio_artist)
+            and radio_artist.casefold()
+            == station.casefold()
+        )
+
+        if title_is_station:
+            radio_title = ""
+
+        # ----------------------------------------------------
+        # Echter Musiktitel
+        # ----------------------------------------------------
+        #
+        # Ein Artist, der identisch zum Sender ist, zählt NICHT
+        # als echter Interpret (z.B. Deutschlandfunk).
+        if (
+            radio_title
+            and radio_artist
+            and not artist_is_station
+        ):
+            return [
+                radio_title,
+                radio_artist,
+            ]
+
+        # ----------------------------------------------------
+        # Radiotext / Sendungsinfo / Nachrichten
+        # ----------------------------------------------------
+        if radio_title:
+            return [
+                radio_title
+            ]
+
+        # ----------------------------------------------------
+        # Keine sinnvollen Zusatzdaten:
+        # Sendername stehen lassen statt FIS leer.
+        # ----------------------------------------------------
+        return [
+            station
+        ]
+
+    except Exception as exc:
+        if ENABLE_LOGGING:
+            logger.warning(
+                "KODI_RADIO_FIS: Metadaten konnten "
+                "nicht gelesen werden: %s",
+                exc
+            )
+
+        return []
+
+
+# RNSE_KODI_INSTANT_STATION_SWITCH_V1
+kodi_station_watch_task = None
+kodi_station_watch_last = ""
+
+
+def get_kodi_radio_station():
+    """
+    Liefert nur den aktuell exportierten Kodi-Radiosender.
+    Keine Titel-/Artist-Auswertung.
+    """
+    try:
+        if not KODI_RADIO_METADATA_PATH.is_file():
+            return ""
+
+        payload = json.loads(
+            KODI_RADIO_METADATA_PATH.read_text(
+                encoding="utf-8"
+            )
+        )
+
+        if payload.get("source") != "kodi_radio":
+            return ""
+
+        if not bool(payload.get("active")):
+            return ""
+
+        timestamp = float(
+            payload.get("timestamp", 0.0)
+        )
+
+        if (
+            timestamp <= 0.0
+            or (time.time() - timestamp)
+            > KODI_RADIO_METADATA_MAX_AGE
+        ):
+            return ""
+
+        return str(
+            payload.get("station", "")
+        ).strip()
+
+    except Exception:
+        return ""
+
+
+async def kodi_radio_station_watch_loop():
+    """
+    Beobachtet ausschließlich Senderwechsel.
+
+    Bei einem neuen Sender:
+      - alten Scroll sofort abbrechen
+      - laufendes Media-Carousel abbrechen
+      - FIS1 leeren
+      - Sender-Intro zurücksetzen
+      - Carousel sofort neu starten
+    """
+
+    global kodi_station_watch_last
+    global media_carousel_task
+    global scroll_task_fis1
+    global kodi_radio_last_station
+    global kodi_radio_station_intro_until
+
+    while not stop_flag:
+
+        await asyncio.sleep(0.10)
+
+        # Nur relevant, solange Kodi tatsächlich läuft.
+        if not kodi_process_running():
+            kodi_station_watch_last = ""
+            continue
+
+        station = get_kodi_radio_station()
+
+        if not station:
+            continue
+
+        # Erster bekannter Sender nach Start:
+        # nur merken, noch nichts gewaltsam abbrechen.
+        if not kodi_station_watch_last:
+            kodi_station_watch_last = station
+            continue
+
+        # Gleicher Sender -> nichts tun.
+        if (
+            station.casefold()
+            == kodi_station_watch_last.casefold()
+        ):
+            continue
+
+        old_station = kodi_station_watch_last
+        kodi_station_watch_last = station
+
+        if ENABLE_LOGGING:
+            logger.info(
+                "KODI_RADIO_FIS: Senderwechsel %r -> %r, "
+                "altes Carousel wird sofort abgebrochen.",
+                old_station,
+                station
+            )
+
+        # ----------------------------------------------------
+        # Sender-Intro für neuen Sender erzwingen
+        # ----------------------------------------------------
+        kodi_radio_last_station = ""
+        kodi_radio_station_intro_until = 0.0
+
+        # ----------------------------------------------------
+        # Laufenden Textscroll sofort stoppen
+        # ----------------------------------------------------
+        if (
+            scroll_task_fis1 is not None
+            and not scroll_task_fis1.done()
+        ):
+            scroll_task_fis1.cancel()
+
+        # ----------------------------------------------------
+        # Auch das komplette Carousel abbrechen.
+        # Damit warten wir NICHT noch die Standzeit des alten
+        # Radiotexts ab.
+        # ----------------------------------------------------
+        old_carousel = media_carousel_task
+
+        if (
+            old_carousel is not None
+            and not old_carousel.done()
+        ):
+            old_carousel.cancel()
+
+            with contextlib.suppress(
+                asyncio.CancelledError,
+                Exception
+            ):
+                await old_carousel
+
+        media_carousel_task = None
+
+        if send_on_canbus and can_functional:
+            clear_content(FIS1)
+
+        # Sofort mit dem neuen Sender neu beginnen.
+        await media_to_dis1()
+
+
 async def media_carousel_loop():
     global title, artist, album, stop_flag, pause_fis1, pause_fis2
     global nav_active, nav_description, nav_distance, last_nav_display_text
     global call_incoming, call_display_name, toggle_fis1
     idx = 0
     last_seen_title = ''
+    last_seen_items = ()
 
     while not stop_flag:
         try:
@@ -7781,26 +8508,113 @@ async def media_carousel_loop():
             if len(artist_parts) == 2 and artist_parts[1].strip().casefold() == 'lossless':
                 current_artist = artist_parts[0].rstrip()
 
-            if current_title != last_seen_title:
-                last_seen_title = current_title
+            # -------------------------------------------------
+            # Aktive Medienquelle
+            # -------------------------------------------------
+
+            kodi_active = kodi_process_running()
+
+            if kodi_active:
+
+                # Kodi Radio:
+                #
+                # Sender -> Titel/Radiotext -> Interpret
+                #
+                # Andere Kodi-Anwendungen liefern momentan
+                # bewusst keine FIS1-Metadaten.
+                active_items = (
+                    get_kodi_radio_carousel_items()
+                )
+
+            else:
+
+                # Bestehendes HUDIY / Android-Auto-Carousel:
+                #
+                # Titel -> Interpret -> Album
+                if current_title != last_seen_title:
+                    last_seen_title = current_title
+                    idx = 0
+
+                active_items = []
+
+                if current_title:
+                    active_items.append(
+                        current_title
+                    )
+
+                if current_artist:
+                    active_items.append(
+                        current_artist
+                    )
+
+                if current_album:
+                    active_items.append(
+                        current_album
+                    )
+
+            # Bei einer Änderung sofort wieder mit Element 0
+            # beginnen.
+            #
+            # Kodi: Sender
+            # HUDIY: Titel
+            active_signature = tuple(
+                active_items
+            )
+
+            if active_signature != last_seen_items:
+                last_seen_items = active_signature
                 idx = 0
 
-            active_items = []
-            if current_title: active_items.append(current_title)
-            if current_artist: active_items.append(current_artist)
-            if current_album: active_items.append(current_album)
+                if ENABLE_LOGGING:
+                    logger.info(
+                        "MEDIA_CAROUSEL source=%s items=%r",
+                        (
+                            "KODI_RADIO"
+                            if kodi_active
+                            else "HUDIY"
+                        ),
+                        active_items
+                    )
 
             if not active_items:
                 await asyncio.sleep(1.0)
                 continue
 
             idx = idx % len(active_items)
-            val = active_items[idx]
+
+            selected_index = idx
+            val = active_items[
+                selected_index
+            ]
+
             idx += 1
 
-            await start_scrolling(val, 'FIS1')
-            val_time = 3.5 if len(val) <= 8 else (3.5 + (len(val) * 0.3))
-            await asyncio.sleep(val_time)
+            await start_scrolling(
+                val,
+                'FIS1'
+            )
+
+            val_time = (
+                3.5
+                if len(val) <= 8
+                else (
+                    3.5
+                    + (len(val) * 0.3)
+                )
+            )
+
+            # Kodi Radio:
+            # Element 0 ist immer der Sender.
+            # Dieser bleibt bewusst länger sichtbar.
+            if (
+                kodi_active
+                and selected_index == 0
+            ):
+                val_time += 2.0
+
+            await asyncio.sleep(
+                val_time
+            )
         except Exception as e:
             logger.exception("MEDIA_CAROUSEL_DEBUG: media_carousel_loop failed: %s", e)
             await asyncio.sleep(1.0)
