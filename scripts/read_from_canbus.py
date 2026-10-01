@@ -5977,9 +5977,13 @@ async def process_canid_351(msg):  # handler as EventHandler-Instance
                 data = f'{pending_speed_display} {speed_unit}'
 
                 if send_on_canbus and can_functional and send_values_to_dashboard:
-                    if toggle_fis1 == 6 and not show_label and not pause_fis1:
-                        set_fis1(data, "right")
-                        fis_sent = True
+                    # RNSE_FIS1_MEDIA_SPEED_CONFLICT_FIX_V1
+                    #
+                    # FIS1 Modus 6 ist im aktuellen Automotive-Setup MEDIA.
+                    # Der historische Speed-Pfad darf deshalb NICHT mehr
+                    # auf FIS1 schreiben.
+                    #
+                    # Fahrzeuggeschwindigkeit gehört ausschließlich auf FIS2.
                     if toggle_fis2 == 6 and not pause_fis2:
                         set_fis2(data, "right")
                         fis_sent = True
@@ -6306,9 +6310,12 @@ async def process_canid_353_35B(msg):
                 data = f'{pending_coolant_display}{temp_unit}'
 
                 if send_on_canbus and can_functional and send_values_to_dashboard:
-                    if toggle_fis1 == 8 and not show_label and not pause_fis1:
-                        set_fis1(data, "right")
-                        fis_sent = True
+                    # RNSE_COOLANT_FIS2_ONLY_V1
+                    #
+                    # FIS1 ist im aktuellen OEM-Konzept exklusiv
+                    # für MEDIA / NAV reserviert.
+                    # Kühlmitteltemperatur gehört ausschließlich
+                    # auf die untere FIS2-Zeile.
                     if toggle_fis2 == 8 and not pause_fis2:
                         set_fis2(data, "right")
                         fis_sent = True
