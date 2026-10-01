@@ -3290,6 +3290,7 @@ async def read_cpu_loop():
 def set_fis1(text, align=None, trace=None):
     global fis1_pending
 
+
     if align is None:
         align = "right"
     if trace is None and ENABLE_LOGGING:
@@ -7703,6 +7704,23 @@ def nav_content_text():
         except Exception:
             direction = ''
 
+    # RNSE_NAV_NORMALIZE_DECODER_DIRECTION_V1
+    #
+    # Der Icon-Decoder kann neben "links"/"rechts" auch
+    # "links halten" bzw. "rechts halten" liefern.
+    #
+    # Für die FIS-Darstellung benötigen wir davon nur die
+    # eigentliche Seite. "halten" ist durch den festen
+    # Richtungspfeil redundant.
+    #
+    # Der Decoder-Cache bleibt dabei vollständig erhalten.
+    direction_normalized = str(direction or '').strip().casefold()
+
+    if direction_normalized.startswith('rechts'):
+        direction = 'rechts'
+    elif direction_normalized.startswith('links'):
+        direction = 'links'
+
     # --------------------------------------------------
     # Kreisverkehr behält seine eigene Beschreibung.
     # --------------------------------------------------
@@ -7721,6 +7739,235 @@ def nav_content_text():
     ):
         text = (direction + ' ' + text).strip()
 
+    # RNSE_NAV_FIS_FORMAT_V2
+    #
+    # Kompakte FIS-Navigationsformatierung:
+    #
+    #   rechts -> ->
+    #   links  -> <-
+    #
+    # Lange Texte (> 8 Zeichen) bekommen den Pfeil
+    # zusätzlich am Ende.
+    #
+    # Bei Autobahn-Manövern wird außerdem die
+    # Informationshierarchie optimiert:
+    #
+    #   "rechts Ausfahrt 9 Wiesbadener Kreuz A3"
+    #
+    # wird ungefähr:
+    #
+    #   "-> A3 Wiesbadener Kreuz Ausfahrt 9 ->"
+    #
+    # Normale Straßennamen werden NICHT umsortiert.
+
+    text = ' '.join(text.split()).strip()
+
+    arrow = ""
+
+    # RNSE_NAV_UTURN_NO_ARROW_V1
+    #
+    # "Wenden" ist kein normales Links-/Rechts-Manöver.
+    # HUDIY liefert teilweise z.B. "links wenden".
+    #
+    # In diesem Fall:
+    #   - keinen Richtungspfeil anzeigen
+    #   - führendes "links"/"rechts" entfernen
+    #
+    # Ergebnis:
+    #   "links wenden" -> "Wenden"
+    is_uturn = bool(
+        re.search(
+            r'\bwenden\b',
+            text,
+            flags=re.I
+        )
+    )
+
+    if is_uturn:
+        text = re.sub(
+            r'^(rechts|links)(?:\s*,)?\s*',
+            '',
+            text,
+            flags=re.I
+        ).strip()
+
+        if text:
+            text = text[0].upper() + text[1:]
+
+        direction_match = None
+    else:
+        direction_match = re.match(
+            r'^(rechts|links)(?:\s*,)?\s*',
+            text,
+            flags=re.I
+        )
+
+    if direction_match:
+        direction = direction_match.group(1).casefold()
+
+        arrow = "->" if direction == "rechts" else "<-"
+
+        text = text[
+            direction_match.end():
+        ].strip(" ,")
+
+    # ----------------------------------------------------
+    # RNSE_NAV_EXIT_ROAD_HIERARCHY_V3
+    #
+    # Autobahn/Bundesstraße + "Ausfahrt" als Anker.
+    #
+    # Beispiele:
+    #
+    #   "Ausfahrt 9 Wiesbadener Kreuz A3"
+    #       -> "A3 Wiesbadener Kreuz Ausfahrt 9"
+    #
+    #   "Halten, Ausfahrt 4, Rees B67"
+    #       -> "B67 Rees Ausfahrt 4"
+    #
+    # Die Ausfahrt wird bewusst nach hinten gestellt.
+    # Straße/Ziel sind während der Fahrt wichtiger.
+    # ----------------------------------------------------
+
+    road_match = re.search(
+        r'\b([AB])\s*(\d{1,3})\b',
+        text,
+        flags=re.I
+    )
+
+    exit_match = re.search(
+        r'\bAusfahrt\s+\d+[A-Za-z]?\b',
+        text,
+        flags=re.I
+    )
+
+    if road_match and exit_match:
+        road = (
+            road_match.group(1).upper()
+            + road_match.group(2)
+        )
+
+        # Straßenkennung aus ihrer bisherigen Position
+        # entfernen.
+        text = (
+            text[:road_match.start()]
+            + " "
+            + text[road_match.end():]
+        )
+
+        # Ausfahrtnummer neu suchen, weil sich der String
+        # durch das Entfernen der Straßenkennung geändert hat.
+        exit_match = re.search(
+            r'\bAusfahrt\s+\d+[A-Za-z]?\b',
+            text,
+            flags=re.I
+        )
+
+        exit_text = ""
+
+        if exit_match:
+            exit_text = exit_match.group(0)
+
+            number = re.search(
+                r'\d+[A-Za-z]?',
+                exit_text
+            )
+
+            if number:
+                exit_text = "Ausfahrt " + number.group(0)
+
+            text = (
+                text[:exit_match.start()]
+                + " "
+                + text[exit_match.end():]
+            )
+
+        # Typische HUDIY-Füllwörter am Anfang entfernen.
+        #
+        # Beispiel:
+        #   "Halten, Rees"
+        #       -> "Rees"
+        text = re.sub(
+            r'^\s*(halten|rechts halten|links halten)\s*,?\s*',
+            '',
+            text,
+            flags=re.I
+        )
+
+        # Kommas / Mehrfachleerzeichen aufräumen.
+        text = re.sub(
+            r'\s*,\s*',
+            ' ',
+            text
+        )
+
+        text = ' '.join(
+            text.split()
+        ).strip(" ,-")
+
+        parts = [road]
+
+        if text:
+            parts.append(text)
+
+        if exit_text:
+            parts.append(exit_text)
+
+        text = ' '.join(parts)
+
+    elif road_match and road_match.group(1).upper() == "A":
+        # Bestehendes Verhalten für Autobahn-Manöver ohne
+        # explizites "Ausfahrt" weiterhin beibehalten.
+        road = "A" + road_match.group(2)
+
+        text = (
+            text[:road_match.start()]
+            + " "
+            + text[road_match.end():]
+        )
+
+        text = re.sub(
+            r'\s*,\s*',
+            ' ',
+            text
+        )
+
+        text = ' '.join(
+            text.split()
+        ).strip(" ,-")
+
+        text = (
+            road + (" " + text if text else "")
+        )
+
+    else:
+        # Bei normalen Straßen ausschließlich Interpunktion
+        # etwas FIS-freundlicher machen, Reihenfolge aber
+        # vollständig erhalten.
+        text = re.sub(
+            r'\s*,\s*',
+            ' ',
+            text
+        )
+
+        text = ' '.join(
+            text.split()
+        ).strip()
+
+    # ----------------------------------------------------
+    # Richtungspfeil hinzufügen
+    # ----------------------------------------------------
+    if arrow:
+        result = f"{arrow} {text}".strip()
+
+        # FIS1 zeigt 8 Zeichen gleichzeitig.
+        #
+        # Sobald gescrollt werden muss, die Richtung am Ende
+        # nochmals wiederholen.
+        if len(result) > 8:
+            result = f"{result} {arrow}"
+
+        text = result
+
     return text
 
 
@@ -7732,8 +7979,15 @@ async def nav_update_fis2():
     nav_fis2_overlay = bool(distance)
 
     if distance:
+        # RNSE_NAV_FIS2_OVERLAY_CENTER_V1
+        #
+        # Ausschließlich die dynamische NAV-Distanz <=500 m
+        # wird zentriert.
+        #
+        # Die normale FIS2-Anzeige bleibt unverändert.
         set_fis2(
-            distance, 'right',
+            distance,
+            'center',
             trace='nav_distance',
             nav_overlay=True
         )
@@ -7764,11 +8018,100 @@ async def nav_update_fis2():
 #
 # Unterhalb 500 m bleibt die bestehende FIS2-Overlay-Logik
 # vollständig erhalten.
-NAV_FIS1_DISTANCE_SECONDS = 15.0
+# RNSE_NAV_DYNAMIC_DISTANCE_TIME_V1
+# RNSE_NAV_LONG_DISTANCE_TIMING_V2
+def nav_fis1_distance_phase_seconds(distance_metres):
+    """
+    Dynamische Dauer der FIS1-Distanzphase.
+
+    Je weiter das nächste Maneuver entfernt ist, desto seltener
+    muss FIS1 die gleiche Anweisung erneut einblenden.
+
+    Staffelung:
+
+        > 30 km        -> 90 s
+        10 - 30 km     -> 60 s
+         5 - 10 km     -> 45 s
+         2 -  5 km     -> 30 s
+         1 -  2 km     -> 25 s
+       500 m - 1 km    -> 18 s
+
+    Unter 500 m greift weiterhin ausschließlich die bestehende
+    dynamische FIS2-Overlay-Logik.
+    """
+    if distance_metres is None:
+        return 18.0
+
+    if distance_metres > 30000:
+        return 90.0
+
+    if distance_metres >= 10000:
+        return 60.0
+
+    if distance_metres >= 5000:
+        return 45.0
+
+    if distance_metres >= 2000:
+        return 30.0
+
+    if distance_metres >= 1000:
+        return 25.0
+
+    return 18.0
 
 # Wird bei einem neuen HUDIY-Maneuver gesetzt, damit eine neue
 # Navigationsanweisung sofort Vorrang vor der laufenden
 # Distanzphase bekommt.
+# RNSE_NAV_UNIFIED_TIMING_V1
+#
+# Eine einzige Timing-Basis für alle FIS1-Navigationsanweisungen.
+#
+# Wichtig:
+# Das dynamische FIS2-Distanzoverlay <=500 m ist hiervon
+# ausdrücklich NICHT betroffen und reagiert weiterhin sofort.
+NAV_SCROLL_INITIAL_HOLD = 3.0
+NAV_SCROLL_STEP_DELAY = 0.25
+NAV_INSTRUCTION_REPEAT_GAP = 0.8
+NAV_SHORT_INSTRUCTION_HOLD = 4.0
+
+
+def nav_instruction_cycle_seconds(text):
+    """
+    Gesamtdauer eines FIS1-NAV-Anweisungszyklus.
+
+    Einheitlich für:
+      - links
+      - rechts
+      - Wenden / keine Richtung
+      - <500-m-Overlay-Modus
+      - >500-m-Distanzcarousel
+
+    Lange Texte:
+        3.0 s Anfangsstand
+        + 0.25 s je Scrollschritt
+        + 0.8 s Ruhe
+
+    Kurze Texte:
+        4.0 s
+    """
+    arrow, body = split_nav_arrow(text)
+
+    body = "" if body is None else str(body)
+
+    # Mit festem Pfeil bleiben 6 Textpositionen übrig.
+    # Ohne Pfeil stehen alle 8 Zeichen zur Verfügung.
+    short_limit = 6 if arrow else 8
+
+    if len(body) <= short_limit:
+        return NAV_SHORT_INSTRUCTION_HOLD
+
+    return (
+        NAV_SCROLL_INITIAL_HOLD
+        + len(body) * NAV_SCROLL_STEP_DELAY
+        + NAV_INSTRUCTION_REPEAT_GAP
+    )
+
+
 nav_force_instruction_once = False
 
 
@@ -7804,6 +8147,14 @@ async def nav_carousel_loop():
     last_distance_text = None
     last_instruction_key = None
     instruction_started = False
+
+    # RNSE_NAV_OVERLAY_REPEAT_V1
+    #
+    # Unter 500 m bleibt FIS2 dauerhaft auf der Distanz.
+    # FIS1 wiederholt währenddessen regelmäßig das aktuelle
+    # Maneuver, damit die obere Zeile nach einem Scroll nicht
+    # leer bleibt.
+    overlay_next_instruction_at = 0.0
 
     # RNSE_NAV_OVERLAY_FIS1_FALLBACK_V1
     #
@@ -7896,32 +8247,86 @@ async def nav_carousel_loop():
                 phase_until = 0.0
                 last_distance_text = None
 
+                now_overlay = loop.time()
+
+                # RNSE_NAV_OVERLAY_SCROLL_POLISH_V1
                 if overlay_just_activated:
+                    # Wenn gerade bereits dieselbe Maneuver-
+                    # Anweisung in FIS1 läuft, darf sie sauber
+                    # weiterlaufen. Nur wenn vorher die Distanz
+                    # oben stand oder gar kein Scroll aktiv ist,
+                    # erzwingen wir eine neue Darstellung.
+                    scroll_is_active = (
+                        scroll_task_fis1 is not None
+                        and not scroll_task_fis1.done()
+                    )
+
+                    same_instruction_already_active = (
+                        scroll_is_active
+                        and instruction_key == last_instruction_key
+                    )
+
+                    if not same_instruction_already_active:
+                        if scroll_is_active:
+                            scroll_task_fis1.cancel()
+
+                        clear_content(FIS1)
+
+                        # Beim Eintritt unter 500 m Maneuver
+                        # sofort anzeigen.
+                        overlay_next_instruction_at = 0.0
+
+                instruction_changed = (
+                    instruction_key != last_instruction_key
+                    or nav_force_instruction_once
+                )
+
+                if instruction_changed:
+                    nav_force_instruction_once = False
+                    last_instruction_key = instruction_key
+
+                    # Neues Maneuver hat immer sofort Vorrang.
                     if (
                         scroll_task_fis1 is not None
                         and not scroll_task_fis1.done()
                     ):
                         scroll_task_fis1.cancel()
 
-                    clear_content(FIS1)
+                    overlay_next_instruction_at = 0.0
 
+                # ------------------------------------------------
+                # Aktuelles Maneuver regelmäßig wiederholen.
+                #
+                # Dadurch bleibt FIS1 unter 500 m nicht leer,
+                # nachdem ein langer Scroll einmal beendet wurde.
+                # ------------------------------------------------
                 if (
-                    overlay_just_activated
-                    or instruction_key != last_instruction_key
-                    or nav_force_instruction_once
+                    overlay_next_instruction_at <= 0.0
+                    or now_overlay >= overlay_next_instruction_at
                 ):
-                    nav_force_instruction_once = False
-                    last_instruction_key = instruction_key
-
                     if content:
-                        await start_scrolling(
-                            content,
-                            "FIS1"
+                        await start_nav_instruction_scrolling(content)
+
+                        # RNSE_NAV_UNIFIED_TIMING_V1
+                        # Einheitliche Timing-Berechnung für sämtliche
+                        # FIS1-Navigationsanweisungen.
+                        display_time = nav_instruction_cycle_seconds(
+                            content
                         )
+
+                        overlay_next_instruction_at = (
+                            now_overlay
+                            + display_time
+                        )
+
                     else:
                         set_fis1(
                             "NAV",
                             "center"
+                        )
+
+                        overlay_next_instruction_at = (
+                            now_overlay + 3.0
                         )
 
                 await asyncio.sleep(0.1)
@@ -7930,6 +8335,7 @@ async def nav_carousel_loop():
             # Overlay ist NICHT aktiv:
             # wir befinden uns wieder im >500-m-Bereich.
             last_overlay = False
+            overlay_next_instruction_at = 0.0
 
             # =================================================
             # >= 500 m:
@@ -7981,7 +8387,9 @@ async def nav_carousel_loop():
                 if phase_until <= 0.0:
                     phase_until = (
                         now
-                        + NAV_FIS1_DISTANCE_SECONDS
+                        + nav_fis1_distance_phase_seconds(
+                            distance_metres
+                        )
                     )
 
                 # Distanz verändert sich laufend.
@@ -8012,10 +8420,7 @@ async def nav_carousel_loop():
                     # Falls HUDIY kurzfristig noch keine
                     # Distanz liefert, Anweisung verwenden.
                     if content:
-                        await start_scrolling(
-                            content,
-                            "FIS1"
-                        )
+                        await start_nav_instruction_scrolling(content)
 
                 # Nach 15 Sekunden einmal zur Anweisung.
                 if now >= phase_until:
@@ -8035,19 +8440,15 @@ async def nav_carousel_loop():
                     instruction_started = True
 
                     if content:
-                        await start_scrolling(
-                            content,
-                            "FIS1"
-                        )
+                        await start_nav_instruction_scrolling(content)
 
-                        # Genug Zeit für genau einen kompletten
-                        # bestehenden Scroll-Durchlauf.
-                        phase_until = now + (
-                            3.5
-                            if len(content) <= 8
-                            else (
-                                3.5
-                                + len(content) * 0.3
+                        # RNSE_NAV_UNIFIED_TIMING_V1
+                        # Exakt dieselbe Timing-Basis wie im
+                        # <500-m-Navigationsmodus.
+                        phase_until = (
+                            now
+                            + nav_instruction_cycle_seconds(
+                                content
                             )
                         )
 
@@ -8660,6 +9061,263 @@ async def media_to_dis2():
 
     except Exception as e:
         logger.error(f"Error in media_to_dis2: {e}")
+
+
+# RNSE_NAV_FIXED_ARROW_SCROLL_V1
+def split_nav_arrow(text):
+    """
+    Trennt den Richtungsindikator vom eigentlichen NAV-Text.
+
+    Unterstützt sowohl unsere bisherigen Testformen
+    > / < als auch -> / <-.
+    """
+    text = "" if text is None else str(text)
+    text = " ".join(text.split()).strip()
+
+    arrow = ""
+
+    # Aktuelle ASCII-Pfeile
+    match = re.match(
+        r'^(->|<-|>|<)\s*',
+        text
+    )
+
+    if match:
+        token = match.group(1)
+
+        arrow = (
+            ">"
+            if token in (">", "->")
+            else "<"
+        )
+
+        text = text[match.end():].strip()
+
+    # Fallback, falls irgendwo noch rechts/links
+    # als Wort geliefert wird.
+    else:
+        match = re.match(
+            r'^(rechts|links)(?:\s*,)?\s*',
+            text,
+            flags=re.I
+        )
+
+        if match:
+            arrow = (
+                ">"
+                if match.group(1).casefold() == "rechts"
+                else "<"
+            )
+
+            text = text[match.end():].strip()
+
+    # Alten Test-Pfeil am Ende entfernen.
+    #
+    # Beispiel:
+    #   -> A3 Wiesbadener Kreuz ->
+    # wird:
+    #   arrow = >
+    #   text  = A3 Wiesbadener Kreuz
+    text = re.sub(
+        r'\s*(->|<-|>|<)\s*$',
+        '',
+        text
+    ).strip()
+
+    return arrow, text
+
+
+# RNSE_NAV_MIRRORED_ARROW_V2
+async def _scroll_nav_fixed_arrow(
+    arrow,
+    body,
+    wait_time=NAV_SCROLL_INITIAL_HOLD,
+    delay=NAV_SCROLL_STEP_DELAY
+):
+    """
+    Links:
+        < TEXT
+
+    Rechts:
+        TEXT >
+
+    Pfeil bleibt fest an der zum Maneuver passenden Seite.
+    Zwischen Pfeil und Text bleibt immer ein Leerzeichen.
+
+    Dadurch bleiben 6 Zeichen für den scrollenden Text.
+    """
+
+    body = "" if body is None else str(body)
+
+    if not body:
+        if not show_label and not pause_fis1:
+            set_fis1(
+                arrow,
+                "center"
+            )
+        return
+
+    window_size = 6
+
+    padded = body + (" " * window_size)
+
+    def render(window):
+        if arrow == "<":
+            return f"< {window}"
+
+        if arrow == ">":
+            return f"{window} >"
+
+        return window
+
+    first_window = body[:window_size]
+
+    if not show_label and not pause_fis1:
+        set_fis1(
+            render(first_window),
+            "left"
+        )
+
+    await asyncio.sleep(wait_time)
+
+    max_start = max(
+        0,
+        len(padded) - window_size
+    )
+
+    for start in range(1, max_start + 1):
+        if (
+            stop_flag
+            or show_label
+            or pause_fis1
+        ):
+            return
+
+        window = padded[
+            start:start + window_size
+        ]
+
+        set_fis1(
+            render(window),
+            "left"
+        )
+
+        await asyncio.sleep(delay)
+
+
+async def start_nav_instruction_scrolling(text):
+    """
+    Navigationsanweisung mit feststehender Richtung.
+
+    Kurz:
+        > A3
+        ^ Leerzeichen bewusst vorhanden
+
+    Lang:
+        >A3 Wies
+        >3 Wiesb
+        > Wiesba
+        ...
+
+    Bei langen Texten bleibt der Pfeil auf Position 1.
+    """
+    global scroll_task_fis1
+
+    arrow, body = split_nav_arrow(text)
+
+    # Keine Richtung erkannt:
+    # bisherigen Standard-Scroller verwenden.
+    if not arrow:
+        await start_scrolling(
+            body,
+            "FIS1"
+        )
+        return
+
+    # Eventuell laufenden alten FIS1-Scroll sofort
+    # abbrechen.
+    if (
+        scroll_task_fis1 is not None
+        and not scroll_task_fis1.done()
+    ):
+        scroll_task_fis1.cancel()
+
+        with contextlib.suppress(
+            asyncio.CancelledError,
+            Exception
+        ):
+            await scroll_task_fis1
+
+        scroll_task_fis1 = None
+
+    # ----------------------------------------------------
+    # KURZ:
+    #
+    # RNSE_NAV_SHORT_FIXED_ARROW_CENTER_V1
+    #
+    # Kurze Navigationsanweisungen bekommen eine feste
+    # 8-Zeichen-Struktur.
+    #
+    # Der Text wird innerhalb von 6 Zeichen zentriert.
+    # Der Richtungspfeil bleibt ganz außen.
+    #
+    # Beispiele:
+    #
+    #   rechts:
+    #       "  B8   >"
+    #
+    #   links:
+    #       "<   B8  "
+    #
+    # 1 Pfeil + 1 Abstand + 6 Textpositionen = 8 Zeichen.
+    # ----------------------------------------------------
+    if len(body) <= 6:
+        # RNSE_NAV_SHORT_TRUE_CENTER_V2
+        #
+        # Den eigentlichen Anweisungstext relativ zur
+        # KOMPLETTEN 8-Zeichen-FIS-Zeile zentrieren.
+        #
+        # Anschließend nur den Richtungspfeil auf die
+        # äußerste Position setzen.
+        #
+        # Beispiel:
+        #   rechts -> "   B8  >"
+        #   links  -> "<  B8   "
+        #
+        # Dadurch bleibt "B8" optisch an derselben
+        # Mittelposition, unabhängig von der Richtung.
+        centered = list(body.center(8))
+
+        if arrow == "<":
+            centered[0] = "<"
+        elif arrow == ">":
+            centered[7] = ">"
+
+        short_value = "".join(centered)
+
+        if not show_label and not pause_fis1:
+            set_fis1(
+                short_value,
+                "left"
+            )
+        return
+
+    # ----------------------------------------------------
+    # LANG:
+    #
+    # Pfeil bleibt fest, Text scrollt über die
+    # verbleibenden sieben Stellen.
+    # ----------------------------------------------------
+    loop = asyncio.get_running_loop()
+
+    scroll_task_fis1 = fire_and_forget(
+        loop,
+        _scroll_nav_fixed_arrow(
+            arrow,
+            body
+        ),
+        "nav_fixed_arrow_scroll"
+    )
 
 
 @handle_errors
