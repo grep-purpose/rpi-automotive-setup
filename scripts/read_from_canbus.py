@@ -6515,6 +6515,49 @@ def ensure_kodi_qol_settings():
         )
 
 
+# RNSE_AUTO_AUDIO_ROUTING_V1
+async def set_audio_sink_for_app(app_name):
+    """
+    Setzt den PipeWire/PulseAudio Default-Sink passend
+    zur aktuell aktiven Infotainment-Anwendung.
+
+    Kodi:
+        direkt auf den BossDAC / soc_sound
+
+    HUDIY:
+        über den HUDIY-Equalizer-Sink
+    """
+
+    if app_name == "kodi":
+        sink = "alsa_output.platform-soc_sound.stereo-fallback"
+    elif app_name == "hudiy":
+        sink = "hudiy_equalizer_sink"
+    else:
+        return False
+
+    result = await run_command(
+        "XDG_RUNTIME_DIR=/run/user/1000 "
+        f"pactl set-default-sink '{sink}'"
+    )
+
+    if result.get("returncode", 0) != 0:
+        logger.warning(
+            "Audio-Routing: Konnte Default-Sink %s nicht setzen: %s",
+            sink,
+            result.get("stderr", "").strip()
+        )
+        return False
+
+    if ENABLE_LOGGING:
+        logger.info(
+            "Audio-Routing: %s -> %s",
+            app_name,
+            sink
+        )
+
+    return True
+
+
 async def toggle_hudiy_kodi():
     global current_app
     global title, artist, album, playing, source
@@ -6555,6 +6598,11 @@ async def toggle_hudiy_kodi():
             )
 
             await asyncio.sleep(0.5)
+
+            # RNSE_AUTO_AUDIO_ROUTING_V1
+            # Vor dem HUDIY-Neustart Audio wieder über
+            # den HUDIY-Equalizer routen.
+            await set_audio_sink_for_app("hudiy")
 
             # HUDIY Access Point wieder aktivieren.
             await run_command(
@@ -6638,6 +6686,11 @@ async def toggle_hudiy_kodi():
         )
 
         await asyncio.sleep(0.5)
+
+        # RNSE_AUTO_AUDIO_ROUTING_V1
+        # HUDIY ist beendet. Kodi soll direkt auf den
+        # BossDAC / soc_sound Hardware-Sink ausgeben.
+        await set_audio_sink_for_app("kodi")
 
         # HUDIY Access Point stoppen.
         await run_command(
@@ -8069,17 +8122,62 @@ def nav_fis1_distance_phase_seconds(distance_metres):
 # Wird bei einem neuen HUDIY-Maneuver gesetzt, damit eine neue
 # Navigationsanweisung sofort Vorrang vor der laufenden
 # Distanzphase bekommt.
-# RNSE_NAV_UNIFIED_TIMING_V1
+# RNSE_GLOBAL_FIS1_TIMING_V1
 #
-# Eine einzige Timing-Basis für alle FIS1-Navigationsanweisungen.
+# Eine einzige Timing-Basis für ALLE Inhalte der oberen FIS-Zeile:
 #
-# Wichtig:
-# Das dynamische FIS2-Distanzoverlay <=500 m ist hiervon
-# ausdrücklich NICHT betroffen und reagiert weiterhin sofort.
-NAV_SCROLL_INITIAL_HOLD = 3.0
-NAV_SCROLL_STEP_DELAY = 0.25
-NAV_INSTRUCTION_REPEAT_GAP = 0.8
-NAV_SHORT_INSTRUCTION_HOLD = 4.0
+#   - HUDIY / Android Auto Medien
+#   - Kodi Radio
+#   - Navigation
+#
+# Damit wirken Textwechsel, Scrollgeschwindigkeit und die Ruhephase
+# zwischen zwei Inhalten überall identisch.
+#
+# WICHTIG:
+# Sicherheitsrelevante NAV-Ereignisse umgehen diese Ruhephase:
+#
+#   - neues Maneuver
+#   - Wechsel auf <=500-m-FIS2-Distanzoverlay
+#
+# Diese reagieren weiterhin sofort.
+FIS1_SCROLL_INITIAL_HOLD = 3.0
+FIS1_SCROLL_STEP_DELAY = 0.25
+FIS1_TRANSITION_GAP = 0.8
+FIS1_SHORT_CONTENT_HOLD = 4.0
+
+# Kompatibilitäts-Aliase für bestehenden NAV-Code.
+NAV_SCROLL_INITIAL_HOLD = FIS1_SCROLL_INITIAL_HOLD
+NAV_SCROLL_STEP_DELAY = FIS1_SCROLL_STEP_DELAY
+NAV_INSTRUCTION_REPEAT_GAP = FIS1_TRANSITION_GAP
+NAV_SHORT_INSTRUCTION_HOLD = FIS1_SHORT_CONTENT_HOLD
+
+
+def fis1_content_cycle_seconds(text, visible_width=8):
+    """
+    Einheitliche Gesamtdauer eines normalen FIS1-Inhalts.
+
+    Kurz:
+        4.0 s Standzeit
+
+    Lang:
+        3.0 s Anfangsstand
+        + 0.25 s je Scrollschritt
+        + 0.8 s Ruhe / Übergang
+
+    visible_width:
+        8 = normale Medien-/Textanzeige
+        6 = NAV mit feststehendem Richtungspfeil
+    """
+    value = "" if text is None else str(text)
+
+    if len(value) <= visible_width:
+        return FIS1_SHORT_CONTENT_HOLD
+
+    return (
+        FIS1_SCROLL_INITIAL_HOLD
+        + len(value) * FIS1_SCROLL_STEP_DELAY
+        + FIS1_TRANSITION_GAP
+    )
 
 
 def nav_instruction_cycle_seconds(text):
@@ -8109,13 +8207,9 @@ def nav_instruction_cycle_seconds(text):
     # Ohne Pfeil stehen alle 8 Zeichen zur Verfügung.
     short_limit = 6 if arrow else 8
 
-    if len(body) <= short_limit:
-        return NAV_SHORT_INSTRUCTION_HOLD
-
-    return (
-        NAV_SCROLL_INITIAL_HOLD
-        + len(body) * NAV_SCROLL_STEP_DELAY
-        + NAV_INSTRUCTION_REPEAT_GAP
+    return fis1_content_cycle_seconds(
+        body,
+        visible_width=short_limit
     )
 
 
@@ -8522,7 +8616,11 @@ KODI_RADIO_METADATA_MAX_AGE = 2.0
 #
 #   WDR 4 Ruhrgebiet -> WDR 4 mit Carina Vogt
 #
-KODI_RADIO_STATION_INTRO_SECONDS = 8.0
+# RNSE_KODI_GLOBAL_FIS1_TIMING_V2
+# Senderwechsel beginnt weiterhin sofort mit dem Sendernamen,
+# aber seine Standzeit folgt nun derselben globalen FIS1-
+# Zeitbasis wie HUDIY, NAV und alle übrigen Radioelemente.
+KODI_RADIO_STATION_INTRO_SECONDS = FIS1_SHORT_CONTENT_HOLD
 
 kodi_radio_last_station = ""
 kodi_radio_station_intro_until = 0.0
@@ -9002,23 +9100,18 @@ async def media_carousel_loop():
                 'FIS1'
             )
 
-            val_time = (
-                3.5
-                if len(val) <= 8
-                else (
-                    3.5
-                    + (len(val) * 0.3)
-                )
+            # RNSE_GLOBAL_FIS1_TIMING_V1
+            # HUDIY und Kodi verwenden exakt dieselbe
+            # FIS1-Zeitbasis wie die Navigation.
+            val_time = fis1_content_cycle_seconds(
+                val,
+                visible_width=8
             )
 
-            # Kodi Radio:
-            # Element 0 ist immer der Sender.
-            # Dieser bleibt bewusst länger sichtbar.
-            if (
-                kodi_active
-                and selected_index == 0
-            ):
-                val_time += 2.0
+            # RNSE_KODI_GLOBAL_FIS1_TIMING_V2
+            # Keine Kodi-spezifische Zusatzwartezeit mehr.
+            # Sender, Titel und Interpret folgen exakt derselben
+            # globalen FIS1-Zeitbasis.
 
             await asyncio.sleep(
                 val_time
@@ -9332,8 +9425,17 @@ async def start_scrolling(rule, display_type):
     global scroll_task_fis1, scroll_task_fis2, max_length, scroll_type
 
     max_length = 8
-    wait_time = 3
-    delay = 0.25
+
+    # RNSE_GLOBAL_FIS1_TIMING_V1
+    # FIS1 benutzt überall dieselbe Scroll-Zeitbasis.
+    if display_type == "FIS1":
+        wait_time = FIS1_SCROLL_INITIAL_HOLD
+        delay = FIS1_SCROLL_STEP_DELAY
+    else:
+        # FIS2 unverändert lassen.
+        wait_time = 3
+        delay = 0.25
+
     loop = asyncio.get_running_loop()
 
     try:
