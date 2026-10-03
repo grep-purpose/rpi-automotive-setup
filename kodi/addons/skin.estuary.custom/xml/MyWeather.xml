@@ -21,11 +21,12 @@
             <top>18</top>
             <width>400</width>
             <height>82</height>
-            <font>font45</font>
+            <font>font55</font>
             <textcolor>fff0f2f5</textcolor>
             <focusedcolor>ffff8800</focusedcolor>
             <label>[B]Aktualisieren[/B]</label>
             <align>left</align>
+                                <aligny>center</aligny>
             <textoffsetx>10</textoffsetx>
             <texturefocus />
             <texturenofocus />
@@ -1467,7 +1468,7 @@
                 <top>20</top>
                 <width>500</width>
                 <height>82</height>
-                <font>font45</font>
+                <font>font55</font>
                 <textcolor>fff0f2f5</textcolor>
                 <focusedcolor>ffff8800</focusedcolor>
                 <label>[B]Einstellungen[/B]</label>
@@ -1487,73 +1488,280 @@
             <control type="group">
                 <left>0</left>
                 <right>0</right>
-                <top>20</top>
+                <top>0</top>
                 <height>82</height>
                 <control type="group">
-                    <left>720</left>
-                    <top>0</top>
-                    <width>430</width>
-                    <height>82</height>
-                    <control type="image">
-                        <left>0</left>
-                        <top>11</top>
-                        <width>54</width>
-                        <height>54</height>
-                        <aspectratio>keep</aspectratio>
-                        <texture>$INFO[Weather.ConditionsIcon]</texture>
-                    </control>
-                    <control type="label">
-                        <left>68</left>
-                        <top>0</top>
-                        <width>120</width>
-                        <height>82</height>
-                        <font>font45</font>
-                        <textcolor>fff0f2f5</textcolor>
-                        <aligny>center</aligny>
-                        <label>[B]$INFO[Weather.Temperature][/B]</label>
-                    </control>
-                    <control type="image">
-                        <left>195</left>
-                        <top>16</top>
-                        <width>2</width>
-                        <height>48</height>
-                        <texture colordiffuse="55ffffff">colors/white.png</texture>
-                    </control>
+                <left>720</left>
+                <top>20</top>
+                <width>420</width>
+                <height>82</height>
 
-                    <control type="label">
-                        <left>220</left>
-                        <top>0</top>
-                        <width>170</width>
-                        <height>82</height>
-                        <font>font45</font>
-                        <textcolor>fff0f2f5</textcolor>
-                        <aligny>center</aligny>
-                        <label>[B]$INFO[System.Time(hh:mm)][/B]</label>
-                    </control>
+                <!-- Wettericon -->
+                <control type="image">
+                    <left>0</left>
+                    <top>0</top>
+                    <width>82</width>
+                    <height>82</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture>$INFO[Weather.ConditionsIcon]</texture>
                 </control>
+
+                <!-- Temperatur -->
+                <control type="label">
+                    <left>88</left>
+                    <top>0</top>
+                    <width>124</width>
+                    <height>82</height>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <font>font55</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <label>[B]$INFO[Weather.Temperature][/B]</label>
+                </control>
+
+                <!-- Trennlinie -->
+                <control type="image">
+                    <left>238</left>
+                    <top>12</top>
+                    <width>2</width>
+                    <height>58</height>
+                    <texture colordiffuse="55ffffff">colors/white.png</texture>
+                </control>
+
+                <!-- Uhrzeit -->
+                <control type="label">
+                    <left>260</left>
+                    <top>0</top>
+                    <width>160</width>
+                    <height>82</height>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <font>font55</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <label>[B]$INFO[System.Time(hh:mm)][/B]</label>
+                </control>
+
+            </control>
             </control>
 
             
-            <control type="button" id="9004">
-                <right>15</right>
+            <control type="group">
+                <right>0</right>
                 <top>20</top>
-                <width>500</width>
+                <width>520</width>
                 <height>82</height>
-                <font>font45</font>
-                <textcolor>fff0f2f5</textcolor>
-                <focusedcolor>ffff8800</focusedcolor>
-                <label>[B]Hauptmenü[/B]</label>
-                <align>right</align>
-                <textoffsetx>0</textoffsetx>
-                <texturefocus />
-                <texturenofocus />
-                <onclick>ActivateWindow(home)</onclick>
+
+                <!-- Telefon verbunden -->
+                <control type="group">
+                    <left>0</left>
+                    <top>0</top>
+                    <width>520</width>
+                    <height>82</height>
+
+                    <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Connected),true)</visible>
+
+                    <!-- Netzbetreiber -->
+                    <control type="label">
+                        <left>0</left>
+                        <top>0</top>
+                        <width>350</width>
+                        <height>82</height>
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <font>font55</font>
+                        <textcolor>fff0f2f5</textcolor>
+                        <label>[B]$INFO[Window(Home).Property(RNSE.Phone.Operator)][/B]</label>
+                    </control>
+
+                    <!-- Mobilfunkempfang -->
+                    <control type="group">
+                        <left>375</left>
+                        <top>23</top>
+                        <width>62</width>
+                        <height>36</height>
+
+                        <control type="image">
+                            <left>0</left>
+                            <bottom>0</bottom>
+                            <width>8</width>
+                            <height>10</height>
+                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal1),true)</visible>
+                        </control>
+
+                        <control type="image">
+                            <left>13</left>
+                            <bottom>0</bottom>
+                            <width>8</width>
+                            <height>16</height>
+                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal2),true)</visible>
+                        </control>
+
+                        <control type="image">
+                            <left>26</left>
+                            <bottom>0</bottom>
+                            <width>8</width>
+                            <height>22</height>
+                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal3),true)</visible>
+                        </control>
+
+                        <control type="image">
+                            <left>39</left>
+                            <bottom>0</bottom>
+                            <width>8</width>
+                            <height>28</height>
+                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal4),true)</visible>
+                        </control>
+
+                        <control type="image">
+                            <left>52</left>
+                            <bottom>0</bottom>
+                            <width>8</width>
+                            <height>34</height>
+                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal5),true)</visible>
+                        </control>
+                    </control>
+
+                    <!-- Akku hochkant -->
+                    <control type="group">
+                        <left>455</left>
+                        <top>11</top>
+                        <width>50</width>
+                        <height>60</height>
+
+                        <!-- Kopf -->
+                        <control type="image">
+                            <left>15</left>
+                            <top>0</top>
+                            <width>16</width>
+                            <height>6</height>
+                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
+                        </control>
+
+                        <!-- Rahmen -->
+                        <control type="image">
+                            <left>4</left>
+                            <top>6</top>
+                            <width>38</width>
+                            <height>3</height>
+                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
+                        </control>
+
+                        <control type="image">
+                            <left>4</left>
+                            <top>56</top>
+                            <width>38</width>
+                            <height>3</height>
+                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
+                        </control>
+
+                        <control type="image">
+                            <left>4</left>
+                            <top>6</top>
+                            <width>3</width>
+                            <height>53</height>
+                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
+                        </control>
+
+                        <control type="image">
+                            <left>39</left>
+                            <top>6</top>
+                            <width>3</width>
+                            <height>53</height>
+                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
+                        </control>
+
+                        <!-- 1/5 -->
+                        <control type="image">
+                            <left>10</left>
+                            <top>46</top>
+                            <width>26</width>
+                            <height>7</height>
+                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery1),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery2),true)</visible>
+                        </control>
+
+                        <!-- 2/5 -->
+                        <control type="image">
+                            <left>10</left>
+                            <top>38</top>
+                            <width>26</width>
+                            <height>15</height>
+                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery2),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery3),true)</visible>
+                        </control>
+
+                        <!-- 3/5 -->
+                        <control type="image">
+                            <left>10</left>
+                            <top>30</top>
+                            <width>26</width>
+                            <height>23</height>
+                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery3),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery4),true)</visible>
+                        </control>
+
+                        <!-- 4/5 -->
+                        <control type="image">
+                            <left>10</left>
+                            <top>22</top>
+                            <width>26</width>
+                            <height>31</height>
+                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery4),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery5),true)</visible>
+                        </control>
+
+                        <!-- 5/5 -->
+                        <control type="image">
+                            <left>10</left>
+                            <top>14</top>
+                            <width>26</width>
+                            <height>39</height>
+                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery5),true)</visible>
+                        </control>
+
+                    </control>
+
+                </control>
+
+
+                <!-- Kein Telefon verbunden -->
+                <control type="label">
+                    <left>0</left>
+                    <top>0</top>
+                    <width>505</width>
+                    <height>82</height>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <font>font55</font>
+                    <textcolor>ff8d99ae</textcolor>
+                    <label>[B]Kein Telefon[/B]</label>
+                    <visible>!String.IsEqual(Window(Home).Property(RNSE.Phone.Connected),true)</visible>
+                </control>
+
+            </control>
+            <control type="button" id="9004">
+                <right>0</right>
+                <top>20</top>
+                <width>520</width>
+                <height>82</height>
+                <label></label>
+                <texturefocus>-</texturefocus>
+                <texturenofocus>-</texturenofocus>
 
                 <onup>9002</onup>
                 <ondown>9002</ondown>
                 <onleft>9002</onleft>
                 <onright>9002</onright>
-        </control>
+
+                <!-- Wird spaeter mit dem Telefonmenue verbunden -->
+                <onclick>SetProperty(RNSE.PhoneFooterPressed,true,home)</onclick>
+            </control>
         </control>
     </controls>
 </window>

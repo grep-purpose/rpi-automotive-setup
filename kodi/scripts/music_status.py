@@ -52,6 +52,17 @@ _bt_anchor_time = 0.0
 _bt_last_position_poll = 0.0
 _bt_last_status = "stopped"
 
+# ============================================================
+# KODI MUSIC -> FIS METADATA EXPORT
+# ============================================================
+
+KODI_MUSIC_METADATA_PATH = "/run/user/1000/rnse_kodi_music_metadata.json"
+KODI_MUSIC_EXPORT_INTERVAL = 0.75
+
+_last_music_export_time = 0.0
+_last_music_export_payload = None
+
+
 
 def prop(name, value=""):
     HOME.setProperty(
@@ -62,6 +73,103 @@ def prop(name, value=""):
 
 def home_prop(name):
     return HOME.getProperty(name)
+
+
+
+# RNSE_KODI_MUSIC_FIS_EXPORT_V1
+
+def export_music_metadata(force=False):
+    global _last_music_export_time
+    global _last_music_export_payload
+
+    now = time.time()
+
+    if (
+        not force
+        and now - _last_music_export_time
+        < KODI_MUSIC_EXPORT_INTERVAL
+    ):
+        return
+
+    title = home_prop(
+        PREFIX + "Title"
+    ).strip()
+
+    artist = home_prop(
+        PREFIX + "Artist"
+    ).strip()
+
+    album = home_prop(
+        PREFIX + "Album"
+    ).strip()
+
+    source = home_prop(
+        PREFIX + "Source"
+    ).strip()
+
+    source_label = home_prop(
+        PREFIX + "SourceLabel"
+    ).strip()
+
+    status = home_prop(
+        PREFIX + "Status"
+    ).strip()
+
+    active = bool(
+        title
+        or artist
+    )
+
+    payload = {
+        "source": "kodi_music",
+        "active": active,
+        "media_source": (
+            source_label
+            or source
+        ),
+        "title": title,
+        "artist": artist,
+        "album": album,
+        "status": status,
+        "timestamp": now,
+    }
+
+    try:
+        target = KODI_MUSIC_METADATA_PATH
+        temp = target + ".tmp"
+
+        with open(
+            temp,
+            "w",
+            encoding="utf-8"
+        ) as handle:
+            json.dump(
+                payload,
+                handle,
+                ensure_ascii=False,
+                separators=(",", ":")
+            )
+
+        os.replace(
+            temp,
+            target
+        )
+
+        _last_music_export_time = now
+        _last_music_export_payload = payload
+
+    except Exception as exc:
+        try:
+            xbmc.log(
+                "[RNSE Music FIS] Export fehlgeschlagen: "
+                + str(exc),
+                xbmc.LOGWARNING
+            )
+        except Exception:
+            pass
+
+
+# RNSE_KODI_MUSIC_FIS_EXPORT_V1 END
 
 
 def normalize(value):
@@ -108,6 +216,10 @@ def clear_properties():
 
     for key, value in defaults.items():
         prop(key, value)
+
+    export_music_metadata(
+        force=True
+    )
 
 
 def run_busctl(args, timeout=2):
@@ -1614,6 +1726,523 @@ def music_window_active():
         return False
 
 
+
+
+
+
+# ============================================================
+# RNSE ACTIVE APP / AUDIO FOCUS V3
+# ============================================================
+
+ACTIVE_APP_PATH = "/run/user/1000/rnse_active_app"
+
+_audio_arbiter_last_bt_playing = False
+_audio_arbiter_resume_kodi = False
+_audio_arbiter_last_kodi_playing = False
+
+_audio_arbiter_bt_start_position = 0
+_audio_arbiter_bt_peak_position = 0
+_audio_arbiter_bt_started_at = 0.0
+
+_audio_arbiter_kodi_was_radio = False
+
+
+def active_app():
+    try:
+        with open(
+            ACTIVE_APP_PATH,
+            "r",
+            encoding="utf-8"
+        ) as handle:
+
+            return handle.read().strip().casefold()
+
+    except Exception:
+        return ""
+
+
+def kodi_is_audio_master():
+    return active_app() == "kodi"
+
+
+def radio_active():
+    return bool(
+        HOME.getProperty(
+            "RNSE.RadioStation"
+        ).strip()
+    )
+
+
+def kodi_current_is_radio():
+
+    path = xbmc.getInfoLabel(
+        "Player.FilenameAndPath"
+    ).strip()
+
+    if "plugin.audio.radiode" in path:
+        return True
+
+    direct_stream = HOME.getProperty(
+        "RNSE.RadioStreamUrl"
+    ).strip()
+
+    return bool(
+        direct_stream
+        and path == direct_stream
+    )
+
+
+def get_bluetooth_playing(player):
+
+    if not player:
+        return False
+
+    status = parse_simple(
+        get_property(
+            player,
+            "Status"
+        )
+    )
+
+    return (
+        str(status or "")
+        .strip()
+        .casefold()
+        == "playing"
+    )
+
+
+def get_bluetooth_position(player):
+
+    if not player:
+        return 0
+
+    try:
+        value = parse_simple(
+            get_property(
+                player,
+                "Position"
+            )
+        )
+
+        return max(
+            0,
+            int(value or 0)
+        )
+
+    except Exception:
+        return 0
+
+
+def pause_kodi_for_bluetooth():
+
+    global _audio_arbiter_resume_kodi
+
+    try:
+
+        if xbmc.getCondVisibility(
+            "Player.Playing"
+        ):
+
+            _audio_arbiter_resume_kodi = True
+
+            xbmc.Player().pause()
+
+            xbmc.log(
+                "[RNSE Audio V3] Bluetooth gestartet -> "
+                "Kodi vorläufig pausiert",
+                xbmc.LOGINFO
+            )
+
+    except Exception as exc:
+
+        xbmc.log(
+            "[RNSE Audio V3] Kodi-Pause fehlgeschlagen: "
+            + str(exc),
+            xbmc.LOGWARNING
+        )
+
+
+def resume_kodi_after_temporary_bluetooth():
+
+    global _audio_arbiter_resume_kodi
+
+    if not _audio_arbiter_resume_kodi:
+        return
+
+    try:
+
+        if xbmc.getCondVisibility(
+            "Player.Paused"
+        ):
+
+            xbmc.Player().pause()
+
+            xbmc.log(
+                "[RNSE Audio V3] Temporäres Bluetooth beendet -> "
+                "Kodi fortgesetzt",
+                xbmc.LOGINFO
+            )
+
+    except Exception as exc:
+
+        xbmc.log(
+            "[RNSE Audio V3] Kodi-Resume fehlgeschlagen: "
+            + str(exc),
+            xbmc.LOGWARNING
+        )
+
+    _audio_arbiter_resume_kodi = False
+
+
+def stop_old_radio_after_music_switch():
+
+    global _audio_arbiter_resume_kodi
+
+    try:
+
+        if (
+            xbmc.getCondVisibility(
+                "Player.HasMedia"
+            )
+            and kodi_current_is_radio()
+        ):
+
+            xbmc.Player().stop()
+
+            xbmc.log(
+                "[RNSE Audio V3] Echte Bluetooth-Musik erkannt -> "
+                "alten Radio-Stream gestoppt",
+                xbmc.LOGINFO
+            )
+
+    except Exception as exc:
+
+        xbmc.log(
+            "[RNSE Audio V3] Radio-Stop fehlgeschlagen: "
+            + str(exc),
+            xbmc.LOGWARNING
+        )
+
+    _audio_arbiter_resume_kodi = False
+
+
+def reset_audio_focus_v3():
+
+    global _audio_arbiter_resume_kodi
+    global _audio_arbiter_bt_start_position
+    global _audio_arbiter_bt_peak_position
+    global _audio_arbiter_bt_started_at
+    global _audio_arbiter_kodi_was_radio
+
+    _audio_arbiter_resume_kodi = False
+
+    _audio_arbiter_bt_start_position = 0
+    _audio_arbiter_bt_peak_position = 0
+    _audio_arbiter_bt_started_at = 0.0
+
+    _audio_arbiter_kodi_was_radio = False
+
+
+def audio_arbiter_update(player):
+    """
+    RNSE Audio Focus V3.
+
+    Grundidee:
+
+    - Bluetooth startet:
+      Kodi zunächst nur pausieren.
+
+    - Bluetooth endet sehr schnell:
+      System-/Entsperr-/Benachrichtigungston -> Kodi Resume.
+
+    - Bluetooth endet und AVRCP springt auf die alte
+      Startposition zurück:
+      temporäres Smartphone-Audio, z.B. WhatsApp -> Kodi Resume.
+
+    - Bluetooth endet an der neu erreichten Position:
+      echte Musikquelle, z.B. Spotify -> alter Radio-Stream wird
+      endgültig gestoppt.
+
+    - Startet Kodi während Bluetooth läuft bewusst neu,
+      gewinnt Kodi und Bluetooth wird pausiert.
+    """
+
+    global _audio_arbiter_last_bt_playing
+    global _audio_arbiter_resume_kodi
+    global _audio_arbiter_last_kodi_playing
+
+    global _audio_arbiter_bt_start_position
+    global _audio_arbiter_bt_peak_position
+    global _audio_arbiter_bt_started_at
+
+    global _audio_arbiter_kodi_was_radio
+
+
+    # --------------------------------------------------------
+    # Nur Kodi darf diesen Arbiter verwenden.
+    # HUDIY / Android Auto bleibt vollständig unangetastet.
+    # --------------------------------------------------------
+
+    if not kodi_is_audio_master():
+
+        _audio_arbiter_last_bt_playing = False
+        _audio_arbiter_last_kodi_playing = False
+
+        reset_audio_focus_v3()
+        return
+
+
+    now = time.monotonic()
+
+    bt_playing = get_bluetooth_playing(
+        player
+    )
+
+    kodi_playing = bool(
+        xbmc.getCondVisibility(
+            "Player.Playing"
+        )
+    )
+
+
+    bt_started = (
+        bt_playing
+        and not _audio_arbiter_last_bt_playing
+    )
+
+    bt_stopped = (
+        not bt_playing
+        and _audio_arbiter_last_bt_playing
+    )
+
+    kodi_started = (
+        kodi_playing
+        and not _audio_arbiter_last_kodi_playing
+    )
+
+
+    # --------------------------------------------------------
+    # Bluetooth startet.
+    #
+    # Noch NICHT entscheiden, ob Spotify oder temporäres Audio.
+    # Beide sehen am Anfang identisch aus.
+    # --------------------------------------------------------
+
+    if bt_started:
+
+        _audio_arbiter_bt_start_position = (
+            get_bluetooth_position(
+                player
+            )
+        )
+
+        _audio_arbiter_bt_peak_position = (
+            _audio_arbiter_bt_start_position
+        )
+
+        _audio_arbiter_bt_started_at = now
+
+        _audio_arbiter_kodi_was_radio = bool(
+            kodi_playing
+            and kodi_current_is_radio()
+        )
+
+        if kodi_playing:
+            pause_kodi_for_bluetooth()
+            kodi_playing = False
+
+        xbmc.log(
+            "[RNSE Audio V3] BT-Start | "
+            "position={} | radio={}".format(
+                _audio_arbiter_bt_start_position,
+                _audio_arbiter_kodi_was_radio
+            ),
+            xbmc.LOGINFO
+        )
+
+
+    # --------------------------------------------------------
+    # Bluetooth läuft:
+    # höchste beobachtete AVRCP-Position merken.
+    # --------------------------------------------------------
+
+    if (
+        bt_playing
+        and _audio_arbiter_bt_started_at > 0.0
+    ):
+
+        position = get_bluetooth_position(
+            player
+        )
+
+        if (
+            position
+            > _audio_arbiter_bt_peak_position
+        ):
+            _audio_arbiter_bt_peak_position = (
+                position
+            )
+
+
+    # --------------------------------------------------------
+    # Kodi wurde vom Benutzer bewusst gestartet / resumed,
+    # während Bluetooth noch spielt.
+    #
+    # Kodi gewinnt.
+    # --------------------------------------------------------
+
+    if (
+        kodi_started
+        and bt_playing
+        and not bt_started
+    ):
+
+        try:
+
+            bluetooth_method(
+                "Pause"
+            )
+
+            xbmc.log(
+                "[RNSE Audio V3] Kodi bewusst gestartet -> "
+                "Bluetooth pausiert",
+                xbmc.LOGINFO
+            )
+
+            bt_playing = False
+
+            reset_audio_focus_v3()
+
+        except Exception as exc:
+
+            xbmc.log(
+                "[RNSE Audio V3] Bluetooth-Pause fehlgeschlagen: "
+                + str(exc),
+                xbmc.LOGWARNING
+            )
+
+
+    # --------------------------------------------------------
+    # Bluetooth endet.
+    #
+    # Jetzt können wir unterscheiden:
+    #
+    # 1. sehr kurzer Ton -> temporär
+    #
+    # 2. Position während Wiedergabe hochgelaufen,
+    #    danach wieder ungefähr auf Startposition zurück
+    #    -> temporär (z.B. WhatsApp)
+    #
+    # 3. Position bleibt am neuen Stand
+    #    -> echte Musik (z.B. Spotify)
+    # --------------------------------------------------------
+
+    if (
+        bt_stopped
+        and _audio_arbiter_bt_started_at > 0.0
+    ):
+
+        end_position = get_bluetooth_position(
+            player
+        )
+
+        elapsed_ms = int(
+            max(
+                0.0,
+                now
+                - _audio_arbiter_bt_started_at
+            )
+            * 1000.0
+        )
+
+        start_position = (
+            _audio_arbiter_bt_start_position
+        )
+
+        peak_position = (
+            _audio_arbiter_bt_peak_position
+        )
+
+        advanced_ms = max(
+            0,
+            peak_position
+            - start_position
+        )
+
+        returned_to_start = (
+            abs(
+                end_position
+                - start_position
+            )
+            <= 1500
+        )
+
+        meaningful_advance = (
+            advanced_ms
+            >= 1500
+        )
+
+        short_temporary = (
+            elapsed_ms
+            <= 1200
+        )
+
+        temporary = bool(
+            short_temporary
+            or (
+                returned_to_start
+                and meaningful_advance
+            )
+        )
+
+        xbmc.log(
+            "[RNSE Audio V3] BT-Ende | "
+            "start={} peak={} end={} "
+            "dauer={}ms advance={}ms "
+            "temporary={}".format(
+                start_position,
+                peak_position,
+                end_position,
+                elapsed_ms,
+                advanced_ms,
+                temporary
+            ),
+            xbmc.LOGINFO
+        )
+
+
+        if temporary:
+
+            resume_kodi_after_temporary_bluetooth()
+
+        else:
+
+            if _audio_arbiter_kodi_was_radio:
+
+                stop_old_radio_after_music_switch()
+
+            else:
+
+                _audio_arbiter_resume_kodi = False
+
+
+        _audio_arbiter_bt_start_position = 0
+        _audio_arbiter_bt_peak_position = 0
+        _audio_arbiter_bt_started_at = 0.0
+
+        _audio_arbiter_kodi_was_radio = False
+
+
+    _audio_arbiter_last_bt_playing = (
+        bt_playing
+    )
+
+    _audio_arbiter_last_kodi_playing = (
+        kodi_playing
+    )
+
+
 def monitor():
 
     lock = acquire_lock()
@@ -1644,6 +2273,8 @@ def monitor():
 
                 update_airplay()
 
+                export_music_metadata()
+
                 kodi_monitor.waitForAbort(
                     POLL_INTERVAL
                 )
@@ -1658,6 +2289,9 @@ def monitor():
             player = get_player_path()
 
             if player:
+
+                # Radio hat Audio-Priorität:
+                # laufendes Bluetooth sofort pausieren.
 
                 now = time.time()
 
@@ -1679,6 +2313,14 @@ def monitor():
                     player,
                     duration
                 )
+
+                # Wenn echte Bluetooth-Musik neu startet,
+                # pausieren wir eine laufende Kodi-Quelle.
+                audio_arbiter_update(
+                    player
+                )
+
+                export_music_metadata()
 
             else:
 

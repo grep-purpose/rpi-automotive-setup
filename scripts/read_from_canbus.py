@@ -3101,6 +3101,19 @@ async def start_send_to_dis():
             "kodi_radio_station_watch"
         )
 
+    # Bluetooth / AirPlay Trackwechsel ebenfalls
+    # unabhängig vom Carousel beobachten.
+    global kodi_music_watch_task
+
+    if (
+        kodi_music_watch_task is None
+        or kodi_music_watch_task.done()
+    ):
+        kodi_music_watch_task = track_task(
+            kodi_music_watch_loop(),
+            "kodi_music_watch"
+        )
+
     if ENABLE_LOGGING:
         logger.info("send_to_dis tasks started with FIS1=%s and FIS2=%s", FIS1, FIS2)
 
@@ -6612,6 +6625,11 @@ async def toggle_hudiy_kodi():
 
             current_app = "hudiy"
 
+            await run_command(
+                "printf 'hudiy\\n' > "
+                "/run/user/1000/rnse_active_app"
+            )
+
             # Display-Manager neu starten.
             # Labwc startet danach HUDIY über seinen Autostart.
             await run_command(
@@ -6727,6 +6745,12 @@ async def toggle_hudiy_kodi():
                 )
 
             current_app = "kodi"
+
+            await run_command(
+                "printf 'kodi\\n' > "
+                "/run/user/1000/rnse_active_app"
+            )
+
             return
 
         env_exp = (
@@ -6751,6 +6775,11 @@ async def toggle_hudiy_kodi():
         await asyncio.create_subprocess_shell(kodi_cmd)
 
         current_app = "kodi"
+
+        await run_command(
+            "printf 'kodi\\n' > "
+            "/run/user/1000/rnse_active_app"
+        )
 
         if ENABLE_LOGGING:
             logger.info(
@@ -8829,9 +8858,119 @@ def get_kodi_radio_carousel_items():
         return []
 
 
+
+
+# RNSE_KODI_MUSIC_FIS_V1
+
+KODI_MUSIC_METADATA_PATH = Path(
+    "/run/user/1000/rnse_kodi_music_metadata.json"
+)
+
+KODI_MUSIC_METADATA_MAX_AGE = 2.0
+
+
+def get_kodi_music_carousel_items():
+    """
+    Liefert Bluetooth-/AirPlay-Metadaten aus Kodi.
+
+    FIS1:
+        Titel -> Interpret
+
+    Album bleibt absichtlich vorerst außen vor.
+    """
+
+    try:
+        if not KODI_MUSIC_METADATA_PATH.is_file():
+            return []
+
+        payload = json.loads(
+            KODI_MUSIC_METADATA_PATH.read_text(
+                encoding="utf-8"
+            )
+        )
+
+        if payload.get("source") != "kodi_music":
+            return []
+
+        if not bool(
+            payload.get(
+                "active"
+            )
+        ):
+            return []
+
+        timestamp = float(
+            payload.get(
+                "timestamp",
+                0.0
+            )
+            or 0.0
+        )
+
+        if (
+            timestamp <= 0.0
+            or (
+                time.time()
+                - timestamp
+            )
+            > KODI_MUSIC_METADATA_MAX_AGE
+        ):
+            return []
+
+        music_title = str(
+            payload.get(
+                "title",
+                ""
+            )
+            or ""
+        ).strip()
+
+        music_artist = str(
+            payload.get(
+                "artist",
+                ""
+            )
+            or ""
+        ).strip()
+
+        items = []
+
+        if music_title:
+            items.append(
+                music_title
+            )
+
+        if (
+            music_artist
+            and music_artist.casefold()
+            != music_title.casefold()
+        ):
+            items.append(
+                music_artist
+            )
+
+        return items
+
+    except Exception as exc:
+        if ENABLE_LOGGING:
+            logger.warning(
+                "KODI_MUSIC_FIS: Metadaten konnten "
+                "nicht gelesen werden: %s",
+                exc
+            )
+
+        return []
+
+
+# RNSE_KODI_MUSIC_FIS_V1 END
+
 # RNSE_KODI_INSTANT_STATION_SWITCH_V1
 kodi_station_watch_task = None
 kodi_station_watch_last = ""
+
+# RNSE_KODI_INSTANT_MUSIC_SWITCH_V1
+kodi_music_watch_task = None
+kodi_music_watch_last = ()
 
 
 def get_kodi_radio_station():
@@ -8973,6 +9112,138 @@ async def kodi_radio_station_watch_loop():
         await media_to_dis1()
 
 
+
+
+# RNSE_KODI_INSTANT_MUSIC_SWITCH_V1
+async def kodi_music_watch_loop():
+    """
+    Erkennt Bluetooth-/AirPlay-Trackwechsel sofort.
+
+    Bei einem neuen Track:
+      - laufenden FIS1-Scroll abbrechen
+      - laufendes Media-Carousel abbrechen
+      - FIS1 leeren
+      - Carousel sofort mit neuem Titel starten
+
+    Kodi-Radio hat weiterhin Vorrang und wird hier bewusst
+    nicht beeinflusst.
+    """
+
+    global kodi_music_watch_last
+    global media_carousel_task
+    global scroll_task_fis1
+
+    while not stop_flag:
+
+        await asyncio.sleep(0.10)
+
+        if not kodi_process_running():
+            kodi_music_watch_last = ()
+            continue
+
+        # ----------------------------------------------------
+        # Radio hat Vorrang.
+        #
+        # Wenn ein Radiosender aktiv ist, kümmert sich bereits
+        # kodi_radio_station_watch_loop() um Sofortwechsel.
+        # ----------------------------------------------------
+
+        radio_station = get_kodi_radio_station()
+
+        if radio_station:
+            kodi_music_watch_last = ()
+            continue
+
+        music_items = tuple(
+            get_kodi_music_carousel_items()
+        )
+
+        if not music_items:
+            kodi_music_watch_last = ()
+            continue
+
+        # Beim ersten bekannten Track nur Ausgangszustand merken.
+        if not kodi_music_watch_last:
+            kodi_music_watch_last = music_items
+            continue
+
+        # Noch derselbe Track.
+        if (
+            music_items
+            == kodi_music_watch_last
+        ):
+            continue
+
+        old_items = kodi_music_watch_last
+        kodi_music_watch_last = music_items
+
+        if ENABLE_LOGGING:
+            logger.info(
+                "KODI_MUSIC_FIS: Trackwechsel %r -> %r, "
+                "altes Carousel wird sofort abgebrochen.",
+                old_items,
+                music_items
+            )
+
+        # ----------------------------------------------------
+        # Laufenden Textscroll sofort stoppen
+        # ----------------------------------------------------
+
+        if (
+            scroll_task_fis1 is not None
+            and not scroll_task_fis1.done()
+        ):
+            scroll_task_fis1.cancel()
+
+            with contextlib.suppress(
+                asyncio.CancelledError,
+                Exception
+            ):
+                await scroll_task_fis1
+
+        # ----------------------------------------------------
+        # Laufendes Media-Carousel sofort stoppen
+        # ----------------------------------------------------
+
+        old_carousel = media_carousel_task
+
+        if (
+            old_carousel is not None
+            and not old_carousel.done()
+        ):
+            old_carousel.cancel()
+
+            with contextlib.suppress(
+                asyncio.CancelledError,
+                Exception
+            ):
+                await old_carousel
+
+        media_carousel_task = None
+
+        # ----------------------------------------------------
+        # Alten Text entfernen
+        # ----------------------------------------------------
+
+        if (
+            send_on_canbus
+            and can_functional
+            and toggle_fis1 == 6
+        ):
+            clear_content(
+                FIS1
+            )
+
+        # ----------------------------------------------------
+        # Sofort mit neuem Track beginnen
+        # ----------------------------------------------------
+
+        await media_to_dis1()
+
+
+# RNSE_KODI_INSTANT_MUSIC_SWITCH_V1 END
+
+
 async def media_carousel_loop():
     global title, artist, album, stop_flag, pause_fis1, pause_fis2
     global nav_active, nav_description, nav_distance, last_nav_display_text
@@ -9022,17 +9293,30 @@ async def media_carousel_loop():
 
             if kodi_active:
 
-                # Kodi Radio:
-                #
-                # Sender -> Titel/Radiotext -> Interpret
-                #
-                # Andere Kodi-Anwendungen liefern momentan
-                # bewusst keine FIS1-Metadaten.
-                active_items = (
+                # Kodi Radio hat Vorrang.
+                radio_items = (
                     get_kodi_radio_carousel_items()
                 )
 
+                if radio_items:
+                    active_items = radio_items
+                    active_source = "KODI_RADIO"
+
+                else:
+                    # Bluetooth / AirPlay über music_status.py
+                    active_items = (
+                        get_kodi_music_carousel_items()
+                    )
+
+                    active_source = (
+                        "KODI_MUSIC"
+                        if active_items
+                        else "KODI"
+                    )
+
             else:
+
+                active_source = "HUDIY"
 
                 # Bestehendes HUDIY / Android-Auto-Carousel:
                 #
@@ -9075,7 +9359,7 @@ async def media_carousel_loop():
                     logger.info(
                         "MEDIA_CAROUSEL source=%s items=%r",
                         (
-                            "KODI_RADIO"
+                            active_source
                             if kodi_active
                             else "HUDIY"
                         ),

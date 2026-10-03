@@ -18,6 +18,8 @@ sleep 0.5
 
 echo "Starting HUDIY..."
 
+echo "hudiy" > /run/user/1000/rnse_active_app
+
 cd /home/pi/.hudiy/share || exit 1
 
 ./hudiy_startup.sh

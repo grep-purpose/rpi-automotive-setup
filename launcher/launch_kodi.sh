@@ -12,4 +12,6 @@ sleep 0.5
 
 echo "Starting Kodi..."
 
+echo "kodi" > /run/user/1000/rnse_active_app
+
 exec kodi --standalone

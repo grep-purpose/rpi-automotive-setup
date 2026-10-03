@@ -39,6 +39,96 @@ if xbmc.getCondVisibility("Window.IsActive(Home)"):
     sys.exit(0)
 
 
+
+# --- RNSE MUSIC ZONE START ---
+#
+# Custom-Musikplayer
+#
+# Header:
+#   9001 / 9003
+#
+# Content:
+#   9100 = Previous
+#   9101 = Play/Pause
+#   9102 = Next
+#
+# Footer:
+#   9002 / 9004
+#
+# Die Fadenkreuztasten werden global über rnse_zone_nav.py
+# behandelt. Der Drehregler bleibt innerhalb der XML über
+# onup/ondown auf 9100/9101/9102.
+# ----------------------------------------------------------
+
+music_content = [9100, 9101, 9102]
+
+music_active = any(
+    visible(cid)
+    for cid in music_content
+)
+
+if music_active:
+
+    music_header = [9001, 9003]
+    music_footer = [9002, 9004]
+
+    music_header_visible = first_visible(
+        music_header
+    )
+
+    music_footer_visible = first_visible(
+        music_footer
+    )
+
+    in_music_header = any(
+        focused(cid)
+        for cid in music_header
+    )
+
+    in_music_content = any(
+        focused(cid)
+        for cid in music_content
+    )
+
+    in_music_footer = any(
+        focused(cid)
+        for cid in music_footer
+    )
+
+    if direction == "up":
+
+        # Footer -> Hauptbereich
+        if in_music_footer:
+            focus(9101)
+
+        # Hauptbereich -> Header
+        elif in_music_content:
+            if music_header_visible:
+                focus(music_header_visible)
+
+        # unbekannter Fokus -> Hauptbereich
+        elif not in_music_header:
+            focus(9101)
+
+    elif direction == "down":
+
+        # Header -> Hauptbereich
+        if in_music_header:
+            focus(9101)
+
+        # Hauptbereich -> Footer
+        elif in_music_content:
+            if music_footer_visible:
+                focus(music_footer_visible)
+
+        # unbekannter Fokus -> Hauptbereich
+        elif not in_music_footer:
+            focus(9101)
+
+    sys.exit(0)
+
+# --- RNSE MUSIC ZONE END ---
+
 # ----------------------------------------------------------
 # Standard-MMI-Struktur
 #
