@@ -166,10 +166,22 @@ def update_radio_metadata():
     data = decode_radio_data(path)
 
     if not data:
+        # Während eines Senderwechsels kann Kodi den Player-Pfad
+        # für einen kurzen Moment leer melden, obwohl Radio.de
+        # bereits den neuen Stream aufbaut.
+        #
+        # In diesem Übergang dürfen wir die vom Router bereits
+        # gesetzten Senderdaten NICHT sofort löschen.
+        if not path:
+            station = HOME.getProperty(
+                "RNSE.RadioStation"
+            ).strip()
+
+            if station:
+                return
+
         # Ein durch den RNS-E-Router gestarteter Direktstream
         # besitzt keine plugin.audio.radiode-URL mehr.
-        # Die Senderdaten wurden deshalb bereits vom Router
-        # in Window(Home) gespeichert.
         direct_stream = HOME.getProperty(
             "RNSE.RadioStreamUrl"
         ).strip()
@@ -194,6 +206,21 @@ def update_radio_metadata():
     )
 
 
+def bluetooth_music_is_playing():
+    """
+    True nur dann, wenn die Bluetooth-/AirPlay-Musikpipeline
+    gerade tatsächlich als spielend gemeldet wird.
+
+    Alte Titel-/Artist-Metadaten werden absichtlich NICHT
+    zur Quellenentscheidung verwendet.
+    """
+    status = HOME.getProperty(
+        "RNSE.Music.Status"
+    ).strip().casefold()
+
+    return status == "playing"
+
+
 def handle_media_command(command):
     command = command.strip().lower()
 
@@ -204,8 +231,38 @@ def handle_media_command(command):
         )
         return
 
+    # ---------------------------------------------------------
+    # GLOBAL MEDIA ROUTING
+    #
+    # Bluetooth/AirPlay spielt wirklich:
+    #   -> music_status.py übernimmt
+    #
+    # Sonst:
+    #   -> bestehender Kodi-/Radio-Router
+    #
+    # Wichtig:
+    # Wir entscheiden NICHT nach vorhandenen Titelmetadaten.
+    # Alte Spotify-Metadaten dürfen daher Radio nicht stören.
+    # ---------------------------------------------------------
+
+    if bluetooth_music_is_playing():
+
+        xbmc.log(
+            f"RNS-E Media Control: {command} -> Bluetooth/AirPlay",
+            xbmc.LOGINFO
+        )
+
+        xbmc.executebuiltin(
+            "RunScript("
+            "/home/pi/.kodi/userdata/scripts/music_status.py,"
+            f"{command}"
+            ")"
+        )
+
+        return
+
     xbmc.log(
-        f"RNS-E Media Control: {command}",
+        f"RNS-E Media Control: {command} -> Kodi/Radio",
         xbmc.LOGINFO
     )
 

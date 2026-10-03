@@ -112,6 +112,39 @@ def load_and_initialize_config(config_path='/home/pi/config.json'):
         logger.critical(f"FATAL: Configuration is missing a key or has an invalid value: {e}", exc_info=True)
         return False
 
+# RNSE_FIS_LONGPRESS_BRIDGE
+def send_fis_bridge_command(command):
+    """
+    Sendet einen kleinen lokalen Befehl an read_from_canbus.py.
+
+    Dadurch bleibt can_keyboard_control der einzige Besitzer der
+    RNS-E-Tastenauswertung, während die eigentliche FIS-Logik
+    weiterhin zentral in read_from_canbus.py liegt.
+    """
+    import socket
+
+    try:
+        with socket.create_connection(
+            ("127.0.0.1", 23456),
+            timeout=1.0
+        ) as sock:
+            sock.sendall(
+                command.encode("utf-8")
+            )
+
+        logger.info(
+            "FIS Bridge command sent: %s",
+            command
+        )
+
+    except Exception as exc:
+        logger.error(
+            "FIS Bridge command failed (%s): %s",
+            command,
+            exc
+        )
+
+
 # --- Core Logic Functions ---
 def initialize_zmq_subscriber():
     """Initializes and configures the ZeroMQ subscriber socket."""
@@ -207,6 +240,38 @@ def run_command(command_str):
         logger.error(f"Failed to execute command '{command_str}': {e}")
 
 # --- Message Handlers ---
+
+# RNSE_MEDIA_UDP_ROUTING_V1
+def send_rnse_media_command(command):
+    """
+    Sendet NEXT/PREV an den zentralen Kodi-Media-Dispatcher.
+    Dieser entscheidet selbst zwischen Radio und Bluetooth/AirPlay.
+    """
+    import socket
+
+    try:
+        with socket.socket(
+            socket.AF_INET,
+            socket.SOCK_DGRAM
+        ) as sock:
+            sock.sendto(
+                command.encode("utf-8"),
+                ("127.0.0.1", 23457)
+            )
+
+        logging.info(
+            "RNS-E Media UDP: %s -> 127.0.0.1:23457",
+            command
+        )
+
+    except Exception as exc:
+        logging.error(
+            "RNS-E Media UDP Fehler (%s): %s",
+            command,
+            exc
+        )
+
+
 def handle_mmi_message(msg, state):
     if msg['dlc'] < 5: return
     data = bytes.fromhex(msg['data_hex'])
@@ -236,15 +301,53 @@ def handle_mmi_message(msg, state):
             state.last_mmi_action_info = {'command': cmd, 'time': now}
         
         elif not state.mmi_long_action_fired.get(cmd) and current_count >= CONFIG['long_press_count']:
-            key = CONFIG['mmi_long_map'].get(cmd)
             logger.info(f"MMI Long Press: {cmd}")
-            press_key(key)
+
+            # Fadenkreuz links oben:
+            # FIS1 MEDIA <-> NAV
+            if cmd == (64, 0):
+                logger.info(
+                    "MMI Long Press Fadenkreuz oben -> FIS1 Toggle"
+                )
+                send_fis_bridge_command(
+                    "fis1_toggle"
+                )
+
+            # Fadenkreuz links unten:
+            # FIS2 Speed -> Coolant -> Tank
+            elif cmd == (128, 0):
+                logger.info(
+                    "MMI Long Press Fadenkreuz unten -> FIS2 Toggle"
+                )
+                send_fis_bridge_command(
+                    "fis2_toggle"
+                )
+
+            else:
+                key = CONFIG['mmi_long_map'].get(cmd)
+                press_key(key)
+
             state.mmi_long_action_fired[cmd] = True
             state.last_mmi_action_info = {'command': cmd, 'time': now}
 
     elif status == 0x04: # Release Event
         if cmd in state.mmi_press_counters and not state.mmi_long_action_fired.get(cmd):
             if cmd not in CONFIG['mmi_scroll_cmds']:
+                # RNS-E Track-Tasten: kurzer Druck -> zentraler Media-Dispatcher
+                if cmd == (2, 0):
+                    logger.info(f"MMI Short Press: {cmd}")
+                    send_rnse_media_command("next")
+                    state.last_mmi_action_info = {'command': cmd, 'time': now}
+                    state.reset_mmi_state(cmd)
+                    return
+                
+                if cmd == (1, 0):
+                    logger.info(f"MMI Short Press: {cmd}")
+                    send_rnse_media_command("previous")
+                    state.last_mmi_action_info = {'command': cmd, 'time': now}
+                    state.reset_mmi_state(cmd)
+                    return
+                
                 key = CONFIG['mmi_short_map'].get(cmd)
                 logger.info(f"MMI Short Press: {cmd}")
                 press_key(key)

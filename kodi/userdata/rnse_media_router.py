@@ -203,37 +203,20 @@ def switch_radio(direction):
         xbmc.LOGINFO
     )
 
+    plugin_url = target_station.get("plugin_url", "")
     stream_url = target_station.get("stream_url", "")
     icon_url = target_station.get("icon_url", "")
     station_name = target_station["name"]
 
-    if not stream_url:
+    if not plugin_url:
         xbmc.log(
-            f"RNS-E Radio Direktstream fehlt: {station_name}",
+            f"RNS-E Radio Plugin-URL fehlt: {station_name}",
             xbmc.LOGERROR
         )
         return True
 
-    item = xbmcgui.ListItem(
-        label=station_name,
-        path=stream_url
-    )
-
-    item.setArt({
-        "thumb": icon_url,
-        "icon": icon_url,
-    })
-
-    item.setInfo(
-        "music",
-        {
-            "title": station_name,
-            "artist": station_name,
-        }
-    )
-
-    # Aktuellen Sender für Home.xml, Metadata-Service
-    # und den nächsten NEXT/PREV-Aufruf speichern.
+    # Aktuellen Sender vorab setzen, damit Home/FIS
+    # sofort auf den neuen Sender reagieren können.
     HOME.setProperty(
         "RNSE.RadioStation",
         station_name
@@ -260,12 +243,36 @@ def switch_radio(direction):
     )
 
     xbmc.log(
-        f"RNS-E Radio Direktstream: {station_name} -> {stream_url}",
+        f"RNS-E Radio Pluginstart: {station_name} -> {plugin_url}",
         xbmc.LOGINFO
     )
 
+    item = xbmcgui.ListItem(
+        label=station_name,
+        path=plugin_url
+    )
+
+    item.setArt({
+        "thumb": icon_url,
+        "icon": icon_url,
+    })
+
+    item.setInfo(
+        "music",
+        {
+            "title": station_name,
+            "artist": station_name,
+            "mediatype": "song",
+        }
+    )
+
+    item.setProperty(
+        "IsPlayable",
+        "true"
+    )
+
     xbmc.Player().play(
-        stream_url,
+        plugin_url,
         item
     )
 
