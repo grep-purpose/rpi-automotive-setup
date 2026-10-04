@@ -1,0 +1,12 @@
+[Unit]
+Description=RNS-E Smartphone Bluetooth Autoconnect
+After=bluetooth.service user@1000.service
+Wants=bluetooth.service user@1000.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/rnse-bluetooth-autoconnect.sh
+TimeoutStartSec=180
+
+[Install]
+WantedBy=multi-user.target

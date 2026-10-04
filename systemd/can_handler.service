@@ -1,6 +1,7 @@
 [Unit]
 Description=RNS-E CAN-Bus Handler
-After=can0-setup.service vcan0.service
+BindsTo=sys-subsystem-net-devices-can0.device
+After=sys-subsystem-net-devices-can0.device
 
 [Service]
 User=pi

@@ -10,10 +10,23 @@ User=pi
 Group=pi
 
 Environment=HOME=/home/pi
+
 Environment=XDG_RUNTIME_DIR=/run/user/1000
 Environment=WAYLAND_DISPLAY=wayland-0
+
+# Wichtig:
+# SDL soll wirklich Wayland verwenden und NICHT versehentlich XWayland.
+Environment=DISPLAY=
 Environment=SDL_VIDEODRIVER=wayland
 Environment=SDL_AUDIODRIVER=dummy
+
+# Desktop-/Session-Umgebung von Raspberry Pi OS / labwc
+Environment=XDG_SESSION_TYPE=wayland
+Environment=XDG_CURRENT_DESKTOP=LXDE
+Environment=XDG_SESSION_DESKTOP=LXDE-pi-labwc
+Environment=DESKTOP_SESSION=LXDE-pi-labwc
+Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+
 Environment=PYGAME_HIDE_SUPPORT_PROMPT=1
 
 ExecStartPre=/bin/sh -c 'until [ -S /run/user/1000/wayland-0 ]; do sleep 0.25; done'
