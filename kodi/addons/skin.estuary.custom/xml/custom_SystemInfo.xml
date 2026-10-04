@@ -1,0 +1,240 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<window id="1153">
+    <defaultcontrol always="true">9400</defaultcontrol>
+    <onload>RunScript(/home/pi/.kodi/userdata/scripts/system_info.py)</onload>
+    <controls>
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>1920</width>
+            <height>1080</height>
+            <texture colordiffuse="ff05070a">colors/black.png</texture>
+        </control>
+        <control type="group">
+            <left>30</left>
+            <right>30</right>
+            <top>18</top>
+            <height>105</height>
+            <control type="label">
+                <left>540</left>
+                <top>0</top>
+                <width>780</width>
+                <height>100</height>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font60</font>
+                <textcolor>ffd90429</textcolor>
+                <label>[B]Systeminformationen[/B]</label>
+            </control>
+        </control>
+        <control type="list" id="9400">
+            <left>60</left>
+            <top>104</top>
+            <width>1760</width>
+            <orientation>vertical</orientation>
+            <onup>9400</onup>
+            <ondown>9400</ondown>
+            <onleft>Control.Move(9400,-1)</onleft>
+            <onright>Control.Move(9400,1)</onright>
+            <itemlayout width="1760" height="92">
+                <control type="label">
+                    <left>35</left>
+                    <top>0</top>
+                    <width>720</width>
+                    <height>92</height>
+                    <font>font60</font>
+                    <textcolor>ffb7c0ca</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B]$INFO[ListItem.Label][/B]</label>
+                </control>
+                <control type="label">
+                    <left>790</left>
+                    <top>0</top>
+                    <width>920</width>
+                    <height>92</height>
+                    <font>font60</font>
+                    <textcolor>ff8d99ae</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>[B]$INFO[ListItem.Label2][/B]</label>
+                </control>
+            </itemlayout>
+            <focusedlayout width="1760" height="92">
+                <control type="image">
+                    <left>0</left>
+                    <top>2</top>
+                    <width>1760</width>
+                    <height>88</height>
+                    <texture colordiffuse="ff141923">colors/black.png</texture>
+                </control>
+                <control type="image">
+                    <left>0</left>
+                    <top>7</top>
+                    <width>10</width>
+                    <height>78</height>
+                    <texture colordiffuse="ffff6b00">colors/white.png</texture>
+                </control>
+                <control type="label">
+                    <left>35</left>
+                    <top>0</top>
+                    <width>720</width>
+                    <height>92</height>
+                    <font>font60</font>
+                    <textcolor>ffffffff</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B]$INFO[ListItem.Label][/B]</label>
+                </control>
+                <control type="label">
+                    <left>790</left>
+                    <top>0</top>
+                    <width>920</width>
+                    <height>92</height>
+                    <font>font60</font>
+                    <textcolor>ffffffff</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>[B]$INFO[ListItem.Label2][/B]</label>
+                </control>
+            </focusedlayout>
+            <content>
+                <item>
+                    <label>Aktualisieren</label>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/system_info.py)</onclick>
+                </item>
+                <item>
+                    <label>WLAN</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.SSID)]</label2>
+                </item>
+                <item>
+                    <label>WLAN-Signal</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.Signal)]</label2>
+                </item>
+                <item>
+                    <label>WLAN-IP</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.WLANIP)]</label2>
+                </item>
+                <item>
+                    <label>Ethernet-IP</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.EthernetIP)]</label2>
+                </item>
+                <item>
+                    <label>Gateway</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.Gateway)]</label2>
+                </item>
+                <item>
+                    <label>DNS</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.DNS)]</label2>
+                </item>
+                <item>
+                    <label>CPU-Temperatur</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.Temp)]</label2>
+                </item>
+                <item>
+                    <label>CPU-Takt</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.CPUFreq)]</label2>
+                </item>
+                <item>
+                    <label>Systemlast 1/5/15 min</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.Load)]</label2>
+                </item>
+                <item>
+                    <label>RAM</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.RAM)]</label2>
+                </item>
+                <item>
+                    <label>Swap</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.Swap)]</label2>
+                </item>
+                <item>
+                    <label>Speicher</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.Disk)]</label2>
+                </item>
+                <item>
+                    <label>System-Uptime</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.Uptime)]</label2>
+                </item>
+                <item>
+                    <label>Throttling</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.Throttle)]</label2>
+                </item>
+                <item>
+                    <label>Hostname</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.Hostname)]</label2>
+                </item>
+                <item>
+                    <label>Betriebssystem</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.OS)]</label2>
+                </item>
+                <item>
+                    <label>Kernel</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.Kernel)]</label2>
+                </item>
+                <item>
+                    <label>Architektur</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.Arch)]</label2>
+                </item>
+                <item>
+                    <label>Kodi-Version</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.KodiVersion)]</label2>
+                </item>
+                <item>
+                    <label>Kodi-Skin</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.Skin)]</label2>
+                </item>
+                <item>
+                    <label>Kodi-Fenster</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.KodiWindow)]</label2>
+                </item>
+                <item>
+                    <label>CAN0</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.CAN0State)]</label2>
+                </item>
+                <item>
+                    <label>CAN0 Bitrate</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.CAN0Bitrate)]</label2>
+                </item>
+                <item>
+                    <label>CAN0 Pakete</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.CAN0Packets)]</label2>
+                </item>
+                <item>
+                    <label>VCAN0</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.VCAN0State)]</label2>
+                </item>
+                <item>
+                    <label>HUDIY</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.HUDIY)]</label2>
+                </item>
+                <item>
+                    <label>Git Branch</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.GitBranch)]</label2>
+                </item>
+                <item>
+                    <label>Git Commit</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.GitCommit)]</label2>
+                </item>
+                <item>
+                    <label>Git Status</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.SysInfo.GitStatus)]</label2>
+                </item>
+            </content>
+            <pagecontrol>9640</pagecontrol>
+            <bottom>158</bottom>
+        </control>
+        <control type="scrollbar" id="9640">
+            <left>1840</left>
+            <top>104</top>
+            <width>8</width>
+            <orientation>vertical</orientation>
+            <showonepage>false</showonepage>
+            <visible>Container(9400).HasNext | Container(9400).HasPrevious</visible>
+            <texturesliderbackground colordiffuse="443f4650">colors/white.png</texturesliderbackground>
+            <texturesliderbar colordiffuse="ff8d99ae">colors/white.png</texturesliderbar>
+            <texturesliderbarfocus colordiffuse="ffff6b00">colors/white.png</texturesliderbarfocus>
+            <textureslidernib />
+            <textureslidernibfocus />
+            <bottom>158</bottom>
+        </control>
+        <include>RNSE_SettingsFooter</include>
+    </controls>
+</window>

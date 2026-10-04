@@ -230,14 +230,7 @@
                         <label>[B]$INFO[ListItem.Label][/B]</label>
                     </control>
 
-                    <!-- Fokuslinie -->
-                    <control type="image">
-                        <left>92</left>
-                        <top>475</top>
-                        <width>235</width>
-                        <height>7</height>
-                        <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                    </control>
+        
 
                 </control>
 
@@ -366,8 +359,7 @@
                 <texture>$INFO[Window(Home).Property(RNSE.Music.Artwork)]</texture>
 
                 <visible>
-                    String.IsEmpty(Window(Home).Property(RNSE.RadioStation))
-                    + String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
+                    String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                     + !String.IsEmpty(Window(Home).Property(RNSE.Music.Artwork))
                 </visible>
             </control>
@@ -384,10 +376,7 @@
 
                 <visible>
                     Player.HasMedia
-                    + [
-                        !String.IsEmpty(Window(Home).Property(RNSE.RadioStation))
-                        | !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
-                    ]
+                    + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                 </visible>
             </control>
 
@@ -402,10 +391,8 @@
                 <texture colordiffuse="ffc8cfd8">DefaultAlbumCover.png</texture>
 
                 <visible>
-                    String.IsEmpty(Window(Home).Property(RNSE.RadioStation))
-                    + String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
+                    String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                     + String.IsEmpty(Window(Home).Property(RNSE.Music.Artwork))
-                    + !Player.HasMedia
                 </visible>
             </control>
 
@@ -435,8 +422,7 @@
                 <label>[B]$INFO[Window(Home).Property(RNSE.Music.Title)][/B]</label>
 
                 <visible>
-                    String.IsEmpty(Window(Home).Property(RNSE.RadioStation))
-                    + String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
+                    String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                     + !String.IsEmpty(Window(Home).Property(RNSE.Music.Title))
                 </visible>
             </control>
@@ -457,8 +443,7 @@
                 <label>[B]$INFO[Window(Home).Property(RNSE.Music.Artist)][/B]</label>
 
                 <visible>
-                    String.IsEmpty(Window(Home).Property(RNSE.RadioStation))
-                    + String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
+                    String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                     + !String.IsEmpty(Window(Home).Property(RNSE.Music.Artist))
                 </visible>
             </control>
@@ -480,10 +465,7 @@
 
                 <visible>
                     Player.HasMedia
-                    + [
-                        !String.IsEmpty(Window(Home).Property(RNSE.RadioStation))
-                        | !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
-                    ]
+                    + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                     + !String.IsEmpty(MusicPlayer.Title)
                 </visible>
             </control>
@@ -505,10 +487,7 @@
 
                 <visible>
                     Player.HasMedia
-                    + [
-                        !String.IsEmpty(Window(Home).Property(RNSE.RadioStation))
-                        | !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
-                    ]
+                    + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                     + String.IsEmpty(MusicPlayer.Title)
                 </visible>
             </control>
@@ -530,10 +509,7 @@
 
                 <visible>
                     Player.HasMedia
-                    + [
-                        !String.IsEmpty(Window(Home).Property(RNSE.RadioStation))
-                        | !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
-                    ]
+                    + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                     + !String.IsEmpty(MusicPlayer.Artist)
                 </visible>
             </control>
@@ -555,10 +531,7 @@
 
                 <visible>
                     Player.HasMedia
-                    + [
-                        !String.IsEmpty(Window(Home).Property(RNSE.RadioStation))
-                        | !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
-                    ]
+                    + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                     + String.IsEmpty(MusicPlayer.Artist)
                     + !String.IsEmpty(MusicPlayer.ChannelName)
                 </visible>
@@ -590,7 +563,7 @@
                 <height>45</height>
                 <font>font30_title</font>
                 <textcolor>ff9da6b2</textcolor>
-                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation))</visible>
+                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
                 <label>SENDER</label>
             </control>
 
@@ -602,7 +575,7 @@
                 <height>45</height>
                 <font>font30_title</font>
                 <textcolor>ff9da6b2</textcolor>
-                <visible>String.IsEmpty(Window(Home).Property(RNSE.RadioStation))</visible>
+                <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) | String.IsEmpty(Window(Home).Property(RNSE.RadioStation))</visible>
                 <label>QUELLE</label>
             </control>
 
@@ -614,7 +587,7 @@
                 <height>65</height>
                 <font>font45</font>
                 <textcolor>ffffffff</textcolor>
-                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation))</visible>
+                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
                 <label>[B]$INFO[Window(Home).Property(RNSE.RadioStation)][/B]</label>
             </control>
 
@@ -626,7 +599,7 @@
                 <height>50</height>
                 <font>font30_title</font>
                 <textcolor>ffd5dae0</textcolor>
-                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation))</visible>
+                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
                 <label>RADIO.DE</label>
             </control>
 
@@ -638,7 +611,7 @@
                 <height>50</height>
                 <font>font30_title</font>
                 <textcolor>ff7f8790</textcolor>
-                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation))</visible>
+                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
                 <label>·</label>
             </control>
 
@@ -650,7 +623,7 @@
                 <height>50</height>
                 <font>font30_title</font>
                 <textcolor>ffff8a32</textcolor>
-                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation))</visible>
+                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
                 <label>[B]LIVE[/B]</label>
             </control>
 
@@ -691,8 +664,7 @@
                 <scroll>true</scroll>
 
                 <visible>
-                    String.IsEmpty(Window(Home).Property(RNSE.RadioStation))
-                    + String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
+                    String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                 </visible>
 
                 <label>[B]$INFO[Window(Home).Property(RNSE.Music.SourceLabel)][/B]</label>
@@ -794,7 +766,7 @@
             </control>
 
 
-            <!-- Einstellungen links: sichtbares Label -->
+            <!-- Einstellungen links: normal -->
             <control type="label">
                 <left>15</left>
                 <top>20</top>
@@ -804,6 +776,20 @@
                 <font>font55</font>
                 <textcolor>fff0f2f5</textcolor>
                 <label>[B]Einstellungen[/B]</label>
+                <visible>!Control.HasFocus(9100)</visible>
+            </control>
+
+            <!-- Einstellungen links: Fokus -->
+            <control type="label">
+                <left>15</left>
+                <top>20</top>
+                <width>500</width>
+                <height>82</height>
+                <aligny>center</aligny>
+                <font>font55</font>
+                <textcolor>ffff8800</textcolor>
+                <label>[B]Einstellungen[/B]</label>
+                <visible>Control.HasFocus(9100)</visible>
             </control>
 
             <!-- Unsichtbares Fokus-Control -->
@@ -817,23 +803,14 @@
                 <texturefocus>-</texturefocus>
                 <texturenofocus>-</texturenofocus>
 
-                <onup>9100</onup>
-                <ondown>9100</ondown>
-                <onleft>9100</onleft>
-                <onright>9100</onright>
+                <onup>9101</onup>
+                <ondown>9101</ondown>
+                <onleft>9101</onleft>
+                <onright>9101</onright>
 
                 <onclick>ActivateWindow(Settings)</onclick>
             </control>
 
-            <!-- Fokuslinie -->
-            <control type="image">
-                <left>15</left>
-                <top>100</top>
-                <width>250</width>
-                <height>4</height>
-                <texture colordiffuse="ffff8800">colors/white.png</texture>
-                <visible>Control.HasFocus(9100)</visible>
-            </control>
 
 
             <!-- EXAKT ZENTRIERTER Statusblock
@@ -898,6 +875,27 @@
 
 
             
+            <!-- Smartphone-Softkey: unsichtbares Fokus-Control -->
+            <control type="button" id="9101">
+                <right>0</right>
+                <top>20</top>
+                <width>520</width>
+                <height>82</height>
+
+                <label></label>
+                <texturefocus>-</texturefocus>
+                <texturenofocus>-</texturenofocus>
+
+                <onup>9100</onup>
+                <ondown>9100</ondown>
+                <onleft>9100</onleft>
+                <onright>9100</onright>
+
+                <onclick>ActivateWindow(1160)</onclick>
+            </control>
+
+
+
             <!-- =====================================================
                  SMARTPHONE STATUS RECHTS
                  ===================================================== -->
@@ -915,7 +913,7 @@
                     <width>520</width>
                     <height>82</height>
 
-                    <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Connected),true)</visible>
+                    <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Connected),true) + !Control.HasFocus(9101)</visible>
 
                     <!-- Netzbetreiber -->
                     <control type="label">
@@ -1086,6 +1084,192 @@
 
                 </control>
 
+
+
+                <!-- =================================================
+                     RNSE PHONE FOCUS OVERLAY
+                     Nur sichtbar bei Fokus auf Smartphone-Softkey
+                     ================================================= -->
+
+                <control type="group">
+                    <left>0</left>
+                    <top>0</top>
+                    <width>520</width>
+                    <height>82</height>
+
+                    <visible>
+                        Control.HasFocus(9101) +
+                        String.IsEqual(Window(Home).Property(RNSE.Phone.Connected),true)
+                    </visible>
+
+                    <!-- Netzbetreiber -->
+                    <control type="label">
+                        <left>0</left>
+                        <top>0</top>
+                        <width>350</width>
+                        <height>82</height>
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <font>font55</font>
+                        <textcolor>ffff8800</textcolor>
+                        <label>[B]$INFO[Window(Home).Property(RNSE.Phone.Operator)][/B]</label>
+                    </control>
+
+                    <!-- Mobilfunkempfang -->
+                    <control type="group">
+                        <left>375</left>
+                        <top>23</top>
+                        <width>62</width>
+                        <height>36</height>
+
+                        <control type="image">
+                            <left>0</left>
+                            <bottom>0</bottom>
+                            <width>8</width>
+                            <height>10</height>
+                            <texture colordiffuse="ffff8800">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal1),true)</visible>
+                        </control>
+
+                        <control type="image">
+                            <left>13</left>
+                            <bottom>0</bottom>
+                            <width>8</width>
+                            <height>16</height>
+                            <texture colordiffuse="ffff8800">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal2),true)</visible>
+                        </control>
+
+                        <control type="image">
+                            <left>26</left>
+                            <bottom>0</bottom>
+                            <width>8</width>
+                            <height>22</height>
+                            <texture colordiffuse="ffff8800">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal3),true)</visible>
+                        </control>
+
+                        <control type="image">
+                            <left>39</left>
+                            <bottom>0</bottom>
+                            <width>8</width>
+                            <height>28</height>
+                            <texture colordiffuse="ffff8800">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal4),true)</visible>
+                        </control>
+
+                        <control type="image">
+                            <left>52</left>
+                            <bottom>0</bottom>
+                            <width>8</width>
+                            <height>34</height>
+                            <texture colordiffuse="ffff8800">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal5),true)</visible>
+                        </control>
+                    </control>
+
+                    <!-- Akku -->
+                    <control type="group">
+                        <left>455</left>
+                        <top>11</top>
+                        <width>50</width>
+                        <height>60</height>
+
+                        <!-- Kopf -->
+                        <control type="image">
+                            <left>15</left>
+                            <top>0</top>
+                            <width>16</width>
+                            <height>6</height>
+                            <texture colordiffuse="ffff8800">colors/white.png</texture>
+                        </control>
+
+                        <!-- Rahmen -->
+                        <control type="image">
+                            <left>4</left>
+                            <top>6</top>
+                            <width>38</width>
+                            <height>3</height>
+                            <texture colordiffuse="ffff8800">colors/white.png</texture>
+                        </control>
+
+                        <control type="image">
+                            <left>4</left>
+                            <top>56</top>
+                            <width>38</width>
+                            <height>3</height>
+                            <texture colordiffuse="ffff8800">colors/white.png</texture>
+                        </control>
+
+                        <control type="image">
+                            <left>4</left>
+                            <top>6</top>
+                            <width>3</width>
+                            <height>53</height>
+                            <texture colordiffuse="ffff8800">colors/white.png</texture>
+                        </control>
+
+                        <control type="image">
+                            <left>39</left>
+                            <top>6</top>
+                            <width>3</width>
+                            <height>53</height>
+                            <texture colordiffuse="ffff8800">colors/white.png</texture>
+                        </control>
+
+                        <!-- 1/5 -->
+                        <control type="image">
+                            <left>10</left>
+                            <top>46</top>
+                            <width>26</width>
+                            <height>7</height>
+                            <texture colordiffuse="ffff8800">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery1),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery2),true)</visible>
+                        </control>
+
+                        <!-- 2/5 -->
+                        <control type="image">
+                            <left>10</left>
+                            <top>38</top>
+                            <width>26</width>
+                            <height>15</height>
+                            <texture colordiffuse="ffff8800">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery2),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery3),true)</visible>
+                        </control>
+
+                        <!-- 3/5 -->
+                        <control type="image">
+                            <left>10</left>
+                            <top>30</top>
+                            <width>26</width>
+                            <height>23</height>
+                            <texture colordiffuse="ffff8800">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery3),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery4),true)</visible>
+                        </control>
+
+                        <!-- 4/5 -->
+                        <control type="image">
+                            <left>10</left>
+                            <top>22</top>
+                            <width>26</width>
+                            <height>31</height>
+                            <texture colordiffuse="ffff8800">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery4),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery5),true)</visible>
+                        </control>
+
+                        <!-- 5/5 -->
+                        <control type="image">
+                            <left>10</left>
+                            <top>14</top>
+                            <width>26</width>
+                            <height>39</height>
+                            <texture colordiffuse="ffff8800">colors/white.png</texture>
+                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery5),true)</visible>
+                        </control>
+
+                    </control>
+
+                </control>
 
                 <!-- Kein Telefon verbunden -->
                 <control type="label">

@@ -22,19 +22,129 @@ def first_visible(ids):
 # ----------------------------------------------------------
 # HOME
 # Content = 9000
-# Footer  = 9100
+# Footer  = 9100 Einstellungen / 9101 Smartphone
 # Kein Header
 # ----------------------------------------------------------
 
 if xbmc.getCondVisibility("Window.IsActive(Home)"):
+
+    xbmc.log(
+        "[RNSE-FOOTER-DEBUG] "
+        f"direction={direction} "
+        f"focus9000={focused(9000)} "
+        f"focus9100={focused(9100)} "
+        f"focus9101={focused(9101)} "
+        f"visible9100={visible(9100)} "
+        f"visible9101={visible(9101)}",
+        xbmc.LOGWARNING
+    )
 
     if direction == "down":
         if focused(9000):
             focus(9100)
 
     elif direction == "up":
-        if focused(9100):
+        if focused(9100) or focused(9101):
             focus(9000)
+
+    elif direction == "left":
+        if focused(9100):
+            focus(9101)
+        elif focused(9101):
+            focus(9100)
+        else:
+            xbmc.executebuiltin("PlayerControl(Previous)")
+
+    elif direction == "right":
+        if focused(9100):
+            focus(9101)
+        elif focused(9101):
+            focus(9100)
+        else:
+            xbmc.executebuiltin("PlayerControl(Next)")
+
+    sys.exit(0)
+
+
+
+# ----------------------------------------------------------
+# WETTER
+#
+# Header:
+#   9001 / 9003
+#
+# Content:
+#   50 = STÜNDLICH
+#   51 = TÄGLICH
+#   52 = RADAR
+#
+# Footer:
+#   9002 / 9004
+#
+# Steuerkreuz:
+#   oben/unten = Zone wechseln
+#
+# Drehregler:
+#   wird NICHT hier behandelt
+# ----------------------------------------------------------
+
+if xbmc.getCondVisibility("Window.IsActive(Weather)"):
+
+    header = [9001, 9003]
+    footer = [9002, 9004]
+    content = [50, 51, 52]
+
+    header_visible = first_visible(header)
+    footer_visible = first_visible(footer)
+
+    in_header = any(focused(x) for x in header)
+    in_content = any(focused(x) for x in content)
+    in_footer = any(focused(x) for x in footer)
+
+    # Aktuell gewählten Wettermodus bestimmen
+    if xbmc.getCondVisibility(
+        "String.IsEqual(Window(home).Property(WeatherView),daily)"
+    ):
+        weather_content = 51
+
+    elif xbmc.getCondVisibility(
+        "String.IsEqual(Window(home).Property(WeatherView),radar)"
+    ):
+        weather_content = 52
+
+    else:
+        weather_content = 50
+
+
+    if direction == "up":
+
+        # Footer -> aktuell gewählter Wettermodus
+        if in_footer:
+            focus(weather_content)
+
+        # Content -> Header
+        elif in_content and header_visible:
+            focus(header_visible)
+
+        # Unbekannter Fokus -> Content
+        elif not in_header and not in_content and not in_footer:
+            focus(weather_content)
+
+
+    elif direction == "down":
+
+        # Header -> aktuell gewählter Wettermodus
+        if in_header:
+            focus(weather_content)
+
+        # Content -> Footer
+        elif in_content and footer_visible:
+            focus(footer_visible)
+
+        # Unbekannter Fokus -> Content
+        elif not in_header and not in_content and not in_footer:
+            focus(weather_content)
+
 
     sys.exit(0)
 
@@ -143,7 +253,7 @@ if music_active:
 # ----------------------------------------------------------
 
 header = [9001, 9003]
-content = [50, 51]
+content = [50, 51, 52]
 footer = [9002, 9004]
 
 header_visible = first_visible(header)

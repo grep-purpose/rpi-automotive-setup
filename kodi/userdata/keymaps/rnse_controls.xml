@@ -1,58 +1,34 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <keymap>
   <global>
     <keyboard>
-      <!-- Drehregler: Taste 1 = Up / Taste 2 = Down -->
-      <one>Up</one>
-      <two>Down</two>
-
-      <!-- Dreh-Druck-Knopf = Auswählen -->
+      <one>Down</one>
+      <two>Up</two>
       <return>Select</return>
-
-      <!-- Return-Taste = Zurück -->
       <escape>Back</escape>
-
-      <!-- RNS-E SETUP kurz = globale Kodi/System-Einstellungen -->
-      <m>ActivateWindow(Settings)</m>
-
-      <!-- Steuerkreuz links: Up = PageUp / Down = PageDown -->
+      <m>ActivateWindow(1150)</m>
       <up>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,up)</up>
       <down>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,down)</down>
-
-      <!-- Track-Tasten global = Links / Rechts -->
       <left>Left</left>
       <right>Right</right>
       <prev_track>Left</prev_track>
       <next_track>Right</next_track>
-
-      <!-- RNS-E Track-Tasten: kurzer Druck -->
       <f7>RunScript(/home/pi/.kodi/userdata/rnse_media_router.py,previous)</f7>
       <f8>RunScript(/home/pi/.kodi/userdata/rnse_media_router.py,next)</f8>
     </keyboard>
   </global>
-
-  <!-- EXKLUSIV IM HOMESCREEN -->
   <Home>
     <keyboard>
-
-      <!--
-        RNS-E linkes Steuerkreuz:
-        oben  = Content / Karussell
-        unten = Footer
-      -->
       <up>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,up)</up>
       <down>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,down)</down>
-
-      <!-- Track-Tasten vorerst wie bisher -->
-      <left>PlayerControl(Previous)</left>
-      <right>PlayerControl(Next)</right>
+      <left>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,left)</left>
+      <right>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,right)</right>
       <prev_track>PlayerControl(Previous)</prev_track>
       <next_track>PlayerControl(Next)</next_track>
-
+      <one>Up</one>
+      <two>Down</two>
     </keyboard>
   </Home>
-
-  <!-- Vollbild Video -->
   <FullScreenVideo>
     <keyboard>
       <return>PlayPause</return>
@@ -65,8 +41,6 @@
       <next_track>StepForward</next_track>
     </keyboard>
   </FullScreenVideo>
-
-  <!-- Vollbild Live-TV -->
   <FullScreenLiveTV>
     <keyboard>
       <return>PlayPause</return>
@@ -77,10 +51,24 @@
       <right>ChannelUp</right>
       <prev_track>ChannelDown</prev_track>
       <next_track>ChannelUp</next_track>
-
-      <!-- RNS-E Track-Tasten: kurzer Druck = Senderwechsel -->
       <f7>ChannelDown</f7>
       <f8>ChannelUp</f8>
     </keyboard>
   </FullScreenLiveTV>
+  <VirtualKeyboard>
+    <keyboard>
+      <one>Left</one>
+      <two>Right</two>
+      <up>Up</up>
+      <down>Down</down>
+      <return>Select</return>
+      <escape>PreviousMenu</escape>
+      <f7>Delete</f7>
+      <f8>Enter</f8>
+      <prev_track>Delete</prev_track>
+      <next_track>Enter</next_track>
+      <left>Backspace</left>
+      <left mod="longpress">Backspace</left>
+    </keyboard>
+  </VirtualKeyboard>
 </keymap>

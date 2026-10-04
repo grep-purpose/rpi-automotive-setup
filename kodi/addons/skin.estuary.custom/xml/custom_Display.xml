@@ -1,0 +1,178 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<window id="1157">
+    <defaultcontrol always="true">9200</defaultcontrol>
+    <controls>
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>1920</width>
+            <height>1080</height>
+            <texture colordiffuse="ff05070a">colors/black.png</texture>
+        </control>
+        <control type="group">
+            <left>30</left>
+            <right>30</right>
+            <top>18</top>
+            <height>105</height>
+            <control type="label">
+                <left>540</left>
+                <top>0</top>
+                <width>780</width>
+                <height>100</height>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font60</font>
+                <textcolor>ffd90429</textcolor>
+                <label>[B]Anzeige[/B]</label>
+            </control>
+        </control>
+        <control type="list" id="9200">
+            <orientation>vertical</orientation>
+            <onup>9200</onup>
+            <ondown>9200</ondown>
+            <onleft>Control.Move(9200,-1)</onleft>
+            <onright>Control.Move(9200,1)</onright>
+            <itemlayout width="1760" height="92">
+                <control type="label">
+                    <left>35</left>
+                    <top>0</top>
+                    <width>720</width>
+                    <height>92</height>
+                    <font>font60</font>
+                    <textcolor>ffb7c0ca</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B]$INFO[ListItem.Label][/B]</label>
+                </control>
+                <control type="label">
+                    <left>790</left>
+                    <top>0</top>
+                    <width>920</width>
+                    <height>92</height>
+                    <font>font60</font>
+                    <textcolor>ff8d99ae</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>[B]$INFO[ListItem.Label2][/B]</label>
+                </control>
+                <control type="image">
+                    <top>16</top>
+                    <width>60</width>
+                    <height>60</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture>settings/chevron_normal.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(RowType),submenu)</visible>
+                    <right>72</right>
+                </control>
+                <control type="image">
+                    <top>16</top>
+                    <width>60</width>
+                    <height>60</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture>settings/checkbox_off_normal.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(RowType),checkbox) + !String.IsEqual(Skin.String(RNSE.SystemSoundsState),on)</visible>
+                    <right>72</right>
+                </control>
+                <control type="image">
+                    <top>16</top>
+                    <width>60</width>
+                    <height>60</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture>settings/checkbox_on_normal.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(RowType),checkbox) + String.IsEqual(Skin.String(RNSE.SystemSoundsState),on)</visible>
+                    <right>72</right>
+                </control>
+            </itemlayout>
+            <focusedlayout width="1760" height="92">
+                <control type="image">
+                    <left>0</left>
+                    <top>2</top>
+                    <width>1760</width>
+                    <height>88</height>
+                    <texture colordiffuse="ff141923">colors/black.png</texture>
+                </control>
+                <control type="image">
+                    <left>0</left>
+                    <top>7</top>
+                    <width>10</width>
+                    <height>78</height>
+                    <texture colordiffuse="ffff6b00">colors/white.png</texture>
+                </control>
+                <control type="label">
+                    <left>35</left>
+                    <top>0</top>
+                    <width>720</width>
+                    <height>92</height>
+                    <font>font60</font>
+                    <textcolor>ffffffff</textcolor>
+                    <aligny>center</aligny>
+                    <label>[B]$INFO[ListItem.Label][/B]</label>
+                </control>
+                <control type="label">
+                    <left>790</left>
+                    <top>0</top>
+                    <width>920</width>
+                    <height>92</height>
+                    <font>font60</font>
+                    <textcolor>ffffffff</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>[B]$INFO[ListItem.Label2][/B]</label>
+                </control>
+                <control type="image">
+                    <top>16</top>
+                    <width>60</width>
+                    <height>60</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture>settings/chevron_focus.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(RowType),submenu)</visible>
+                    <right>72</right>
+                </control>
+                <control type="image">
+                    <top>16</top>
+                    <width>60</width>
+                    <height>60</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture>settings/checkbox_off_focus.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(RowType),checkbox) + !String.IsEqual(Skin.String(RNSE.SystemSoundsState),on)</visible>
+                    <right>72</right>
+                </control>
+                <control type="image">
+                    <top>16</top>
+                    <width>60</width>
+                    <height>60</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture>settings/checkbox_on_focus.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(RowType),checkbox) + String.IsEqual(Skin.String(RNSE.SystemSoundsState),on)</visible>
+                    <right>72</right>
+                </control>
+            </focusedlayout>
+            <content>
+                <item>
+                    <label>Anzeigeeinstellungen</label>
+                    <property name="RowType">action</property>
+                    <onclick>Notification(Anzeige,Anzeigeeinstellungen folgen,2000)</onclick>
+                </item>
+            </content>
+            <pagecontrol>9620</pagecontrol>
+            <left>60</left>
+            <top>104</top>
+            <bottom>158</bottom>
+            <width>1760</width>
+        </control>
+        <control type="scrollbar" id="9620">
+            <visible>Container(9200).HasNext | Container(9200).HasPrevious</visible>
+            <texturesliderbackground colordiffuse="443f4650">colors/white.png</texturesliderbackground>
+            <texturesliderbar colordiffuse="ff8d99ae">colors/white.png</texturesliderbar>
+            <texturesliderbarfocus colordiffuse="ffff6b00">colors/white.png</texturesliderbarfocus>
+            <textureslidernib />
+            <textureslidernibfocus />
+            <left>1840</left>
+            <top>104</top>
+            <bottom>158</bottom>
+            <width>8</width>
+            <orientation>vertical</orientation>
+            <showonepage>false</showonepage>
+        </control>
+        <include>RNSE_SettingsFooter</include>
+    </controls>
+</window>
