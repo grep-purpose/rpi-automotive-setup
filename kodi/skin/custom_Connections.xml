@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<window id="1151">
+<window id="1155">
     <defaultcontrol always="true">9200</defaultcontrol>
     <controls>
         <control type="image">
@@ -23,7 +23,7 @@
                 <aligny>center</aligny>
                 <font>font60</font>
                 <textcolor>ffd90429</textcolor>
-                <label>[B]System[/B]</label>
+                <label>[B]Verbindungen[/B]</label>
             </control>
         </control>
         <control type="list" id="9200">
@@ -148,29 +148,14 @@
             </focusedlayout>
             <content>
                 <item>
-                    <label>Verbindungen</label>
+                    <label>WLAN</label>
                     <property name="RowType">submenu</property>
-                    <onclick>ActivateWindow(1155)</onclick>
+                    <onclick>ActivateWindow(1152)</onclick>
                 </item>
                 <item>
-                    <label>Töne</label>
+                    <label>Bluetooth</label>
                     <property name="RowType">submenu</property>
-                    <onclick>ActivateWindow(1156)</onclick>
-                </item>
-                <item>
-                    <label>Anzeige</label>
-                    <property name="RowType">submenu</property>
-                    <onclick>ActivateWindow(1157)</onclick>
-                </item>
-                <item>
-                    <label>Wartung</label>
-                    <property name="RowType">submenu</property>
-                    <onclick>ActivateWindow(1158)</onclick>
-                </item>
-                <item>
-                    <label>Energie</label>
-                    <property name="RowType">submenu</property>
-                    <onclick>ActivateWindow(1159)</onclick>
+                    <onclick>ActivateWindow(1160)</onclick>
                 </item>
             </content>
             <pagecontrol>9620</pagecontrol>

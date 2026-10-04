@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <window id="1151">
     <defaultcontrol always="true">9200</defaultcontrol>
+    <onload>RunScript(/home/pi/.kodi/userdata/scripts/toggle_system_sounds.py,sync)</onload>
     <controls>
         <control type="image">
             <left>0</left>
@@ -148,29 +149,39 @@
             </focusedlayout>
             <content>
                 <item>
-                    <label>Verbindungen</label>
+                    <label>WLAN</label>
                     <property name="RowType">submenu</property>
-                    <onclick>ActivateWindow(1155)</onclick>
+                    <onclick>ActivateWindow(1152)</onclick>
                 </item>
                 <item>
-                    <label>Töne</label>
-                    <property name="RowType">submenu</property>
-                    <onclick>ActivateWindow(1156)</onclick>
+                    <label>System-Sounds</label>
+                    <property name="RowType">checkbox</property>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/toggle_system_sounds.py,toggle)</onclick>
                 </item>
                 <item>
-                    <label>Anzeige</label>
-                    <property name="RowType">submenu</property>
-                    <onclick>ActivateWindow(1157)</onclick>
+                    <label>Oberfläche neu laden</label>
+                    <property name="RowType">action</property>
+                    <onclick>ReloadSkin()</onclick>
                 </item>
                 <item>
-                    <label>Wartung</label>
-                    <property name="RowType">submenu</property>
-                    <onclick>ActivateWindow(1158)</onclick>
+                    <label>Kodi neu starten</label>
+                    <property name="RowType">action</property>
+                    <onclick>Notification(Kodi,Neustart wird nach DRM/TTY-Test angebunden,2500)</onclick>
                 </item>
                 <item>
-                    <label>Energie</label>
+                    <label>Pi neu starten</label>
+                    <property name="RowType">action</property>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/power_control.py,reboot)</onclick>
+                </item>
+                <item>
+                    <label>Pi herunterfahren</label>
+                    <property name="RowType">action</property>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/power_control.py,poweroff)</onclick>
+                </item>
+                <item>
+                    <label>Systeminformationen</label>
                     <property name="RowType">submenu</property>
-                    <onclick>ActivateWindow(1159)</onclick>
+                    <onclick>ActivateWindow(1153)</onclick>
                 </item>
             </content>
             <pagecontrol>9620</pagecontrol>
@@ -193,6 +204,66 @@
             <orientation>vertical</orientation>
             <showonepage>false</showonepage>
         </control>
-        <include>RNSE_SettingsFooter</include>
+        <control type="group">
+            <left>30</left>
+            <control type="image">
+                <left>0</left>
+                <top>20</top>
+                <width>500</width>
+                <height>90</height>
+                <texture colordiffuse="ff05070a">colors/black.png</texture>
+            </control>
+            <right>30</right>
+            <bottom>18</bottom>
+            <height>124</height>
+            <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>5</height>
+                <texture colordiffuse="aaffffff">colors/white.png</texture>
+            </control>
+            <control type="group">
+                <left>720</left>
+                <top>20</top>
+                <width>430</width>
+                <height>82</height>
+                <control type="image">
+                    <left>0</left>
+                    <top>11</top>
+                    <width>54</width>
+                    <height>54</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture>$INFO[Weather.ConditionsIcon]</texture>
+                </control>
+                <control type="label">
+                    <left>68</left>
+                    <top>0</top>
+                    <width>120</width>
+                    <height>82</height>
+                    <aligny>center</aligny>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <label>[B]$INFO[Weather.Temperature][/B]</label>
+                </control>
+                <control type="image">
+                    <left>195</left>
+                    <top>16</top>
+                    <width>2</width>
+                    <height>48</height>
+                    <texture colordiffuse="55ffffff">colors/white.png</texture>
+                </control>
+                <control type="label">
+                    <left>220</left>
+                    <top>0</top>
+                    <width>170</width>
+                    <height>82</height>
+                    <aligny>center</aligny>
+                    <font>font45</font>
+                    <textcolor>fff0f2f5</textcolor>
+                    <label>[B]$INFO[System.Time(hh:mm)][/B]</label>
+                </control>
+            </control>
+        </control>
     </controls>
 </window>

@@ -205,66 +205,6 @@
             <orientation>vertical</orientation>
             <showonepage>false</showonepage>
         </control>
-        <control type="group">
-            <left>30</left>
-            <control type="image">
-                <left>0</left>
-                <top>20</top>
-                <width>500</width>
-                <height>90</height>
-                <texture colordiffuse="ff05070a">colors/black.png</texture>
-            </control>
-            <right>30</right>
-            <bottom>18</bottom>
-            <height>124</height>
-            <control type="image">
-                <left>0</left>
-                <top>0</top>
-                <width>100%</width>
-                <height>5</height>
-                <texture colordiffuse="aaffffff">colors/white.png</texture>
-            </control>
-            <control type="group">
-                <left>720</left>
-                <top>20</top>
-                <width>430</width>
-                <height>82</height>
-                <control type="image">
-                    <left>0</left>
-                    <top>11</top>
-                    <width>54</width>
-                    <height>54</height>
-                    <aspectratio>keep</aspectratio>
-                    <texture>$INFO[Weather.ConditionsIcon]</texture>
-                </control>
-                <control type="label">
-                    <left>68</left>
-                    <top>0</top>
-                    <width>120</width>
-                    <height>82</height>
-                    <aligny>center</aligny>
-                    <font>font45</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <label>[B]$INFO[Weather.Temperature][/B]</label>
-                </control>
-                <control type="image">
-                    <left>195</left>
-                    <top>16</top>
-                    <width>2</width>
-                    <height>48</height>
-                    <texture colordiffuse="55ffffff">colors/white.png</texture>
-                </control>
-                <control type="label">
-                    <left>220</left>
-                    <top>0</top>
-                    <width>170</width>
-                    <height>82</height>
-                    <aligny>center</aligny>
-                    <font>font45</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <label>[B]$INFO[System.Time(hh:mm)][/B]</label>
-                </control>
-            </control>
-        </control>
+        <include>RNSE_SettingsFooter</include>
     </controls>
 </window>

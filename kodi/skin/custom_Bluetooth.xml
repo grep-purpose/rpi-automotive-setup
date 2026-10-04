@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<window id="1152">
-    <defaultcontrol always="true">9300</defaultcontrol>
-    <onload>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,scan)</onload>
+<window id="1160">
+    <defaultcontrol always="true">9660</defaultcontrol>
+    <onload>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,sync)</onload>
     <controls>
         <control type="image">
             <left>0</left>
@@ -24,15 +24,15 @@
                 <aligny>center</aligny>
                 <font>font60</font>
                 <textcolor>ffd90429</textcolor>
-                <label>[B]WLAN[/B]</label>
+                <label>[B]Bluetooth[/B]</label>
             </control>
         </control>
-        <control type="list" id="9300">
+        <control type="list" id="9660">
             <orientation>vertical</orientation>
-            <onup>Control.Move(9300,-1)</onup>
-            <ondown>Control.Move(9300,1)</ondown>
-            <onleft>Control.Move(9300,-1)</onleft>
-            <onright>Control.Move(9300,1)</onright>
+            <onup>Control.Move(9660,-1)</onup>
+            <ondown>Control.Move(9660,1)</ondown>
+            <onleft>Control.Move(9660,-1)</onleft>
+            <onright>Control.Move(9660,1)</onright>
             <itemlayout width="1760" height="92">
                 <control type="label">
                     <left>35</left>
@@ -70,7 +70,7 @@
                     <height>60</height>
                     <aspectratio>keep</aspectratio>
                     <texture>settings/checkbox_off_normal.png</texture>
-                    <visible>String.IsEqual(ListItem.Property(RowType),toggle) + !String.IsEqual(Window(Home).Property(RNSE.WLAN.EnabledState),on)</visible>
+                    <visible>String.IsEqual(ListItem.Property(RowType),toggle) + !String.IsEqual(Window(Home).Property(RNSE.Bluetooth.EnabledState),on)</visible>
                     <right>72</right>
                 </control>
                 <control type="image">
@@ -79,7 +79,7 @@
                     <height>60</height>
                     <aspectratio>keep</aspectratio>
                     <texture>settings/checkbox_on_normal.png</texture>
-                    <visible>String.IsEqual(ListItem.Property(RowType),toggle) + String.IsEqual(Window(Home).Property(RNSE.WLAN.EnabledState),on)</visible>
+                    <visible>String.IsEqual(ListItem.Property(RowType),toggle) + String.IsEqual(Window(Home).Property(RNSE.Bluetooth.EnabledState),on)</visible>
                     <right>72</right>
                 </control>
             </itemlayout>
@@ -134,7 +134,7 @@
                     <height>60</height>
                     <aspectratio>keep</aspectratio>
                     <texture>settings/checkbox_off_focus.png</texture>
-                    <visible>String.IsEqual(ListItem.Property(RowType),toggle) + !String.IsEqual(Window(Home).Property(RNSE.WLAN.EnabledState),on)</visible>
+                    <visible>String.IsEqual(ListItem.Property(RowType),toggle) + !String.IsEqual(Window(Home).Property(RNSE.Bluetooth.EnabledState),on)</visible>
                     <right>72</right>
                 </control>
                 <control type="image">
@@ -143,105 +143,100 @@
                     <height>60</height>
                     <aspectratio>keep</aspectratio>
                     <texture>settings/checkbox_on_focus.png</texture>
-                    <visible>String.IsEqual(ListItem.Property(RowType),toggle) + String.IsEqual(Window(Home).Property(RNSE.WLAN.EnabledState),on)</visible>
+                    <visible>String.IsEqual(ListItem.Property(RowType),toggle) + String.IsEqual(Window(Home).Property(RNSE.Bluetooth.EnabledState),on)</visible>
                     <right>72</right>
                 </control>
             </focusedlayout>
             <content>
                 <item>
-                    <label>WLAN</label>
+                    <label>Bluetooth</label>
                     <property name="RowType">toggle</property>
-                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,toggle_wifi)</onclick>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,toggle)</onclick>
                 </item>
                 <item>
-                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID1)]</label>
-                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info1)]</label2>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Device1.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Device1.Status)]</label2>
                     <property name="RowType">network</property>
-                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID1))</visible>
-                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,1)</onclick>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Device1.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,device,1)</onclick>
                 </item>
                 <item>
-                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID2)]</label>
-                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info2)]</label2>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Device2.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Device2.Status)]</label2>
                     <property name="RowType">network</property>
-                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID2))</visible>
-                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,2)</onclick>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Device2.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,device,2)</onclick>
                 </item>
                 <item>
-                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID3)]</label>
-                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info3)]</label2>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Device3.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Device3.Status)]</label2>
                     <property name="RowType">network</property>
-                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID3))</visible>
-                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,3)</onclick>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Device3.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,device,3)</onclick>
                 </item>
                 <item>
-                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID4)]</label>
-                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info4)]</label2>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Device4.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Device4.Status)]</label2>
                     <property name="RowType">network</property>
-                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID4))</visible>
-                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,4)</onclick>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Device4.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,device,4)</onclick>
                 </item>
                 <item>
-                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID5)]</label>
-                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info5)]</label2>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Device5.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Device5.Status)]</label2>
                     <property name="RowType">network</property>
-                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID5))</visible>
-                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,5)</onclick>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Device5.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,device,5)</onclick>
                 </item>
                 <item>
-                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID6)]</label>
-                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info6)]</label2>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Device6.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Device6.Status)]</label2>
                     <property name="RowType">network</property>
-                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID6))</visible>
-                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,6)</onclick>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Device6.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,device,6)</onclick>
                 </item>
                 <item>
-                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID7)]</label>
-                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info7)]</label2>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Device7.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Device7.Status)]</label2>
                     <property name="RowType">network</property>
-                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID7))</visible>
-                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,7)</onclick>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Device7.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,device,7)</onclick>
                 </item>
                 <item>
-                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID8)]</label>
-                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info8)]</label2>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Device8.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Device8.Status)]</label2>
                     <property name="RowType">network</property>
-                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID8))</visible>
-                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,8)</onclick>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Device8.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,device,8)</onclick>
                 </item>
                 <item>
-                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID9)]</label>
-                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info9)]</label2>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Device9.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Device9.Status)]</label2>
                     <property name="RowType">network</property>
-                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID9))</visible>
-                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,9)</onclick>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Device9.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,device,9)</onclick>
                 </item>
                 <item>
-                    <label>$INFO[Window(Home).Property(RNSE.WLAN.SSID10)]</label>
-                    <label2>$INFO[Window(Home).Property(RNSE.WLAN.Info10)]</label2>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Device10.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Device10.Status)]</label2>
                     <property name="RowType">network</property>
-                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.WLAN.SSID10))</visible>
-                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,connect,10)</onclick>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Device10.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,device,10)</onclick>
                 </item>
                 <item>
-                    <label>Gespeicherte WLANs</label>
-                    <property name="RowType">submenu</property>
-                    <onclick>ActivateWindow(1154)</onclick>
-                </item>
-                <item>
-                    <label>Netzwerke neu suchen</label>
+                    <label>Geräte suchen</label>
                     <property name="RowType">action</property>
-                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/wifi_manager.py,scan)</onclick>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,scan)</onclick>
                 </item>
             </content>
-            <pagecontrol>9630</pagecontrol>
+            <pagecontrol>9661</pagecontrol>
             <left>60</left>
             <top>104</top>
             <bottom>158</bottom>
             <width>1760</width>
         </control>
-        <control type="scrollbar" id="9630">
-            <visible>Container(9300).HasNext | Container(9300).HasPrevious</visible>
+        <control type="scrollbar" id="9661">
+            <visible>Container(9660).HasNext | Container(9660).HasPrevious</visible>
             <texturesliderbackground colordiffuse="443f4650">colors/white.png</texturesliderbackground>
             <texturesliderbar colordiffuse="ff8d99ae">colors/white.png</texturesliderbar>
             <texturesliderbarfocus colordiffuse="ffff6b00">colors/white.png</texturesliderbarfocus>
