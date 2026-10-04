@@ -42,8 +42,14 @@ def write_fis_metadata():
     ).strip()
 
     try:
+        # Wichtig:
+        # isPlayingAudio() bleibt bei einem pausierten Radio-Stream
+        # teilweise True. Für die FIS-Priorität brauchen wir aber
+        # ausschließlich wirklich laufende Wiedergabe.
         playing = bool(
-            xbmc.Player().isPlayingAudio()
+            xbmc.getCondVisibility(
+                "Player.Playing"
+            )
         )
     except Exception:
         playing = False

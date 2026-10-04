@@ -9162,10 +9162,18 @@ async def kodi_music_watch_loop():
             kodi_music_watch_last = ()
             continue
 
-        # Beim ersten bekannten Track nur Ausgangszustand merken.
+        # Auch der erste bekannte Track ist ein echtes
+        # Sofortwechsel-Ereignis.
+        #
+        # Wichtig insbesondere bei Radio -> Bluetooth:
+        # Während Radio aktiv ist, wird kodi_music_watch_last
+        # bewusst auf () zurückgesetzt. Sobald Spotify/AirPlay
+        # übernimmt, muss deshalb das alte Radio-Carousel sofort
+        # abgebrochen werden und darf nicht erst zu Ende laufen.
         if not kodi_music_watch_last:
-            kodi_music_watch_last = music_items
-            continue
+            old_items = ()
+        else:
+            old_items = kodi_music_watch_last
 
         # Noch derselbe Track.
         if (
@@ -9174,7 +9182,6 @@ async def kodi_music_watch_loop():
         ):
             continue
 
-        old_items = kodi_music_watch_last
         kodi_music_watch_last = music_items
 
         if ENABLE_LOGGING:

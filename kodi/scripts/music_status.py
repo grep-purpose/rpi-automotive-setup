@@ -276,6 +276,12 @@ def decode_busctl_string(value):
     if not isinstance(value, str):
         return value
 
+    # BlueZ/busctl liefert Apostrophe teilweise escaped,
+    # z.B. Mama\\'s Boy.
+    # Für Anzeige, Kodi und FIS soll daraus wieder
+    # ein normales Apostroph werden.
+    value = value.replace("\\'", "'")
+
     # busctl gibt Nicht-ASCII-Zeichen teilweise als
     # oktale Byte-Escapes aus, z.B.:
     #
