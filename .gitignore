@@ -6,3 +6,6 @@ venv/
 .venv*/
 *.tar.gz
 *.bak*
+
+# Lokale Arbeitsbackups
+*.backup-*
