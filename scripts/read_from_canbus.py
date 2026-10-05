@@ -6528,11 +6528,12 @@ def ensure_kodi_qol_settings():
         )
 
 
-# RNSE_AUTO_AUDIO_ROUTING_V1
+# RNSE_AUTO_AUDIO_ROUTING_V2
 async def set_audio_sink_for_app(app_name):
     """
-    Setzt den PipeWire/PulseAudio Default-Sink passend
-    zur aktuell aktiven Infotainment-Anwendung.
+    Setzt den PipeWire/PulseAudio Default-Sink passend zur
+    aktuell aktiven Infotainment-Anwendung und verschiebt
+    bereits laufende Streams vom vorherigen App-Sink mit.
 
     Kodi:
         direkt auf den BossDAC / soc_sound
@@ -6542,30 +6543,87 @@ async def set_audio_sink_for_app(app_name):
     """
 
     if app_name == "kodi":
-        sink = "alsa_output.platform-soc_sound.stereo-fallback"
+        target_sink = "alsa_output.platform-soc_sound.stereo-fallback"
+        previous_sink = "hudiy_equalizer_sink"
     elif app_name == "hudiy":
-        sink = "hudiy_equalizer_sink"
+        target_sink = "hudiy_equalizer_sink"
+        previous_sink = "alsa_output.platform-soc_sound.stereo-fallback"
     else:
         return False
 
+    # 1. Neuen Default-Sink setzen.
     result = await run_command(
         "XDG_RUNTIME_DIR=/run/user/1000 "
-        f"pactl set-default-sink '{sink}'"
+        f"pactl set-default-sink '{target_sink}'"
     )
 
     if result.get("returncode", 0) != 0:
         logger.warning(
             "Audio-Routing: Konnte Default-Sink %s nicht setzen: %s",
-            sink,
+            target_sink,
             result.get("stderr", "").strip()
         )
         return False
 
+    # 2. Numerische ID des bisherigen App-Sinks bestimmen.
+    sinks_result = await run_command(
+        "XDG_RUNTIME_DIR=/run/user/1000 "
+        "pactl list short sinks"
+    )
+
+    previous_sink_id = None
+
+    for line in sinks_result.get("stdout", "").splitlines():
+        parts = line.split()
+
+        if len(parts) >= 2 and parts[1] == previous_sink:
+            previous_sink_id = parts[0]
+            break
+
+    moved_inputs = []
+
+    # 3. Bereits laufende Streams vom alten App-Sink
+    #    auf den neuen App-Sink verschieben.
+    if previous_sink_id:
+        inputs_result = await run_command(
+            "XDG_RUNTIME_DIR=/run/user/1000 "
+            "pactl list short sink-inputs"
+        )
+
+        for line in inputs_result.get("stdout", "").splitlines():
+            parts = line.split()
+
+            if len(parts) < 2:
+                continue
+
+            input_id = parts[0]
+            sink_id = parts[1]
+
+            if sink_id != previous_sink_id:
+                continue
+
+            move_result = await run_command(
+                "XDG_RUNTIME_DIR=/run/user/1000 "
+                f"pactl move-sink-input '{input_id}' '{target_sink}'"
+            )
+
+            if move_result.get("returncode", 0) == 0:
+                moved_inputs.append(input_id)
+            else:
+                logger.warning(
+                    "Audio-Routing: Sink-Input %s konnte nicht "
+                    "nach %s verschoben werden: %s",
+                    input_id,
+                    target_sink,
+                    move_result.get("stderr", "").strip()
+                )
+
     if ENABLE_LOGGING:
         logger.info(
-            "Audio-Routing: %s -> %s",
+            "Audio-Routing: %s -> %s | verschobene Streams: %s",
             app_name,
-            sink
+            target_sink,
+            ", ".join(moved_inputs) if moved_inputs else "keine"
         )
 
     return True

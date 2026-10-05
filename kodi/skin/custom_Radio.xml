@@ -1,0 +1,216 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<window id="1198">
+    <defaultcontrol always="true">9101</defaultcontrol>
+    <onload>SetProperty(RNSE.Radio.PlayerActive,true,home)</onload>
+    <onunload>ClearProperty(RNSE.Radio.PlayerActive,home)</onunload>
+    <controls>
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>1920</width>
+            <height>1080</height>
+            <texture colordiffuse="ff05070a">colors/black.png</texture>
+        </control>
+        <include content="RNSE_AppHeader">
+            <param name="header_left_label" value="Senderliste" />
+            <param name="header_left_action" value="RunScript(/home/pi/.kodi/userdata/scripts/radio_player.py,show-list)" />
+            <param name="header_title" value="Radio" />
+            <param name="header_right_label" value="Medien" />
+            <param name="header_right_action" value="ReplaceWindow(1199)" />
+        </include>
+        <control type="group">
+            <left>63</left>
+            <top>135</top>
+            <width>1860</width>
+            <height>800</height>
+            <control type="image">
+                <left>10</left>
+                <top>60</top>
+                <width>720</width>
+                <height>720</height>
+                <texture colordiffuse="99000000">colors/black.png</texture>
+            </control>
+            <control type="image">
+                <left>0</left>
+                <top>50</top>
+                <width>710</width>
+                <height>710</height>
+                <texture colordiffuse="ff111820">colors/white.png</texture>
+            </control>
+            <control type="image">
+                <left>24</left>
+                <top>74</top>
+                <width>662</width>
+                <height>662</height>
+                <aspectratio>keep</aspectratio>
+                <texture>$INFO[Window(Home).Property(RNSE.RadioLogo)]</texture>
+                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioLogo))</visible>
+            </control>
+            <control type="image">
+                <left>122</left>
+                <top>182</top>
+                <width>470</width>
+                <height>470</height>
+                <aspectratio>keep</aspectratio>
+                <texture colordiffuse="ffc8cfd8">DefaultAlbumCover.png</texture>
+                <visible>String.IsEmpty(Window(Home).Property(RNSE.RadioLogo))</visible>
+            </control>
+            <control type="label">
+                <left>770</left>
+                <top>55</top>
+                <width>1100</width>
+                <height>72</height>
+                <font>font55</font>
+                <textcolor>ff8d99ae</textcolor>
+                <label>[B]LIVE[/B]  •  $INFO[Window(Home).Property(RNSE.RadioStation)]</label>
+                <scroll>true</scroll>
+            </control>
+            <control type="label">
+                <left>770</left>
+                <top>185</top>
+                <width>940</width>
+                <height>130</height>
+                <font>font75</font>
+                <textcolor>ffffffff</textcolor>
+                <label>$INFO[MusicPlayer.Title]</label>
+                <scroll>true</scroll>
+            </control>
+            <control type="label">
+                <left>770</left>
+                <top>305</top>
+                <width>940</width>
+                <height>105</height>
+                <font>font60</font>
+                <textcolor>ffff8a32</textcolor>
+                <label>$INFO[MusicPlayer.Artist]</label>
+                <scroll>true</scroll>
+            </control>
+            <control type="label">
+                <left>770</left>
+                <top>400</top>
+                <width>940</width>
+                <height>90</height>
+                <font>font55</font>
+                <textcolor>ffd5dae0</textcolor>
+                <label>$INFO[MusicPlayer.Album]</label>
+                <scroll>true</scroll>
+            </control>
+            <control type="label">
+                <left>770</left>
+                <top>605</top>
+                <width>1000</width>
+                <height>72</height>
+                <font>font55</font>
+                <textcolor>ff8d99ae</textcolor>
+                <align>left</align>
+                <aligny>center</aligny>
+                <scroll>true</scroll>
+                <label>$INFO[MusicPlayer.Codec] • Stereo$INFO[MusicPlayer.SampleRate, • , kHz]</label>
+                <visible>String.IsEqual(MusicPlayer.Channels,2)</visible>
+            </control>
+            <control type="label">
+                <left>770</left>
+                <top>605</top>
+                <width>1000</width>
+                <height>72</height>
+                <font>font55</font>
+                <textcolor>ff8d99ae</textcolor>
+                <align>left</align>
+                <aligny>center</aligny>
+                <scroll>true</scroll>
+                <label>$INFO[MusicPlayer.Codec] • Mono$INFO[MusicPlayer.SampleRate, • , kHz]</label>
+                <visible>String.IsEqual(MusicPlayer.Channels,1)</visible>
+            </control>
+            <control type="label">
+                <left>770</left>
+                <top>605</top>
+                <width>1000</width>
+                <height>72</height>
+                <font>font55</font>
+                <textcolor>ff8d99ae</textcolor>
+                <align>left</align>
+                <aligny>center</aligny>
+                <scroll>true</scroll>
+                <label>$INFO[MusicPlayer.Codec]$INFO[MusicPlayer.Channels, • , Kanäle]$INFO[MusicPlayer.SampleRate, • , kHz]</label>
+                <visible>!String.IsEqual(MusicPlayer.Channels,1) + !String.IsEqual(MusicPlayer.Channels,2)</visible>
+            </control>
+            <control type="button" id="9100">
+                <left>915</left>
+                <top>735</top>
+                <width>220</width>
+                <height>145</height>
+                <label />
+                <onright>9002</onright>
+                <onleft>9001</onleft>
+                <onup>9101</onup>
+                <texturenofocus>music/transport_normal.png</texturenofocus>
+                <texturefocus>music/transport_focus.png</texturefocus>
+                <onclick>RunScript(/home/pi/.kodi/userdata/rnse_media_router.py,previous)</onclick>
+                <ondown>9102</ondown>
+            </control>
+            <control type="image">
+                <left>960</left>
+                <top>765</top>
+                <width>130</width>
+                <height>85</height>
+                <aspectratio>keep</aspectratio>
+                <texture>music/previous.png</texture>
+            </control>
+            <control type="button" id="9101">
+                <left>1160</left>
+                <top>732</top>
+                <width>220</width>
+                <height>145</height>
+                <label />
+                <onleft>9001</onleft>
+                <onright>9002</onright>
+                <onup>9102</onup>
+                <texturenofocus>music/transport_normal.png</texturenofocus>
+                <texturefocus>music/transport_focus.png</texturefocus>
+                <onclick>PlayerControl(Play)</onclick>
+                <ondown>9100</ondown>
+            </control>
+            <control type="image">
+                <left>1210</left>
+                <top>753</top>
+                <width>120</width>
+                <height>104</height>
+                <aspectratio>keep</aspectratio>
+                <texture>music/play.png</texture>
+                <visible>!Player.Playing</visible>
+            </control>
+            <control type="image">
+                <left>1210</left>
+                <top>753</top>
+                <width>120</width>
+                <height>104</height>
+                <aspectratio>keep</aspectratio>
+                <texture>music/pause.png</texture>
+                <visible>Player.Playing</visible>
+            </control>
+            <control type="button" id="9102">
+                <left>1405</left>
+                <top>735</top>
+                <width>220</width>
+                <height>145</height>
+                <label />
+                <onleft>9001</onleft>
+                <onright>9002</onright>
+                <onup>9100</onup>
+                <texturenofocus>music/transport_normal.png</texturenofocus>
+                <texturefocus>music/transport_focus.png</texturefocus>
+                <onclick>RunScript(/home/pi/.kodi/userdata/rnse_media_router.py,next)</onclick>
+                <ondown>9101</ondown>
+            </control>
+            <control type="image">
+                <left>1450</left>
+                <top>765</top>
+                <width>130</width>
+                <height>85</height>
+                <aspectratio>keep</aspectratio>
+                <texture>music/next.png</texture>
+            </control>
+        </control>
+        <include content="RNSE_GlobalFooter" />
+    </controls>
+</window>

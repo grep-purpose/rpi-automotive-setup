@@ -5,7 +5,7 @@
       <one>Down</one>
       <two>Up</two>
       <return>Select</return>
-      <escape>Back</escape>
+      <escape>RunScript(/home/pi/.kodi/userdata/scripts/radio_player.py,back)</escape>
       <m>ActivateWindow(1150)</m>
       <up>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,up)</up>
       <down>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,down)</down>

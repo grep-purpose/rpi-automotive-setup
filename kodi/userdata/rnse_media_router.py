@@ -10,7 +10,7 @@ import xbmcgui
 HOME = xbmcgui.Window(10000)
 
 
-RADIO_DIRECTORY = (
+DEFAULT_RADIO_DIRECTORY = (
     "plugin://plugin.audio.radiode/"
     "?data=%7b%22name%22%3a%20%22Local%20stations%22%7d"
     "&mode=get_local_stations"
@@ -108,11 +108,43 @@ def get_current_radio():
     return None
 
 
+def get_radio_directory():
+    """
+    Liefert die Senderliste, aus der der aktuell gewählte
+    Radiosender stammt.
+
+    Falls noch kein Kontext bekannt ist, bleibt
+    'Local stations' der sichere Fallback.
+    """
+
+    directory = HOME.getProperty(
+        "RNSE.RadioDirectory"
+    ).strip()
+
+    if (
+        directory.startswith(
+            "plugin://plugin.audio.radiode/"
+        )
+        and "mode=play_stream" not in directory
+    ):
+        return directory
+
+    return DEFAULT_RADIO_DIRECTORY
+
+
 def get_radio_stations():
+
+    directory = get_radio_directory()
+
+    xbmc.log(
+        f"RNS-E Radio Directory: {directory}",
+        xbmc.LOGINFO
+    )
+
     result = rpc(
         "Files.GetDirectory",
         {
-            "directory": RADIO_DIRECTORY,
+            "directory": directory,
             "media": "music",
             "properties": [
                 "title",
@@ -122,22 +154,36 @@ def get_radio_stations():
         }
     )
 
-    items = result.get("result", {}).get("files", [])
+    items = result.get(
+        "result",
+        {}
+    ).get(
+        "files",
+        []
+    )
 
     stations = []
 
     for item in items:
-        plugin_url = item.get("file", "")
+
+        plugin_url = item.get(
+            "file",
+            ""
+        )
 
         if "mode=play_stream" not in plugin_url:
             continue
 
-        data = decode_radio_data(plugin_url)
+        data = decode_radio_data(
+            plugin_url
+        )
 
         if not data:
             continue
 
-        station_id = data.get("id")
+        station_id = data.get(
+            "id"
+        )
 
         if not station_id:
             continue
@@ -145,14 +191,27 @@ def get_radio_stations():
         stations.append(
             {
                 "id": station_id,
-                "name": data.get("name") or item.get("label", station_id),
+                "name": (
+                    data.get("name")
+                    or item.get(
+                        "label",
+                        station_id
+                    )
+                ),
                 "plugin_url": plugin_url,
-                "stream_url": data.get("stream_url", ""),
-                "icon_url": data.get("icon_url", ""),
+                "stream_url": data.get(
+                    "stream_url",
+                    ""
+                ),
+                "icon_url": data.get(
+                    "icon_url",
+                    ""
+                ),
             }
         )
 
     return stations
+
 
 
 def switch_radio(direction):

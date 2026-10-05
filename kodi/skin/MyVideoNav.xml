@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<window>
+    <defaultcontrol always="true">50</defaultcontrol>
+    <backgroundcolor>background</backgroundcolor>
+    <views>50</views>
+    <menucontrol>9000</menucontrol>
+    <controls>
+        <!-- 1. Background -->
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>100%</height>
+            <texture>colors/black.png</texture>
+        </control>
+        <!-- 2. Großer OEM Audi Top-Header -->
+        <include content="RNSE_AppHeader" />
+        <!-- 3. RNS-E Hero List -->
+        <control type="fixedlist" id="50">
+            <left>40</left>
+            <top>135</top>
+            <bottom>135</bottom>
+            <width>1840</width>
+            <onup>50</onup>
+            <ondown>50</ondown>
+            <onleft>50</onleft>
+            <onright>50</onright>
+            <viewtype label="Kacheln">list</viewtype>
+            <orientation>vertical</orientation>
+            <focusposition>0</focusposition>
+            <movement>1</movement>
+            <scrolltime tween="sine" easing="out">130</scrolltime>
+            <hideparentitems>true</hideparentitems>
+            <itemlayout width="1840" height="420">
+                <control type="image">
+                    <left>10</left>
+                    <top>15</top>
+                    <width>660</width>
+                    <height>371</height>
+                    <texture background="true" fallback="DefaultVideo.png">$INFO[ListItem.Art(thumb)]</texture>
+                    <aspectratio align="center" aligny="center">scale</aspectratio>
+                </control>
+                <control type="label">
+                    <left>700</left>
+                    <top>25</top>
+                    <width>1120</width>
+                    <height>170</height>
+                    <font>font45</font>
+                    <textcolor>grey</textcolor>
+                    <wrapmultiline>true</wrapmultiline>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+                <control type="label">
+                    <left>700</left>
+                    <top>230</top>
+                    <width>1120</width>
+                    <height>60</height>
+                    <font>font30_title</font>
+                    <textcolor>darkgrey</textcolor>
+                    <label>$INFO[ListItem.Duration,[B],[/B]  •  ]$INFO[ListItem.Date]</label>
+                </control>
+            </itemlayout>
+            <focusedlayout width="1840" height="420">
+                <!-- Fokus-Rahmen um Thumbnail -->
+                <control type="image">
+                    <left>4</left>
+                    <top>9</top>
+                    <width>672</width>
+                    <height>383</height>
+                    <texture border="6">colors/white.png</texture>
+                    <colordiffuse>ffff8800</colordiffuse>
+                </control>
+                <control type="image">
+                    <left>10</left>
+                    <top>15</top>
+                    <width>660</width>
+                    <height>371</height>
+                    <texture background="true" fallback="DefaultVideo.png">$INFO[ListItem.Art(thumb)]</texture>
+                    <aspectratio align="center" aligny="center">scale</aspectratio>
+                </control>
+                <control type="label">
+                    <left>700</left>
+                    <top>25</top>
+                    <width>1120</width>
+                    <height>170</height>
+                    <font>font45</font>
+                    <textcolor>white</textcolor>
+                    <scroll>true</scroll>
+                    <wrapmultiline>true</wrapmultiline>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+                <control type="label">
+                    <left>700</left>
+                    <top>230</top>
+                    <width>1120</width>
+                    <height>60</height>
+                    <font>font30_title</font>
+                    <textcolor>ffff8800</textcolor>
+                    <label>$INFO[ListItem.Duration,[B],[/B]  •  ]$INFO[ListItem.Date]</label>
+                </control>
+            </focusedlayout>
+        </control>
+        <!-- 4. RNS-E Status-Footer mit symmetrischen Shortcuts -->
+        <include content="RNSE_GlobalFooter" />
+    </controls>
+</window>

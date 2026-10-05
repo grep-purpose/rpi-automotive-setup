@@ -5,7 +5,7 @@
       <one>Down</one>
       <two>Up</two>
       <return>Select</return>
-      <escape>Back</escape>
+      <escape>RunScript(/home/pi/.kodi/userdata/scripts/radio_player.py,back)</escape>
       <m>ActivateWindow(1150)</m>
       <up>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,up)</up>
       <down>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,down)</down>
@@ -21,8 +21,8 @@
     <keyboard>
       <up>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,up)</up>
       <down>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,down)</down>
-      <left>PlayerControl(Previous)</left>
-      <right>PlayerControl(Next)</right>
+      <left>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,left)</left>
+      <right>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,right)</right>
       <prev_track>PlayerControl(Previous)</prev_track>
       <next_track>PlayerControl(Next)</next_track>
       <one>Up</one>

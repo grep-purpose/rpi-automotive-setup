@@ -1585,4 +1585,5 @@
             </control>
         </focusedlayout>
     </include>
+    <include file="Includes_RNSE_AppShell.xml" />
 </includes>

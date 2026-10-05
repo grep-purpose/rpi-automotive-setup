@@ -1,0 +1,146 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<window id="1162">
+    <defaultcontrol always="true">9670</defaultcontrol>
+    <onload>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,sync)</onload>
+
+    <controls>
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>1920</width>
+            <height>1080</height>
+            <texture colordiffuse="ff05070a">colors/black.png</texture>
+        </control>
+
+        <control type="group">
+            <left>30</left>
+            <right>30</right>
+            <top>18</top>
+            <height>105</height>
+
+            <control type="label">
+                <left>440</left>
+                <top>0</top>
+                <width>980</width>
+                <height>100</height>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font60</font>
+                <textcolor>ffd90429</textcolor>
+                <label>[B]Gekoppelte Geräte[/B]</label>
+            </control>
+        </control>
+
+        <control type="list" id="9670">
+            <orientation>vertical</orientation>
+            <onup>Control.Move(9670,-1)</onup>
+            <ondown>Control.Move(9670,1)</ondown>
+            <onleft>Control.Move(9670,-1)</onleft>
+            <onright>Control.Move(9670,1)</onright>
+
+            <itemlayout width="1760" height="92">
+                <include>RNSE_SettingsRow_Normal</include>
+            </itemlayout>
+
+            <focusedlayout width="1760" height="92">
+                <include>RNSE_SettingsRow_Focused</include>
+            </focusedlayout>
+
+            <content>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired1.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired1.Status)]</label2>
+                    <property name="RowType">submenu</property>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Paired1.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,paired,1)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired2.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired2.Status)]</label2>
+                    <property name="RowType">submenu</property>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Paired2.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,paired,2)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired3.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired3.Status)]</label2>
+                    <property name="RowType">submenu</property>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Paired3.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,paired,3)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired4.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired4.Status)]</label2>
+                    <property name="RowType">submenu</property>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Paired4.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,paired,4)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired5.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired5.Status)]</label2>
+                    <property name="RowType">submenu</property>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Paired5.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,paired,5)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired6.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired6.Status)]</label2>
+                    <property name="RowType">submenu</property>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Paired6.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,paired,6)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired7.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired7.Status)]</label2>
+                    <property name="RowType">submenu</property>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Paired7.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,paired,7)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired8.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired8.Status)]</label2>
+                    <property name="RowType">submenu</property>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Paired8.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,paired,8)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired9.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired9.Status)]</label2>
+                    <property name="RowType">submenu</property>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Paired9.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,paired,9)</onclick>
+                </item>
+                <item>
+                    <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired10.Name)]</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired10.Status)]</label2>
+                    <property name="RowType">submenu</property>
+                    <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Paired10.Name))</visible>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,paired,10)</onclick>
+                </item>
+            </content>
+
+            <pagecontrol>9671</pagecontrol>
+            <left>60</left>
+            <top>104</top>
+            <bottom>158</bottom>
+            <width>1760</width>
+        </control>
+
+        <control type="scrollbar" id="9671">
+            <visible>Container(9670).HasNext | Container(9670).HasPrevious</visible>
+            <texturesliderbackground colordiffuse="443f4650">colors/white.png</texturesliderbackground>
+            <texturesliderbar colordiffuse="ff8d99ae">colors/white.png</texturesliderbar>
+            <texturesliderbarfocus colordiffuse="ffff6b00">colors/white.png</texturesliderbarfocus>
+            <textureslidernib />
+            <textureslidernibfocus />
+            <left>1840</left>
+            <top>104</top>
+            <bottom>158</bottom>
+            <width>8</width>
+            <orientation>vertical</orientation>
+            <showonepage>false</showonepage>
+        </control>
+
+        <include>RNSE_SettingsFooter</include>
+    </controls>
+</window>

@@ -2102,6 +2102,7 @@ def audio_arbiter_update(player):
         kodi_started
         and bt_playing
         and not bt_started
+        and kodi_current_is_radio()
     ):
 
         try:

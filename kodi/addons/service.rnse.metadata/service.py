@@ -12,6 +12,137 @@ import xbmcgui
 
 HOME = xbmcgui.Window(10000)
 
+
+# RNSE RADIO PLAYBACK CALLBACK START
+
+class RNSEPlaybackPlayer(xbmc.Player):
+
+    def _maybe_open_radio_player(self):
+
+        pending = (
+            HOME.getProperty(
+                "RNSE.Radio.OpenPlayerPending"
+            ).strip().lower()
+            == "true"
+        )
+
+        xbmc.log(
+            f"RNSE RADIO CALLBACK | "
+            f"AVStarted | pending={pending}",
+            xbmc.LOGINFO
+        )
+
+        if not pending:
+            return
+
+
+        # Aktuellen radio.de-Listen-Kontext merken.
+        #
+        # Beispiel:
+        # Local Stations, Hamburg, Genre, Land usw.
+        #
+        # onAVStarted läuft noch, während die Senderliste
+        # im Hintergrund der aktive Kodi-Container ist.
+        radio_directory = xbmc.getInfoLabel(
+            "Container.FolderPath"
+        ).strip()
+
+        if (
+            radio_directory.startswith(
+                "plugin://plugin.audio.radiode/"
+            )
+            and "mode=play_stream" not in radio_directory
+        ):
+            HOME.setProperty(
+                "RNSE.RadioDirectory",
+                radio_directory
+            )
+
+            xbmc.log(
+                "RNSE RADIO DIRECTORY | "
+                + radio_directory,
+                xbmc.LOGINFO
+            )
+
+        station = HOME.getProperty(
+            "RNSE.RadioStation"
+        ).strip()
+
+        if not station:
+
+            xbmc.log(
+                "RNSE RADIO CALLBACK | "
+                "kein Sender gesetzt",
+                xbmc.LOGINFO
+            )
+
+            return
+
+
+        # AVStarted bedeutet bereits:
+        # Kodi hat Audio wirklich initialisiert.
+        #
+        # Noch eine kleine Beruhigungszeit,
+        # damit radio.de / PAPlayer vollständig stabil ist.
+        xbmc.sleep(700)
+
+
+        if not xbmc.getCondVisibility(
+            "Player.HasMedia"
+        ):
+
+            xbmc.log(
+                "RNSE RADIO CALLBACK | "
+                "Player.HasMedia=false",
+                xbmc.LOGINFO
+            )
+
+            return
+
+
+        xbmc.log(
+            f"RNSE RADIO CALLBACK | "
+            f"öffne Player für {station!r}",
+            xbmc.LOGINFO
+        )
+
+
+        HOME.clearProperty(
+            "RNSE.Radio.OpenPlayerPending"
+        )
+
+        HOME.clearProperty(
+            "RNSE.Radio.ListRequested"
+        )
+
+
+        xbmc.executebuiltin(
+            "ActivateWindow(1198)"
+        )
+
+
+    def onAVStarted(self):
+        self._maybe_open_radio_player()
+
+
+    def onPlayBackStarted(self):
+        # Absichtlich NICHT öffnen.
+        #
+        # Dieses Event kommt bei radio.de deutlich früher
+        # als OnAVStarted und kann noch mitten im
+        # Stream-/Cache-Aufbau liegen.
+        xbmc.log(
+            "RNSE RADIO CALLBACK | "
+            "PlayBackStarted - warte auf AVStarted",
+            xbmc.LOGINFO
+        )
+
+
+_RNSE_PLAYBACK_PLAYER = RNSEPlaybackPlayer()
+
+# RNSE RADIO PLAYBACK CALLBACK END
+
+
 COMMAND_HOST = "127.0.0.1"
 COMMAND_PORT = 23457
 
@@ -167,6 +298,10 @@ def decode_radio_data(path):
         return None
 
 
+
+
+
+
 def update_radio_metadata():
     path = xbmc.getInfoLabel("Player.FilenameAndPath")
     data = decode_radio_data(path)
@@ -206,6 +341,7 @@ def update_radio_metadata():
     HOME.setProperty("RNSE.RadioStationId", station_id)
     HOME.setProperty("RNSE.RadioProvider", "radio.de")
     HOME.setProperty("RNSE.RadioLogo", station_logo)
+
     HOME.setProperty(
         "RNSE.RadioStreamUrl",
         str(data.get("stream_url", "")).strip()

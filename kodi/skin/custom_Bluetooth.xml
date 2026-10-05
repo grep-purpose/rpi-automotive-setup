@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <window id="1160">
     <defaultcontrol always="true">9660</defaultcontrol>
-    <onload>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,sync)</onload>
+    <onload>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,main_sync)</onload>
     <controls>
         <control type="image">
             <left>0</left>
@@ -10,11 +10,13 @@
             <height>1080</height>
             <texture colordiffuse="ff05070a">colors/black.png</texture>
         </control>
+
         <control type="group">
             <left>30</left>
             <right>30</right>
             <top>18</top>
             <height>105</height>
+
             <control type="label">
                 <left>540</left>
                 <top>0</top>
@@ -27,132 +29,49 @@
                 <label>[B]Bluetooth[/B]</label>
             </control>
         </control>
+
         <control type="list" id="9660">
             <orientation>vertical</orientation>
             <onup>Control.Move(9660,-1)</onup>
             <ondown>Control.Move(9660,1)</ondown>
             <onleft>Control.Move(9660,-1)</onleft>
             <onright>Control.Move(9660,1)</onright>
+
             <itemlayout width="1760" height="92">
-                <control type="label">
-                    <left>35</left>
-                    <top>0</top>
-                    <width>720</width>
-                    <height>92</height>
-                    <font>font60</font>
-                    <textcolor>ffb7c0ca</textcolor>
-                    <aligny>center</aligny>
-                    <label>[B]$INFO[ListItem.Label][/B]</label>
-                </control>
-                <control type="label">
-                    <left>790</left>
-                    <top>0</top>
-                    <width>920</width>
-                    <height>92</height>
-                    <font>font60</font>
-                    <textcolor>ff8d99ae</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
-                    <label>[B]$INFO[ListItem.Label2][/B]</label>
-                </control>
-                <control type="image">
-                    <top>16</top>
-                    <width>60</width>
-                    <height>60</height>
-                    <aspectratio>keep</aspectratio>
-                    <texture>settings/chevron_normal.png</texture>
-                    <visible>String.IsEqual(ListItem.Property(RowType),submenu)</visible>
-                    <right>72</right>
-                </control>
-                <control type="image">
-                    <top>16</top>
-                    <width>60</width>
-                    <height>60</height>
-                    <aspectratio>keep</aspectratio>
-                    <texture>settings/checkbox_off_normal.png</texture>
-                    <visible>String.IsEqual(ListItem.Property(RowType),toggle) + !String.IsEqual(Window(Home).Property(RNSE.Bluetooth.EnabledState),on)</visible>
-                    <right>72</right>
-                </control>
-                <control type="image">
-                    <top>16</top>
-                    <width>60</width>
-                    <height>60</height>
-                    <aspectratio>keep</aspectratio>
-                    <texture>settings/checkbox_on_normal.png</texture>
-                    <visible>String.IsEqual(ListItem.Property(RowType),toggle) + String.IsEqual(Window(Home).Property(RNSE.Bluetooth.EnabledState),on)</visible>
-                    <right>72</right>
-                </control>
+                <include>RNSE_SettingsRow_Normal</include>
             </itemlayout>
+
             <focusedlayout width="1760" height="92">
-                <control type="image">
-                    <left>0</left>
-                    <top>2</top>
-                    <width>1760</width>
-                    <height>88</height>
-                    <texture colordiffuse="ff141923">colors/black.png</texture>
-                </control>
-                <control type="image">
-                    <left>0</left>
-                    <top>7</top>
-                    <width>10</width>
-                    <height>78</height>
-                    <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                </control>
-                <control type="label">
-                    <left>35</left>
-                    <top>0</top>
-                    <width>720</width>
-                    <height>92</height>
-                    <font>font60</font>
-                    <textcolor>ffffffff</textcolor>
-                    <aligny>center</aligny>
-                    <label>[B]$INFO[ListItem.Label][/B]</label>
-                </control>
-                <control type="label">
-                    <left>790</left>
-                    <top>0</top>
-                    <width>920</width>
-                    <height>92</height>
-                    <font>font60</font>
-                    <textcolor>ffffffff</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
-                    <label>[B]$INFO[ListItem.Label2][/B]</label>
-                </control>
-                <control type="image">
-                    <top>16</top>
-                    <width>60</width>
-                    <height>60</height>
-                    <aspectratio>keep</aspectratio>
-                    <texture>settings/chevron_focus.png</texture>
-                    <visible>String.IsEqual(ListItem.Property(RowType),submenu)</visible>
-                    <right>72</right>
-                </control>
-                <control type="image">
-                    <top>16</top>
-                    <width>60</width>
-                    <height>60</height>
-                    <aspectratio>keep</aspectratio>
-                    <texture>settings/checkbox_off_focus.png</texture>
-                    <visible>String.IsEqual(ListItem.Property(RowType),toggle) + !String.IsEqual(Window(Home).Property(RNSE.Bluetooth.EnabledState),on)</visible>
-                    <right>72</right>
-                </control>
-                <control type="image">
-                    <top>16</top>
-                    <width>60</width>
-                    <height>60</height>
-                    <aspectratio>keep</aspectratio>
-                    <texture>settings/checkbox_on_focus.png</texture>
-                    <visible>String.IsEqual(ListItem.Property(RowType),toggle) + String.IsEqual(Window(Home).Property(RNSE.Bluetooth.EnabledState),on)</visible>
-                    <right>72</right>
-                </control>
+                <include>RNSE_SettingsRow_Focused</include>
             </focusedlayout>
+
             <content>
                 <item>
                     <label>Bluetooth</label>
                     <property name="RowType">toggle</property>
                     <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,toggle)</onclick>
                 </item>
+
+                <item>
+                    <label>Bevorzugtes Telefon</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Preferred.Name)]</label2>
+                    <property name="RowType">submenu</property>
+                    <onclick>ActivateWindow(1161)</onclick>
+                </item>
+
+                <item>
+                    <label>Gekoppelte Geräte</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Paired.CountLabel)]</label2>
+                    <property name="RowType">submenu</property>
+                    <onclick>ActivateWindow(1162)</onclick>
+                </item>
+
+                <item>
+                    <label>Geräte suchen</label>
+                    <property name="RowType">action</property>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,scan)</onclick>
+                </item>
+
                 <item>
                     <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Device1.Name)]</label>
                     <label2>$INFO[Window(Home).Property(RNSE.Bluetooth.Device1.Status)]</label2>
@@ -223,18 +142,15 @@
                     <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Device10.Name))</visible>
                     <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,device,10)</onclick>
                 </item>
-                <item>
-                    <label>Geräte suchen</label>
-                    <property name="RowType">action</property>
-                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,scan)</onclick>
-                </item>
             </content>
+
             <pagecontrol>9661</pagecontrol>
             <left>60</left>
             <top>104</top>
             <bottom>158</bottom>
             <width>1760</width>
         </control>
+
         <control type="scrollbar" id="9661">
             <visible>Container(9660).HasNext | Container(9660).HasPrevious</visible>
             <texturesliderbackground colordiffuse="443f4650">colors/white.png</texturesliderbackground>
@@ -249,6 +165,7 @@
             <orientation>vertical</orientation>
             <showonepage>false</showonepage>
         </control>
+
         <include>RNSE_SettingsFooter</include>
     </controls>
 </window>
