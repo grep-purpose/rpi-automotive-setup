@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window id="1164" type="dialog">
+
+    <defaultcontrol always="true">9161</defaultcontrol>
+    <onload>SetFocus(9161)</onload>
+
+    <controls>
+
+        <!--
+            V1-Hintergrund:
+            exakt wieder mit weißer Grundtextur + transparenter
+            schwarzer Einfärbung.
+        -->
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>1920</width>
+            <height>1080</height>
+            <texture colordiffuse="99000000">colors/white.png</texture>
+        </control>
+
+        <!--
+            Hauptpanel:
+            aktuelles V4-Design mit Rundung aus der
+            Musik-/Radio-Transporttextur.
+        -->
+        <!-- Grundfläche: erhöht nur die Deckkraft des Popup-Panels -->
+        <control type="image">
+            <left>210</left>
+            <top>130</top>
+            <width>1500</width>
+            <height>820</height>
+            <texture border="45" colordiffuse="b3ffffff">music/transport_normal.png</texture>
+        </control>
+
+        <!-- Sichtbare Panel-Oberfläche -->
+        <control type="image">
+            <left>210</left>
+            <top>130</top>
+            <width>1500</width>
+            <height>820</height>
+            <texture border="45" colordiffuse="e6ffffff">music/transport_normal.png</texture>
+        </control>
+
+        <!-- TITEL -->
+        <control type="label">
+            <left>310</left>
+            <top>200</top>
+            <width>1300</width>
+            <height>85</height>
+            <font>font60</font>
+            <textcolor>ffffffff</textcolor>
+            <align>center</align>
+            <aligny>center</aligny>
+            <label>[B]Bluetooth koppeln[/B]</label>
+        </control>
+
+        <!-- GERÄTENAME -->
+        <control type="label">
+            <left>310</left>
+            <top>320</top>
+            <width>1300</width>
+            <height>75</height>
+            <font>font55</font>
+            <textcolor>ffcad3dd</textcolor>
+            <align>center</align>
+            <aligny>center</aligny>
+            <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Pairing.DeviceName)]</label>
+            <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Pairing.DeviceName))</visible>
+        </control>
+
+        <!-- GERÄTENAME FALLBACK -->
+        <control type="label">
+            <left>310</left>
+            <top>320</top>
+            <width>1300</width>
+            <height>75</height>
+            <font>font55</font>
+            <textcolor>ffcad3dd</textcolor>
+            <align>center</align>
+            <aligny>center</aligny>
+            <label>Bluetooth-Gerät</label>
+            <visible>String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Pairing.DeviceName))</visible>
+        </control>
+
+        <!-- HINWEIS -->
+        <control type="label">
+            <left>290</left>
+            <top>445</top>
+            <width>1340</width>
+            <height>75</height>
+            <font>font50</font>
+            <textcolor>ffffffff</textcolor>
+            <align>center</align>
+            <aligny>center</aligny>
+            <label>Stimmt dieser Code auf beiden Geräten überein?</label>
+        </control>
+
+        <!-- CODE -->
+        <control type="label">
+            <left>310</left>
+            <top>565</top>
+            <width>1300</width>
+            <height>110</height>
+            <font>font75</font>
+            <textcolor>ffffffff</textcolor>
+            <align>center</align>
+            <aligny>center</aligny>
+            <label>$INFO[Window(Home).Property(RNSE.Bluetooth.Pairing.Code)]</label>
+            <visible>!String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Pairing.Code))</visible>
+        </control>
+
+        <!-- CODE FALLBACK -->
+        <control type="label">
+            <left>310</left>
+            <top>565</top>
+            <width>1300</width>
+            <height>110</height>
+            <font>font75</font>
+            <textcolor>66ffffff</textcolor>
+            <align>center</align>
+            <aligny>center</aligny>
+            <label>------</label>
+            <visible>String.IsEmpty(Window(Home).Property(RNSE.Bluetooth.Pairing.Code))</visible>
+        </control>
+
+        <!-- ABBRECHEN -->
+        <control type="button" id="9160">
+            <left>420</left>
+            <top>755</top>
+            <width>500</width>
+            <height>145</height>
+
+            <label>Abbrechen</label>
+            <font>font55</font>
+            <textcolor>ffffffff</textcolor>
+            <focusedcolor>ffffffff</focusedcolor>
+
+            <align>center</align>
+            <aligny>center</aligny>
+
+            <texturenofocus>music/transport_normal.png</texturenofocus>
+            <texturefocus>music/transport_focus.png</texturefocus>
+
+            <onright>9161</onright>
+            <onleft>9161</onleft>
+            <onup>9161</onup>
+            <ondown>9161</ondown>
+
+            <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,pair_reject)</onclick>
+        </control>
+
+        <!-- BESTÄTIGEN -->
+        <control type="button" id="9161">
+            <left>1000</left>
+            <top>755</top>
+            <width>500</width>
+            <height>145</height>
+
+            <label>Bestätigen</label>
+            <font>font55</font>
+            <textcolor>ffffffff</textcolor>
+            <focusedcolor>ffffffff</focusedcolor>
+
+            <align>center</align>
+            <aligny>center</aligny>
+
+            <texturenofocus>music/transport_normal.png</texturenofocus>
+            <texturefocus>music/transport_focus.png</texturefocus>
+
+            <onleft>9160</onleft>
+            <onright>9160</onright>
+            <onup>9160</onup>
+            <ondown>9160</ondown>
+
+            <onclick>RunScript(/home/pi/.kodi/userdata/scripts/bluetooth_manager.py,pair_approve)</onclick>
+        </control>
+
+    </controls>
+
+</window>

@@ -11,8 +11,16 @@ export LD_LIBRARY_PATH="/home/pi/.hudiy/share:${LD_LIBRARY_PATH}"
 
 echo "Stopping Kodi..."
 
-pkill -x kodi.bin 2>/dev/null || true
-pkill -x kodi 2>/dev/null || true
+# Zuerst den /usr/bin/kodi-Wrapper beenden.
+# Sonst kann er kodi.bin nach dem Kill erneut starten.
+pkill -TERM -f '^/bin/sh /usr/bin/kodi$' 2>/dev/null || true
+pkill -TERM -x kodi.bin 2>/dev/null || true
+
+sleep 0.3
+
+# Falls noch etwas übrig geblieben ist, hart entfernen.
+pkill -KILL -f '^/bin/sh /usr/bin/kodi$' 2>/dev/null || true
+pkill -KILL -x kodi.bin 2>/dev/null || true
 
 sleep 0.5
 

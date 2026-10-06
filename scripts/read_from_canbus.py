@@ -6661,10 +6661,16 @@ async def toggle_hudiy_kodi():
             # Auch eventuell alte kodi-standalone.orig-Wrapper
             # werden entfernt, damit sie Kodi nicht neu starten.
             await run_command(
-                "pkill -9 -x kodi.bin 2>/dev/null || true; "
-                "pkill -9 -f '/usr/bin/kodi --standalone' "
+                "pkill -TERM -f '^/bin/sh /usr/bin/kodi$' "
                 "2>/dev/null || true; "
-                "pkill -9 -f '/usr/bin/kodi-standalone.orig' "
+                "pkill -TERM -x kodi.bin 2>/dev/null || true; "
+                "sleep 0.3; "
+                "pkill -KILL -f '^/bin/sh /usr/bin/kodi$' "
+                "2>/dev/null || true; "
+                "pkill -KILL -x kodi.bin 2>/dev/null || true; "
+                "pkill -KILL -f '/usr/bin/kodi --standalone' "
+                "2>/dev/null || true; "
+                "pkill -KILL -f '/usr/bin/kodi-standalone.orig' "
                 "2>/dev/null || true"
             )
 
@@ -6688,10 +6694,22 @@ async def toggle_hudiy_kodi():
                 "/run/user/1000/rnse_active_app"
             )
 
-            # Display-Manager neu starten.
-            # Labwc startet danach HUDIY über seinen Autostart.
-            await run_command(
-                "sudo systemctl restart display-manager"
+            # HUDIY direkt in der bestehenden Wayland-Session starten.
+            #
+            # WICHTIG:
+            # Kein Neustart des Display-Managers mehr.
+            # Der würde die laufende User-/Wayland-/PipeWire-Session
+            # zerreißen und dabei die Bluetooth-A2DP-Endpunkte verlieren.
+            hudiy_cmd = (
+                "setsid "
+                "/home/pi/rpi-automotive-setup/launcher/launch_hudiy.sh "
+                ">/dev/null 2>&1 &"
+            )
+
+            await asyncio.create_subprocess_shell(
+                hudiy_cmd,
+                stdout=asyncio.subprocess.DEVNULL,
+                stderr=asyncio.subprocess.DEVNULL,
             )
 
             return
@@ -6763,6 +6781,60 @@ async def toggle_hudiy_kodi():
 
         await asyncio.sleep(0.5)
 
+        # RNSE_HUDIY_KODI_A2DP_RECONNECT_V2
+        #
+        # Android Auto/HUDIY kann beim Beenden einen formal
+        # verbundenen, aber stummen A2DP-Transport hinterlassen.
+        #
+        # Bewährte Reparatur:
+        #   DisconnectProfile -> kurze Pause -> ConnectProfile
+        #
+        # Der Vorgang läuft im Hintergrund, damit Kodi nicht
+        # auf den Bluetooth-Reconnect warten muss.
+        a2dp_reconnect_cmd = (
+            "bash -c '"
+            "DEVICE=/org/bluez/hci0/dev_F4_2B_8C_23_CD_78; "
+            "UUID=0000110a-0000-1000-8000-00805f9b34fb; "
+
+            "busctl call org.bluez "
+            "$DEVICE "
+            "org.bluez.Device1 DisconnectProfile s "
+            "$UUID >/dev/null 2>&1 || true; "
+
+            "sleep 1; "
+
+            "for i in $(seq 1 15); do "
+            "busctl call org.bluez "
+            "$DEVICE "
+            "org.bluez.Device1 ConnectProfile s "
+            "$UUID >/dev/null 2>&1 || true; "
+
+            "sleep 1; "
+
+            "TREE=$(busctl tree org.bluez 2>/dev/null); "
+
+            "if echo \"$TREE\" | grep -q "
+            "'/org/bluez/hci0/dev_F4_2B_8C_23_CD_78/player' "
+            "&& echo \"$TREE\" | grep -q "
+            "'/org/bluez/hci0/dev_F4_2B_8C_23_CD_78/sep' "
+            "&& echo \"$TREE\" | grep -q "
+            "'/org/bluez/hci0/dev_F4_2B_8C_23_CD_78/fd'; then "
+
+            "echo \"$(date +%H:%M:%S) "
+            "A2DP Transport vollständig wiederhergestellt\" "
+            ">> /tmp/rnse-hudiy-kodi-a2dp.log; "
+
+            "break; "
+            "fi; "
+            "done'"
+        )
+
+        await asyncio.create_subprocess_shell(
+            a2dp_reconnect_cmd,
+            stdout=asyncio.subprocess.DEVNULL,
+            stderr=asyncio.subprocess.DEVNULL,
+        )
+
         # RNSE_AUTO_AUDIO_ROUTING_V1
         # HUDIY ist beendet. Kodi soll direkt auf den
         # BossDAC / soc_sound Hardware-Sink ausgeben.
@@ -6787,6 +6859,43 @@ async def toggle_hudiy_kodi():
             wifi_cmd,
             stdout=asyncio.subprocess.DEVNULL,
             stderr=asyncio.subprocess.DEVNULL,
+        )
+
+        # RNSE_HUDIY_KODI_AVRCP_FALLBACK_V1
+        #
+        # A2DP kann bereits wieder funktionieren, während BlueZ
+        # noch keinen MediaPlayer1/player0 bereitstellt.
+        # In diesem Zustand läuft Bluetooth-Audio, aber Kodi erhält
+        # keine AVRCP-Metadaten.
+        #
+        # Nur wenn player0 nach dem normalen A2DP-Restore fehlt,
+        # führen wir einen vollständigen Geräte-Reconnect aus.
+        avrcp_fallback_cmd = (
+            "MAC='F4:2B:8C:23:CD:78'; "
+            "DEV='/org/bluez/hci0/dev_F4_2B_8C_23_CD_78'; "
+            "LOG='/tmp/rnse-hudiy-kodi-a2dp.log'; "
+            "sleep 2; "
+            "if ! busctl tree org.bluez 2>/dev/null "
+            "| grep -q \"$DEV/player\"; then "
+            "echo \"$(date '+%H:%M:%S') "
+            "AVRCP player0 fehlt - Geräte-Reconnect\" >> \"$LOG\"; "
+            "bluetoothctl disconnect \"$MAC\" >/dev/null 2>&1 || true; "
+            "sleep 2; "
+            "bluetoothctl connect \"$MAC\" >/dev/null 2>&1 || true; "
+            "for I in 1 2 3 4 5 6; do "
+            "if busctl tree org.bluez 2>/dev/null "
+            "| grep -q \"$DEV/player\"; then "
+            "echo \"$(date '+%H:%M:%S') "
+            "AVRCP player0 wiederhergestellt\" >> \"$LOG\"; "
+            "break; "
+            "fi; "
+            "sleep 1; "
+            "done; "
+            "fi"
+        )
+
+        await run_command(
+            avrcp_fallback_cmd
         )
 
         # Noch einmal unmittelbar vor dem Start prüfen.
@@ -6814,7 +6923,8 @@ async def toggle_hudiy_kodi():
         env_exp = (
             "export HOME=/home/pi; "
             "export DISPLAY=:0; "
-            "export XDG_RUNTIME_DIR=/run/user/1000;"
+            "export XDG_RUNTIME_DIR=/run/user/1000; "
+            "export WAYLAND_DISPLAY=wayland-0;"
         )
 
         # WICHTIG:
@@ -6826,7 +6936,7 @@ async def toggle_hudiy_kodi():
         # nach einem harten Beenden erneut starten kann.
         kodi_cmd = (
             f"setsid bash -c "
-            f"'{env_exp} exec /usr/bin/kodi --standalone' "
+            f"'{env_exp} exec /usr/bin/kodi' "
             f">/dev/null 2>&1 &"
         )
 

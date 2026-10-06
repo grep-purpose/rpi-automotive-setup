@@ -163,6 +163,11 @@ def open_if_active():
     # erster Start:
     # Liste zeigen und bereits auf die erste Senderwahl warten.
 
+    HOME.setProperty(
+        "RNSE.Radio.OpenPlayerPending",
+        "true",
+    )
+
     focus_first_real_station()
 
 

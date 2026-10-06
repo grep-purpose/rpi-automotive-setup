@@ -16,6 +16,10 @@ MAX_DEVICES = 10
 PREFERRED_FILE = Path.home() / ".kodi/userdata/rnse_bluetooth_preferred.json"
 AUTOSTART_FILE = Path.home() / ".config/rnse-bluetooth/autoconnect_devices"
 
+PAIRING_AGENT = Path.home() / ".kodi/userdata/scripts/bluetooth_pair_agent.py"
+PAIRING_STATE_FILE = Path("/run/user/1000/rnse_bt_pairing_state.json")
+PAIRING_DECISION_FILE = Path("/run/user/1000/rnse_bt_pairing_decision")
+
 PHONE_AUDIO_UUIDS = (
     "0000110a",  # Audio Source
     "0000110d",  # Advanced Audio Distribution
@@ -517,6 +521,284 @@ def toggle_power():
     main_sync()
 
 
+
+def pairing_read_state():
+    try:
+        return json.loads(
+            PAIRING_STATE_FILE.read_text()
+        )
+    except Exception:
+        return {}
+
+
+def pairing_set_properties(
+    name=None,
+    code=None,
+    status=None,
+):
+    if name is not None:
+        HOME.setProperty(
+            "RNSE.Bluetooth.Pairing.DeviceName",
+            str(name),
+        )
+
+    if code is not None:
+        HOME.setProperty(
+            "RNSE.Bluetooth.Pairing.Code",
+            str(code),
+        )
+
+    if status is not None:
+        HOME.setProperty(
+            "RNSE.Bluetooth.Pairing.Status",
+            str(status),
+        )
+
+
+def pairing_write_decision(decision):
+    try:
+        PAIRING_DECISION_FILE.write_text(
+            str(decision).strip() + "\n"
+        )
+        return True
+
+    except Exception as exc:
+        notify(
+            "Bluetooth",
+            f"Pairing-Antwort fehlgeschlagen: {exc}",
+            3500,
+        )
+        return False
+
+
+def pairing_approve():
+    pairing_set_properties(
+        status="Pairing wird bestätigt …"
+    )
+
+    pairing_write_decision("approve")
+
+
+def pairing_reject():
+    pairing_set_properties(
+        status="Pairing abgebrochen"
+    )
+
+    pairing_write_decision("reject")
+
+    xbmc.executebuiltin(
+        "Dialog.Close(1164)"
+    )
+
+
+def pair_start(index):
+    sync()
+
+    base = f"RNSE.Bluetooth.Device{index}"
+
+    mac = HOME.getProperty(f"{base}.MAC")
+    name = HOME.getProperty(f"{base}.Name")
+
+    if not mac:
+        notify(
+            "Bluetooth",
+            "Gerät konnte nicht ermittelt werden",
+            3000,
+        )
+        return
+
+    if not name:
+        name = "Bluetooth-Gerät"
+
+    # Alte Pairing-Daten entfernen.
+    for file_path in (
+        PAIRING_STATE_FILE,
+        PAIRING_DECISION_FILE,
+    ):
+        try:
+            file_path.unlink()
+        except FileNotFoundError:
+            pass
+        except Exception:
+            pass
+
+    pairing_set_properties(
+        name=name,
+        code="",
+        status="Pairing wird gestartet …",
+    )
+
+    if not PAIRING_AGENT.exists():
+        notify(
+            "Bluetooth",
+            "Pairing-Agent wurde nicht gefunden",
+            3500,
+        )
+        return
+
+    try:
+        subprocess.Popen(
+            [
+                "/usr/bin/python3",
+                str(PAIRING_AGENT),
+                mac,
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True,
+        )
+
+    except Exception as exc:
+        notify(
+            "Bluetooth",
+            f"Pairing konnte nicht gestartet werden: {exc}",
+            3500,
+        )
+        return
+
+    notify(
+        "Bluetooth",
+        f"Pairing mit {name} wird gestartet …",
+        2500,
+    )
+
+    monitor = xbmc.Monitor()
+    dialog_open = False
+
+    # Maximal ca. 90 Sekunden auf BlueZ warten.
+    for _ in range(450):
+
+        if monitor.abortRequested():
+            break
+
+        state = pairing_read_state()
+
+        status = str(
+            state.get("status", "")
+        )
+
+        code = str(
+            state.get("code", "")
+        )
+
+        if status == "confirmation_required":
+
+            pairing_set_properties(
+                name=name,
+                code=code,
+                status="Code bestätigen",
+            )
+
+            if not dialog_open:
+                xbmc.executebuiltin(
+                    "ActivateWindow(1164)"
+                )
+                dialog_open = True
+
+        elif status == "paired":
+
+            pairing_set_properties(
+                status="Erfolgreich gekoppelt"
+            )
+
+            # Zur Sicherheit als vertrauenswürdig markieren.
+            run_bt(
+                "trust",
+                mac,
+                timeout=8,
+            )
+
+            xbmc.sleep(500)
+
+            # Scan-Ergebnisse entfernen und gekoppelte
+            # Geräte neu einlesen.
+            main_sync()
+
+            if dialog_open:
+                xbmc.executebuiltin(
+                    "Dialog.Close(1164)"
+                )
+
+            notify(
+                "Bluetooth",
+                f"{name} wurde erfolgreich gekoppelt",
+                3000,
+            )
+
+            return
+
+        elif status in (
+            "confirmation_rejected",
+            "canceled",
+        ):
+
+            if dialog_open:
+                xbmc.executebuiltin(
+                    "Dialog.Close(1164)"
+                )
+
+            main_sync()
+
+            notify(
+                "Bluetooth",
+                "Pairing abgebrochen",
+                2500,
+            )
+
+            return
+
+        elif status == "error":
+
+            if dialog_open:
+                xbmc.executebuiltin(
+                    "Dialog.Close(1164)"
+                )
+
+            message = str(
+                state.get(
+                    "message",
+                    "Unbekannter Pairing-Fehler",
+                )
+            )
+
+            message = (
+                message
+                .replace("\n", " ")
+                .strip()
+            )
+
+            if len(message) > 110:
+                message = message[:107] + "..."
+
+            main_sync()
+
+            notify(
+                "Bluetooth",
+                f"Pairing fehlgeschlagen: {message}",
+                4000,
+            )
+
+            return
+
+        xbmc.sleep(200)
+
+    # Timeout / Kodi wird beendet
+    pairing_write_decision("reject")
+
+    if dialog_open:
+        xbmc.executebuiltin(
+            "Dialog.Close(1164)"
+        )
+
+    main_sync()
+
+    notify(
+        "Bluetooth",
+        "Pairing-Zeitüberschreitung",
+        3000,
+    )
+
+
 def device_action(index):
     sync()
 
@@ -566,11 +848,7 @@ def device_action(index):
             )
 
     else:
-        notify(
-            "Bluetooth",
-            "Pairing neuer Geräte folgt im nächsten Schritt",
-            3000,
-        )
+        pair_start(index)
 
     xbmc.sleep(1000)
     sync()
@@ -858,6 +1136,12 @@ def main():
 
     elif action == "scan":
         scan()
+
+    elif action == "pair_approve":
+        pairing_approve()
+
+    elif action == "pair_reject":
+        pairing_reject()
 
     elif action == "preferred" and len(sys.argv) > 2:
         try:

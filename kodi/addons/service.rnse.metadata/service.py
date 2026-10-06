@@ -32,17 +32,13 @@ class RNSEPlaybackPlayer(xbmc.Player):
             xbmc.LOGINFO
         )
 
-        if not pending:
-            return
-
-
-        # Aktuellen radio.de-Listen-Kontext merken.
+        # Aktuellen radio.de-Listen-Kontext IMMER merken.
         #
-        # Beispiel:
-        # Local Stations, Hamburg, Genre, Land usw.
-        #
-        # onAVStarted läuft noch, während die Senderliste
-        # im Hintergrund der aktive Kodi-Container ist.
+        # Das ist bewusst unabhängig vom automatischen
+        # Öffnen des Players. Dadurch funktionieren
+        # Previous/Next auch dann korrekt, wenn ein Sender
+        # aus Local Stations oder einem anderen Verzeichnis
+        # ohne vorherigen Player-Wechsel gestartet wurde.
         radio_directory = xbmc.getInfoLabel(
             "Container.FolderPath"
         ).strip()
@@ -63,6 +59,9 @@ class RNSEPlaybackPlayer(xbmc.Player):
                 + radio_directory,
                 xbmc.LOGINFO
             )
+
+        if not pending:
+            return
 
         station = HOME.getProperty(
             "RNSE.RadioStation"

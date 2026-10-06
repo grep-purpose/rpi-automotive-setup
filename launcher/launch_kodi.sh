@@ -10,8 +10,8 @@ pkill -x hudiy 2>/dev/null || true
 
 sleep 0.5
 
-echo "Starting Kodi..."
+echo "Starting Kodi in existing Wayland session..."
 
 echo "kodi" > /run/user/1000/rnse_active_app
 
-exec kodi --standalone
+exec /usr/bin/kodi

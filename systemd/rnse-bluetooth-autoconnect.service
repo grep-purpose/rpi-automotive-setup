@@ -6,7 +6,7 @@ Wants=bluetooth.service user@1000.service
 [Service]
 Type=oneshot
 ExecStart=/usr/local/bin/rnse-bluetooth-autoconnect.sh
-TimeoutStartSec=180
+TimeoutStartSec=210
 
 [Install]
 WantedBy=multi-user.target

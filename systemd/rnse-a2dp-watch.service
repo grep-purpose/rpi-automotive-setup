@@ -1,0 +1,13 @@
+[Unit]
+Description=RNS-E A2DP Diagnostic Watcher
+After=bluetooth.service
+Wants=bluetooth.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/rnse-a2dp-watch.sh
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

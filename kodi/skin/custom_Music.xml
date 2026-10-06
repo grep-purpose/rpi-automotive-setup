@@ -957,7 +957,7 @@
             </control>
             <control type="button" id="9101">
                 <left>1160</left>
-                <top>732</top>
+                <top>735</top>
                 <width>220</width>
                 <height>145</height>
                 <label />
@@ -970,19 +970,19 @@
                 <ondown>9100</ondown>
             </control>
             <control type="image">
-                <left>1210</left>
-                <top>753</top>
-                <width>120</width>
-                <height>104</height>
+                <left>1205</left>
+                <top>765</top>
+                <width>130</width>
+                <height>85</height>
                 <aspectratio>keep</aspectratio>
                 <texture>music/play.png</texture>
                 <visible>!String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
             </control>
             <control type="image">
-                <left>1210</left>
-                <top>753</top>
-                <width>120</width>
-                <height>104</height>
+                <left>1205</left>
+                <top>765</top>
+                <width>130</width>
+                <height>85</height>
                 <aspectratio>keep</aspectratio>
                 <texture>music/pause.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>

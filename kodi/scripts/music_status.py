@@ -21,6 +21,14 @@ import xbmcgui
 
 MUSIC_WINDOW_ID = 11199
 
+# Tatsächliche Custom-Window-IDs unserer Player
+RNSE_RADIO_WINDOW_ID = 11198
+RNSE_MUSIC_WINDOW_ID = 11199
+
+# Radio -> Musik Auto-Switch
+_radio_music_switch_candidate_since = 0.0
+_radio_music_switch_done = False
+
 PREFIX = "RNSE.Music."
 HOME = xbmcgui.Window(10000)
 
@@ -1950,6 +1958,102 @@ def reset_audio_focus_v3():
     _audio_arbiter_kodi_was_radio = False
 
 
+
+def radio_to_music_autoswitch(player):
+    """
+    Wenn im Radio-Player echte Bluetooth-Musik gestartet wird,
+    automatisch zum Musik-Player wechseln.
+
+    Nur Radio -> Musik.
+    Kein automatischer Rückweg.
+
+    Schutz gegen kurze Smartphone-Töne:
+    - Bluetooth muss playing sein
+    - ein Titel muss vorhanden sein
+    - Zustand muss ca. 1,8 Sekunden stabil bleiben
+    """
+
+    global _radio_music_switch_candidate_since
+    global _radio_music_switch_done
+
+    # Nur innerhalb von Kodi arbeiten.
+    if not kodi_is_audio_master():
+        _radio_music_switch_candidate_since = 0.0
+        _radio_music_switch_done = False
+        return
+
+    try:
+        current_window = xbmcgui.getCurrentWindowId()
+    except Exception:
+        current_window = 0
+
+    # Sobald wir nicht mehr im Radio-Player sind,
+    # Kandidatenzustand zurücksetzen.
+    if current_window != RNSE_RADIO_WINDOW_ID:
+        _radio_music_switch_candidate_since = 0.0
+
+        if not get_bluetooth_playing(player):
+            _radio_music_switch_done = False
+
+        return
+
+    bt_playing = get_bluetooth_playing(player)
+
+    title = (
+        HOME.getProperty(
+            "RNSE.Music.Title"
+        )
+        .strip()
+    )
+
+    # Kein echtes Musiksignal erkennbar.
+    if not bt_playing or not title:
+        _radio_music_switch_candidate_since = 0.0
+
+        if not bt_playing:
+            _radio_music_switch_done = False
+
+        return
+
+    # Für dieselbe laufende Wiedergabe nur einmal wechseln.
+    if _radio_music_switch_done:
+        return
+
+    now = time.monotonic()
+
+    if _radio_music_switch_candidate_since == 0.0:
+        _radio_music_switch_candidate_since = now
+
+        xbmc.log(
+            "[RNSE UI] Radio -> Musik Kandidat erkannt: "
+            + title,
+            xbmc.LOGINFO
+        )
+
+        return
+
+    # Kurze Smartphone-Töne ignorieren.
+    if (
+        now
+        - _radio_music_switch_candidate_since
+        < 1.8
+    ):
+        return
+
+    xbmc.log(
+        "[RNSE UI] Bluetooth-Musik stabil erkannt -> "
+        "wechsle Radio zu Musik",
+        xbmc.LOGINFO
+    )
+
+    _radio_music_switch_done = True
+    _radio_music_switch_candidate_since = 0.0
+
+    xbmc.executebuiltin(
+        f"ReplaceWindow({RNSE_MUSIC_WINDOW_ID})"
+    )
+
+
 def audio_arbiter_update(player):
     """
     RNSE Audio Focus V3.
@@ -2319,6 +2423,13 @@ def monitor():
                 update_bluetooth_live(
                     player,
                     duration
+                )
+
+                # Wenn wir gerade im Radio-Player sind und am
+                # Smartphone echte Bluetooth-Musik gestartet wird,
+                # automatisch auf den Musik-Player wechseln.
+                radio_to_music_autoswitch(
+                    player
                 )
 
                 # Wenn echte Bluetooth-Musik neu startet,

@@ -74,6 +74,7 @@
                 <textcolor>ffffffff</textcolor>
                 <label>$INFO[MusicPlayer.Title]</label>
                 <scroll>true</scroll>
+                <visible>!String.IsEqual(MusicPlayer.Title,Window(Home).Property(RNSE.RadioStation))</visible>
             </control>
             <control type="label">
                 <left>770</left>
@@ -84,6 +85,7 @@
                 <textcolor>ffff8a32</textcolor>
                 <label>$INFO[MusicPlayer.Artist]</label>
                 <scroll>true</scroll>
+                <visible>!String.IsEqual(MusicPlayer.Artist,Window(Home).Property(RNSE.RadioStation))</visible>
             </control>
             <control type="label">
                 <left>770</left>
@@ -158,7 +160,7 @@
             </control>
             <control type="button" id="9101">
                 <left>1160</left>
-                <top>732</top>
+                <top>735</top>
                 <width>220</width>
                 <height>145</height>
                 <label />
@@ -171,19 +173,19 @@
                 <ondown>9100</ondown>
             </control>
             <control type="image">
-                <left>1210</left>
-                <top>753</top>
-                <width>120</width>
-                <height>104</height>
+                <left>1205</left>
+                <top>765</top>
+                <width>130</width>
+                <height>85</height>
                 <aspectratio>keep</aspectratio>
                 <texture>music/play.png</texture>
                 <visible>!Player.Playing</visible>
             </control>
             <control type="image">
-                <left>1210</left>
-                <top>753</top>
-                <width>120</width>
-                <height>104</height>
+                <left>1205</left>
+                <top>765</top>
+                <width>130</width>
+                <height>85</height>
                 <aspectratio>keep</aspectratio>
                 <texture>music/pause.png</texture>
                 <visible>Player.Playing</visible>
