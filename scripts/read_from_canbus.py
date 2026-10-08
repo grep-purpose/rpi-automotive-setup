@@ -9067,6 +9067,15 @@ def get_kodi_music_carousel_items():
         ):
             return []
 
+        # RNSE_KODI_MUSIC_PAUSE_RESUME_V2
+        # Pausierte Musik darf keine Titel im FIS anzeigen.
+        playback_status = str(
+            payload.get("status", "") or ""
+        ).strip().casefold()
+
+        if playback_status in ("paused", "stopped"):
+            return []
+
         timestamp = float(
             payload.get(
                 "timestamp",
@@ -9438,7 +9447,80 @@ async def kodi_music_watch_loop():
             get_kodi_music_carousel_items()
         )
 
+        # RNSE_KODI_MUSIC_PAUSE_RESUME_V2
+        # Wenn der Musikplayer pausiert, laufenden Scroll
+        # und das Karussell sofort abbrechen.
         if not music_items:
+            paused = False
+
+            try:
+                music_payload = json.loads(
+                    KODI_MUSIC_METADATA_PATH.read_text(
+                        encoding="utf-8"
+                    )
+                )
+
+                music_timestamp = float(
+                    music_payload.get("timestamp", 0.0) or 0.0
+                )
+
+                paused = (
+                    music_payload.get("source") == "kodi_music"
+                    and music_timestamp > 0
+                    and 0 <= time.time() - music_timestamp
+                    <= KODI_MUSIC_METADATA_MAX_AGE
+                    and str(
+                        music_payload.get("status", "") or ""
+                    ).strip().casefold()
+                    in ("paused", "stopped")
+                )
+
+            except (OSError, ValueError, TypeError):
+                pass
+
+            if paused and kodi_music_watch_last:
+                old_scroll = scroll_task_fis1
+
+                if (
+                    old_scroll is not None
+                    and not old_scroll.done()
+                ):
+                    old_scroll.cancel()
+
+                    with contextlib.suppress(
+                        asyncio.CancelledError,
+                        Exception
+                    ):
+                        await old_scroll
+
+                old_carousel = media_carousel_task
+
+                if (
+                    old_carousel is not None
+                    and not old_carousel.done()
+                ):
+                    old_carousel.cancel()
+
+                    with contextlib.suppress(
+                        asyncio.CancelledError,
+                        Exception
+                    ):
+                        await old_carousel
+
+                media_carousel_task = None
+
+                if (
+                    send_on_canbus
+                    and can_functional
+                    and toggle_fis1 == 6
+                ):
+                    clear_content(FIS1)
+
+                if ENABLE_LOGGING:
+                    logger.info(
+                        "KODI_MUSIC_FIS_V2: Pause/Stopp -> FIS leer"
+                    )
+
             kodi_music_watch_last = ()
             continue
 
