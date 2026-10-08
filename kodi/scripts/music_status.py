@@ -1970,7 +1970,7 @@ def radio_to_music_autoswitch(player):
     Schutz gegen kurze Smartphone-Töne:
     - Bluetooth muss playing sein
     - ein Titel muss vorhanden sein
-    - Zustand muss ca. 1,8 Sekunden stabil bleiben
+    - Zustand muss ca. 6 Sekunden stabil bleiben
     """
 
     global _radio_music_switch_candidate_since
@@ -2036,7 +2036,7 @@ def radio_to_music_autoswitch(player):
     if (
         now
         - _radio_music_switch_candidate_since
-        < 1.8
+        < 6.0
     ):
         return
 
@@ -2048,6 +2048,11 @@ def radio_to_music_autoswitch(player):
 
     _radio_music_switch_done = True
     _radio_music_switch_candidate_since = 0.0
+
+    # Erst jetzt ist echte Bluetooth-Musik ausreichend lange
+    # bestätigt. Den Radio-Stream daher genau an dieser Stelle
+    # sauber beenden.
+    stop_old_radio_after_music_switch()
 
     xbmc.executebuiltin(
         f"ReplaceWindow({RNSE_MUSIC_WINDOW_ID})"
@@ -2158,7 +2163,18 @@ def audio_arbiter_update(player):
             and kodi_current_is_radio()
         )
 
-        if kodi_playing:
+        # Einen laufenden Radio-Stream bei einem zunächst
+        # unbekannten Bluetooth-Impuls NICHT sofort pausieren.
+        #
+        # Sperren/Entsperren, Benachrichtigungen und andere kurze
+        # Smartphone-Ereignisse können AVRCP kurz auf "playing"
+        # setzen, obwohl keine echte Musikwiedergabe gestartet wurde.
+        #
+        # Andere Kodi-Medien behalten das bisherige Verhalten.
+        if (
+            kodi_playing
+            and not _audio_arbiter_kodi_was_radio
+        ):
             pause_kodi_for_bluetooth()
             kodi_playing = False
 
@@ -2233,6 +2249,36 @@ def audio_arbiter_update(player):
                 xbmc.LOGWARNING
             )
 
+
+    # --------------------------------------------------------
+    # RNSE_AUDIO_FOCUS_STABLE_BT_V4
+    #
+    # Echte Bluetooth-Musik nach stabiler Wiedergabe
+    # bestätigen, ohne auf BT-Ende warten zu müssen.
+    # Unabhängig vom geöffneten Kodi-Fenster.
+    # --------------------------------------------------------
+
+    if (
+        bt_playing
+        and _audio_arbiter_kodi_was_radio
+        and _audio_arbiter_bt_started_at > 0.0
+        and now - _audio_arbiter_bt_started_at >= 6.0
+        and (
+            _audio_arbiter_bt_peak_position
+            - _audio_arbiter_bt_start_position
+        ) >= 1500
+        and kodi_current_is_radio()
+    ):
+
+        xbmc.log(
+            "[RNSE Audio V4] Bluetooth stabil -> "
+            "Radio endgültig stoppen",
+            xbmc.LOGINFO
+        )
+
+        stop_old_radio_after_music_switch()
+
+        _audio_arbiter_kodi_was_radio = False
 
     # --------------------------------------------------------
     # Bluetooth endet.
