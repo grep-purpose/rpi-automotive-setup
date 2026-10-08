@@ -1,21 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <window>
     <onload>RunScript(/home/pi/.kodi/userdata/scripts/music_status.py,monitor)</onload>
-
     <onload>RunScript(/home/pi/.kodi/userdata/scripts/phone_status.py)</onload>
     <defaultcontrol always="true">9000</defaultcontrol>
     <views>9000</views>
-
     <controls>
-
-
-        <!-- =========================================================
-             AUDI HOME v3
-             Modern MMI / RNS-E inspired interface
-             ========================================================= -->
-
-
-        <!-- BACKGROUND -->
         <control type="image">
             <left>0</left>
             <top>0</top>
@@ -23,19 +12,11 @@
             <height>1080</height>
             <texture colordiffuse="ff05070a">colors/black.png</texture>
         </control>
-
-
-        <!-- =========================================================
-             HEADER
-             ========================================================= -->
-
         <control type="group">
             <left>30</left>
             <right>30</right>
             <top>18</top>
             <height>105</height>
-
-            <!-- linke MMI-Linie: gleiche Position wie in den Apps -->
             <control type="image">
                 <left>0</left>
                 <top>82</top>
@@ -43,8 +24,6 @@
                 <height>3</height>
                 <texture colordiffuse="99ffffff">colors/white.png</texture>
             </control>
-
-            <!-- Haupttitel -->
             <control type="label">
                 <left>540</left>
                 <top>0</top>
@@ -56,8 +35,6 @@
                 <textcolor>ffd90429</textcolor>
                 <label>[B]Hauptmenü[/B]</label>
             </control>
-
-            <!-- rechte MMI-Linie: gleiche Position wie in den Apps -->
             <control type="image">
                 <right>0</right>
                 <top>82</top>
@@ -65,470 +42,360 @@
                 <height>3</height>
                 <texture colordiffuse="99ffffff">colors/white.png</texture>
             </control>
-
         </control>
-
-
-        <!-- =========================================================
-             HAUPTKARUSSELL
-
-             240 px linker Rand
-             1440 px Nutzbreite
-             480 px je Element
-             Fokusposition 1 = Bildschirmmitte bei X=960
-             ========================================================= -->
-
         <control type="wraplist" id="9000">
-
-            <left>80</left>
-            <top>165</top>
-            <top condition="Player.HasMedia | String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)">155</top>
-
-            <width>1760</width>
-
-            <height>700</height>
-            <height condition="Player.HasMedia | String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)">575</height>
-
+            <left>30</left>
+            <top>170</top>
+            <top condition="Player.HasMedia | String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)">170</top>
+            <width>1860</width>
+            <height>495</height>
+            <height condition="Player.HasMedia | String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)">495</height>
             <orientation>horizontal</orientation>
-
             <onleft>Control.Move(9000,-1)</onleft>
             <onright>Control.Move(9000,1)</onright>
-
-            <!-- vorerst weiterhin kompatibel mit bisheriger Bedienung -->
             <onup>Control.Move(9000,-1)</onup>
             <ondown>Control.Move(9000,1)</ondown>
-
             <focusposition>2</focusposition>
             <movement>0</movement>
-
             <scrolltime tween="cubic" ease="out">220</scrolltime>
-
-
-            <!-- =============================================
-                 NICHT AUSGEWÄHLTE APP
-                 kleiner / weiter hinten
-                 ============================================= -->
-
-            <itemlayout width="352" height="560">
-
+            <itemlayout width="372" height="480">
                 <control type="group">
-                    <left>6</left>
-                    <top>62</top>
-
-                    <!-- dezente Tiefenfläche -->
+                    <left>15</left>
+                    <top>20</top>
                     <control type="image">
-                        <left>20</left>
-                        <top>35</top>
-                        <width>300</width>
-                        <height>300</height>
-                        <texture colordiffuse="1019222b">colors/white.png</texture>
-                    </control>
-
-                    <!-- Icon -->
-                    <control type="image">
-                        <left>55</left>
-                        <top>55</top>
-                        <width>230</width>
-                        <height>230</height>
-                        <aspectratio>keep</aspectratio>
-                        <texture colordiffuse="bfc8cfd8">$INFO[ListItem.Icon]</texture>
-                    </control>
-
-                    <!-- Name -->
-                    <control type="label">
                         <left>0</left>
-                        <top>315</top>
-                        <width>340</width>
-                        <height>78</height>
+                        <top>0</top>
+                        <width>342</width>
+                        <height>410</height>
+                        <texture>home/tile_normal.png</texture>
+                    </control>
+                    <control type="image">
+                        <left>52</left>
+                        <top>32</top>
+                        <width>238</width>
+                        <height>238</height>
+                        <aspectratio>keep</aspectratio>
+                        <texture>$INFO[ListItem.Icon]</texture>
+                        <visible>String.IsEqual(ListItem.Label,Radio)</visible>
+                    </control>
+                    <control type="image">
+                        <left>61</left>
+                        <top>32</top>
+                        <width>219</width>
+                        <height>219</height>
+                        <aspectratio>keep</aspectratio>
+                        <texture>$INFO[ListItem.Icon]</texture>
+                        <visible>String.IsEqual(ListItem.Label,Android Auto)</visible>
+                    </control>
+                    <control type="image">
+                        <left>52</left>
+                        <top>44</top>
+                        <width>238</width>
+                        <height>238</height>
+                        <aspectratio>keep</aspectratio>
+                        <texture>$INFO[ListItem.Icon]</texture>
+                        <visible>!String.IsEqual(ListItem.Label,Radio) + !String.IsEqual(ListItem.Label,Android Auto)</visible>
+                    </control>
+                    <control type="label">
+                        <left>8</left>
+                        <top>292</top>
+                        <width>326</width>
+                        <height>75</height>
                         <align>center</align>
                         <aligny>center</aligny>
-                        <font>font45</font>
-                        <textcolor>e0e8ebef</textcolor>
+                        <font>font55</font>
+                        <textcolor>ffffffff</textcolor>
                         <label>[B]$INFO[ListItem.Label][/B]</label>
+                        <visible>!String.IsEqual(ListItem.Label,Android Auto)</visible>
+                    </control>
+                    <control type="label">
+                        <left>8</left>
+                        <top>289</top>
+                        <width>326</width>
+                        <height>46</height>
+                        <align>center</align>
+                        <aligny>center</aligny>
+                        <font>font50</font>
+                        <textcolor>ffffffff</textcolor>
+                        <label>[B]Android[/B]</label>
+                        <visible>String.IsEqual(ListItem.Label,Android Auto)</visible>
+                    </control>
+                    <control type="label">
+                        <left>8</left>
+                        <top>333</top>
+                        <width>326</width>
+                        <height>46</height>
+                        <align>center</align>
+                        <aligny>center</aligny>
+                        <font>font50</font>
+                        <textcolor>ffffffff</textcolor>
+                        <label>[B]Auto[/B]</label>
+                        <visible>String.IsEqual(ListItem.Label,Android Auto)</visible>
                     </control>
                 </control>
-
             </itemlayout>
-
-
-            <!-- =============================================
-                 AUSGEWÄHLTE APP
-                 moderne MMI-Karte mit Tiefenwirkung
-                 ============================================= -->
-
-            <focusedlayout width="352" height="560">
-
+            <focusedlayout width="372" height="480">
                 <control type="group">
-                    <left>-34</left>
-                    <top>0</top>
-
-                    <!-- Schatten -->
+                    <left>15</left>
+                    <top>20</top>
                     <control type="image">
-                        <left>12</left>
-                        <top>22</top>
-                        <width>410</width>
-                        <height>505</height>
-                        <texture colordiffuse="aa000000">colors/black.png</texture>
-                    </control>
-
-                    <!-- Tiefenlayer -->
+                        <left>0</left>
+                        <top>0</top>
+                        <width>342</width>
+                        <height>410</height>
+                        <texture>home/tile_normal.png</texture>
+                    <visible>!Control.HasFocus(9000)</visible></control><control type="image">
+                        <left>0</left>
+                        <top>0</top>
+                        <width>342</width>
+                        <height>410</height>
+                        <texture>home/tile_focus.png</texture>
+                    <visible>Control.HasFocus(9000)</visible></control>
                     <control type="image">
-                        <left>4</left>
-                        <top>12</top>
-                        <width>410</width>
-                        <height>500</height>
-                        <texture colordiffuse="55182028">colors/white.png</texture>
-                    </control>
-
-                    <!-- Hauptkarte -->
-                    <control type="image">
-                        <left>12</left>
-                        <top>20</top>
-                        <width>394</width>
-                        <height>480</height>
-                        <texture colordiffuse="f0121820">colors/white.png</texture>
-                    </control>
-
-                    <!-- Lichtkante -->
-                    <control type="image">
-                        <left>14</left>
-                        <top>21</top>
-                        <width>390</width>
-                        <height>4</height>
-                        <texture colordiffuse="66ffffff">colors/white.png</texture>
-                    </control>
-
-                    <!-- innere Fläche -->
-                    <control type="image">
-                        <left>32</left>
-                        <top>42</top>
-                        <width>354</width>
-                        <height>300</height>
-                        <texture colordiffuse="1e26323f">colors/white.png</texture>
-                    </control>
-
-                    <!-- Icon -->
-                    <control type="image">
-                        <left>62</left>
-                        <top>52</top>
-                        <width>295</width>
-                        <height>295</height>
+                        <left>36</left>
+                        <top>14</top>
+                        <width>270</width>
+                        <height>270</height>
                         <aspectratio>keep</aspectratio>
-                        <texture colordiffuse="ffffffff">$INFO[ListItem.Icon]</texture>
+                        <texture>$INFO[ListItem.Icon]</texture>
+                        <visible>String.IsEqual(ListItem.Label,Radio)</visible>
                     </control>
-
-                    <!-- Name -->
+                    <control type="image">
+                        <left>47</left>
+                        <top>32</top>
+                        <width>248</width>
+                        <height>248</height>
+                        <aspectratio>keep</aspectratio>
+                        <texture>$INFO[ListItem.Icon]</texture>
+                        <visible>String.IsEqual(ListItem.Label,Android Auto)</visible>
+                    </control>
+                    <control type="image">
+                        <left>36</left>
+                        <top>32</top>
+                        <width>270</width>
+                        <height>270</height>
+                        <aspectratio>keep</aspectratio>
+                        <texture>$INFO[ListItem.Icon]</texture>
+                        <visible>!String.IsEqual(ListItem.Label,Radio) + !String.IsEqual(ListItem.Label,Android Auto)</visible>
+                    </control>
                     <control type="label">
-                        <left>10</left>
-                        <top>365</top>
-                        <width>395</width>
-                        <height>85</height>
+                        <left>8</left>
+                        <top>302</top>
+                        <width>326</width>
+                        <height>75</height>
                         <align>center</align>
                         <aligny>center</aligny>
                         <font>font60</font>
                         <textcolor>ffffffff</textcolor>
                         <label>[B]$INFO[ListItem.Label][/B]</label>
+                        <visible>!String.IsEqual(ListItem.Label,Android Auto)</visible>
                     </control>
-
-        
-
+                    <control type="label">
+                        <left>8</left>
+                        <top>289</top>
+                        <width>326</width>
+                        <height>46</height>
+                        <align>center</align>
+                        <aligny>center</aligny>
+                        <font>font55</font>
+                        <textcolor>ffffffff</textcolor>
+                        <label>[B]Android[/B]</label>
+                        <visible>String.IsEqual(ListItem.Label,Android Auto)</visible>
+                    </control>
+                    <control type="label">
+                        <left>8</left>
+                        <top>333</top>
+                        <width>326</width>
+                        <height>46</height>
+                        <align>center</align>
+                        <aligny>center</aligny>
+                        <font>font55</font>
+                        <textcolor>ffffffff</textcolor>
+                        <label>[B]Auto[/B]</label>
+                        <visible>String.IsEqual(ListItem.Label,Android Auto)</visible>
+                    </control>
                 </control>
-
             </focusedlayout>
-
-
-            <!-- =====================================================
-                 APPS
-                 Funktionspfade bewusst aus funktionierendem Stand
-                 übernommen
-                 ===================================================== -->
-
             <content>
-
                 <item>
-                    <label>Fernsehen</label>
-                    <icon>home/tv.png</icon>
+                    <label>TV</label>
+                    <icon>home/mmi_icons_v1/tv.png</icon>
                     <onclick>ActivateWindow(TVChannels)</onclick>
                 </item>
-
                 <item>
                     <label>YouTube</label>
-                    <icon>home/youtube.png</icon>
+                    <icon>home/mmi_icons_v1/youtube.png</icon>
                     <onclick>ActivateWindow(Videos,plugin://plugin.video.youtube/special/recommendations?category_label=Recommendations,return)</onclick>
                 </item>
-
                 <item>
                     <label>Twitch</label>
-                    <icon>home/twitch.png</icon>
-                    <onclick>ActivateWindow(10025,&quot;plugin://plugin.video.twitch/?content=live&amp;mode=followed&quot;,return)</onclick>
+                    <icon>home/mmi_icons_v1/twitch.png</icon>
+                    <onclick>ActivateWindow(10025,"plugin://plugin.video.twitch/?content=live&amp;mode=followed",return)</onclick>
                 </item>
-
                 <item>
                     <label>Radio</label>
-                    <icon>home/radio.png</icon>
-                    <onclick>ActivateWindow(10502,&quot;plugin://plugin.audio.radiode/?data=%7b%22name%22%3a%20%22Local%20stations%22%7d&amp;mode=get_local_stations&quot;,return)</onclick>
+                    <icon>home/mmi_icons_v1/radio.png</icon>
+                    <onclick>ActivateWindow(10502,"plugin://plugin.audio.radiode/?data=%7b%22name%22%3a%20%22Local%20stations%22%7d&amp;mode=get_local_stations",return)</onclick>
                 </item>
-
                 <item>
                     <label>Musik</label>
-                    <icon>DefaultAlbumCover.png</icon>
+                    <icon>home/mmi_icons_v1/music.png</icon>
                     <onclick>ActivateWindow(11199)</onclick>
                 </item>
-
                 <item>
                     <label>Android Auto</label>
                     <icon>home/android_auto.png</icon>
                     <onclick>RunScript(/home/pi/.kodi/userdata/scripts/android_auto_toggle.py)</onclick>
                 </item>
-
                 <item>
                     <label>Wetter</label>
-                    <icon>home/weather.png</icon>
+                    <icon>home/mmi_icons_v1/weather.png</icon>
                     <onclick>ActivateWindow(Weather)</onclick>
                 </item>
-
                 <item>
                     <label>Spiele</label>
-                    <icon>home/games.png</icon>
+                    <icon>home/mmi_icons_v1/games.png</icon>
                     <onclick>RunScript(script.audi.games)</onclick>
                 </item>
-
             </content>
-
         </control>
-
-
-        <!-- =========================================================
-             NOW PLAYING
-             große Automotive-Informationszone
-             ========================================================= -->
-
-        <control type="group">
-
-            <left>30</left>
-            <right>30</right>
-            <bottom>175</bottom>
-            <height>250</height>
-
-            <visible>Player.HasMedia | !String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) | String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
-
-            <!-- Schatten -->
-            <control type="image">
-                <left>5</left>
-                <top>7</top>
-                <width>100%</width>
-                <height>230</height>
-                <texture colordiffuse="99000000">colors/black.png</texture>
-            </control>
-
-            <!-- Hauptfläche -->
+        <control type="group" id="9200">
+            <left>45</left>
+            <right>40</right>
+            <bottom>190</bottom>
+            <height>350</height>
+            <visible>Player.Playing | String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
             <control type="image">
                 <left>0</left>
                 <top>0</top>
                 <width>100%</width>
-                <height>225</height>
-                <texture colordiffuse="f20b1016">colors/white.png</texture>
-            </control>
-
-            <!-- obere Lichtkante -->
+                <height>350</height>
+                <texture>home/nowplaying_v38.png</texture>
+            <visible>!Control.HasFocus(9201)</visible></control>
             <control type="image">
                 <left>0</left>
                 <top>0</top>
                 <width>100%</width>
-                <height>4</height>
-                <texture colordiffuse="668d99ae">colors/white.png</texture>
-            </control>
-
-            <!-- Audi-Orange links -->
-            <control type="image">
-                <left>0</left>
-                <top>0</top>
-                <width>8</width>
-                <height>225</height>
-                <texture colordiffuse="ffff6b00">colors/white.png</texture>
-            </control>
-
-            <!-- Unified Music Artwork -->
-            <control type="image">
-                <left>22</left>
-                <top>20</top>
-                <width>195</width>
-                <height>195</height>
+                <height>350</height>
+                <texture>home/nowplaying_focused_v44.png</texture>
+            <visible>Control.HasFocus(9201)</visible></control><control type="image">
+                <left>24</left>
+                <top>45</top>
+                <width>260</width>
+                <height>260</height>
                 <aspectratio>keep</aspectratio>
-
                 <texture>$INFO[Window(Home).Property(RNSE.Music.Artwork)]</texture>
-
                 <visible>
                     String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                     + !String.IsEmpty(Window(Home).Property(RNSE.Music.Artwork))
                 </visible>
             </control>
-
-            <!-- Kodi Artwork Fallback -->
             <control type="image">
-                <left>22</left>
-                <top>20</top>
-                <width>195</width>
-                <height>195</height>
+                <left>24</left>
+                <top>45</top>
+                <width>260</width>
+                <height>260</height>
                 <aspectratio>keep</aspectratio>
-
                 <texture>$INFO[Player.Art(thumb)]</texture>
-
                 <visible>
                     Player.HasMedia
                     + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                 </visible>
             </control>
-
-            <!-- Bluetooth ohne Cover -->
             <control type="image">
                 <left>42</left>
-                <top>40</top>
-                <width>155</width>
-                <height>155</height>
+                <top>63</top>
+                <width>224</width>
+                <height>224</height>
                 <aspectratio>keep</aspectratio>
-
                 <texture colordiffuse="ffc8cfd8">DefaultAlbumCover.png</texture>
-
                 <visible>
                     String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                     + String.IsEmpty(Window(Home).Property(RNSE.Music.Artwork))
                 </visible>
             </control>
-
-            <!-- METADATEN MITTE -->
-
-
-            <!-- =====================================================
-                 NOW PLAYING METADATEN
-
-                 Einheitliche Hierarchie:
-                 oben  = Titel
-                 unten = Interpret / Sender
-                 ===================================================== -->
-
-            <!-- RNSE MUSIC: Titel -->
             <control type="label">
-                <left>255</left>
-                <top>38</top>
-                <width>980</width>
-                <height>74</height>
-
-                <font>font45</font>
+                <left>315</left>
+                <top>45</top>
+                <width>950</width>
+                <height>95</height>
+                <font>font75</font>
                 <textcolor>ffffffff</textcolor>
-
                 <scroll>true</scroll>
-
                 <label>[B]$INFO[Window(Home).Property(RNSE.Music.Title)][/B]</label>
-
                 <visible>
                     String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                     + !String.IsEmpty(Window(Home).Property(RNSE.Music.Title))
                 </visible>
             </control>
-
-
-            <!-- RNSE MUSIC: Interpret -->
             <control type="label">
-                <left>255</left>
-                <top>116</top>
-                <width>980</width>
-                <height>74</height>
-
-                <font>font45</font>
+                <left>315</left>
+                <top>164</top>
+                <width>950</width>
+                <height>80</height>
+                <font>font50</font>
                 <textcolor>ffff8a32</textcolor>
-
                 <scroll>true</scroll>
-
                 <label>[B]$INFO[Window(Home).Property(RNSE.Music.Artist)][/B]</label>
-
                 <visible>
                     String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                     + !String.IsEmpty(Window(Home).Property(RNSE.Music.Artist))
                 </visible>
             </control>
-
-
-            <!-- KODI / RADIO: Titel -->
             <control type="label">
-                <left>255</left>
-                <top>38</top>
-                <width>980</width>
-                <height>74</height>
-
-                <font>font45</font>
+                <left>315</left>
+                <top>45</top>
+                <width>950</width>
+                <height>95</height>
+                <font>font75</font>
                 <textcolor>ffffffff</textcolor>
-
                 <scroll>true</scroll>
-
                 <label>[B]$INFO[MusicPlayer.Title][/B]</label>
-
                 <visible>
                     Player.HasMedia
                     + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                     + !String.IsEmpty(MusicPlayer.Title)
                 </visible>
             </control>
-
-
-            <!-- KODI / RADIO: Player.Title Fallback -->
             <control type="label">
-                <left>255</left>
-                <top>38</top>
-                <width>980</width>
-                <height>74</height>
-
-                <font>font45</font>
+                <left>315</left>
+                <top>45</top>
+                <width>950</width>
+                <height>95</height>
+                <font>font75</font>
                 <textcolor>ffffffff</textcolor>
-
                 <scroll>true</scroll>
-
                 <label>[B]$INFO[Player.Title][/B]</label>
-
                 <visible>
                     Player.HasMedia
                     + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                     + String.IsEmpty(MusicPlayer.Title)
                 </visible>
             </control>
-
-
-            <!-- KODI / RADIO: Interpret -->
             <control type="label">
-                <left>255</left>
-                <top>116</top>
-                <width>980</width>
-                <height>74</height>
-
-                <font>font45</font>
+                <left>315</left>
+                <top>164</top>
+                <width>950</width>
+                <height>80</height>
+                <font>font50</font>
                 <textcolor>ffff8a32</textcolor>
-
                 <scroll>true</scroll>
-
                 <label>[B]$INFO[MusicPlayer.Artist][/B]</label>
-
                 <visible>
                     Player.HasMedia
                     + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                     + !String.IsEmpty(MusicPlayer.Artist)
                 </visible>
             </control>
-
-
-            <!-- KODI / RADIO: Sender-Fallback -->
             <control type="label">
-                <left>255</left>
-                <top>116</top>
-                <width>980</width>
-                <height>74</height>
-
-                <font>font45</font>
+                <left>315</left>
+                <top>164</top>
+                <width>950</width>
+                <height>80</height>
+                <font>font50</font>
                 <textcolor>ffff8a32</textcolor>
-
                 <scroll>true</scroll>
-
                 <label>[B]$INFO[MusicPlayer.ChannelName][/B]</label>
-
                 <visible>
                     Player.HasMedia
                     + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
@@ -536,759 +403,132 @@
                     + !String.IsEmpty(MusicPlayer.ChannelName)
                 </visible>
             </control>
-
-
-            <!-- RECHTE STATUSZONE -->
-
-            <!-- vertikale Trennung -->
             <control type="image">
-                <left>1325</left>
-                <top>24</top>
+                <left>1320</left>
+                <top>75</top>
                 <width>3</width>
-                <height>178</height>
+                <height>200</height>
                 <texture colordiffuse="668d99ae">colors/white.png</texture>
             </control>
-
-            <!-- =====================================================
-                 RECHTE STATUSZONE
-                 Radio: Sender / Provider / Live
-                 Andere Medien: bisherige Quellenanzeige
-                 ===================================================== -->
-
-            <!-- Radio: Überschrift -->
             <control type="label">
-                <left>1365</left>
-                <top>30</top>
-                <width>400</width>
-                <height>45</height>
-                <font>font30_title</font>
+                <left>1360</left>
+                <top>50</top>
+                <width>390</width>
+                <height>55</height>
+                <font>font36_title</font>
                 <textcolor>ff9da6b2</textcolor>
                 <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
                 <label>SENDER</label>
             </control>
-
-            <!-- Andere Medien: Überschrift -->
             <control type="label">
-                <left>1365</left>
-                <top>30</top>
-                <width>400</width>
-                <height>45</height>
-                <font>font30_title</font>
+                <left>1360</left>
+                <top>50</top>
+                <width>390</width>
+                <height>55</height>
+                <font>font36_title</font>
                 <textcolor>ff9da6b2</textcolor>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) | String.IsEmpty(Window(Home).Property(RNSE.RadioStation))</visible>
                 <label>QUELLE</label>
             </control>
-
-            <!-- Radio: echter Sendername aus Metadata Service -->
             <control type="label">
-                <left>1365</left>
-                <top>72</top>
-                <width>430</width>
-                <height>65</height>
-                <font>font45</font>
+                <left>1360</left>
+                <top>124</top>
+                <width>390</width>
+                <height>85</height>
+                <font>font60</font>
                 <textcolor>ffffffff</textcolor>
                 <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
                 <label>[B]$INFO[Window(Home).Property(RNSE.RadioStation)][/B]</label>
+                <scroll>true</scroll>
             </control>
-
-            <!-- Radio: Provider -->
             <control type="label">
-                <left>1365</left>
-                <top>145</top>
-                <width>190</width>
-                <height>50</height>
-                <font>font30_title</font>
+                <left>1360</left>
+                <top>230</top>
+                <width>390</width>
+                <height>55</height>
+                <font>font36_title</font>
                 <textcolor>ffd5dae0</textcolor>
                 <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
-                <label>RADIO.DE</label>
+                <label>RADIO.DE  ·  [COLOR=FFFF8A32]LIVE[/COLOR]</label>
             </control>
-
-            <!-- Radio: Trenner -->
             <control type="label">
-                <left>1535</left>
-                <top>145</top>
-                <width>35</width>
-                <height>50</height>
-                <font>font30_title</font>
-                <textcolor>ff7f8790</textcolor>
-                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
-                <label>·</label>
-            </control>
-
-            <!-- Radio: Live-Status -->
-            <control type="label">
-                <left>1570</left>
-                <top>145</top>
-                <width>150</width>
-                <height>50</height>
-                <font>font30_title</font>
-                <textcolor>ffff8a32</textcolor>
-                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
-                <label>[B]LIVE[/B]</label>
-            </control>
-
-            <!-- Andere Medien: echter ChannelName, falls vorhanden -->
-            <control type="label">
-                <left>1365</left>
-                <top>72</top>
-                <width>430</width>
-                <height>65</height>
-                <font>font45</font>
+                <left>1360</left>
+                <top>124</top>
+                <width>390</width>
+                <height>85</height>
+                <font>font60</font>
                 <textcolor>ffffffff</textcolor>
-                <visible>String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEmpty(MusicPlayer.ChannelName)</visible>
+                <visible>String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(MusicPlayer.ChannelName)</visible>
                 <label>[B]$INFO[MusicPlayer.ChannelName][/B]</label>
+                <scroll>true</scroll>
             </control>
-
-            <!-- Radio.de Fallback, falls Metadata Service einmal nichts liefert -->
             <control type="label">
-                <left>1365</left>
-                <top>72</top>
-                <width>430</width>
-                <height>65</height>
-                <font>font45</font>
+                <left>1360</left>
+                <top>124</top>
+                <width>390</width>
+                <height>85</height>
+                <font>font60</font>
                 <textcolor>ffffffff</textcolor>
-                <visible>String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + String.IsEmpty(MusicPlayer.ChannelName) + String.Contains(Player.FilenameAndPath,plugin.audio.radiode)</visible>
+                <visible>String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + String.IsEmpty(MusicPlayer.ChannelName) + String.Contains(Player.FilenameAndPath,plugin.audio.radiode)</visible>
                 <label>[B]RADIO.DE[/B]</label>
             </control>
-
-            <!-- Unified Music Quelle -->
             <control type="label">
-                <left>1365</left>
-                <top>72</top>
-                <width>430</width>
-                <height>65</height>
-
-                <font>font45</font>
+                <left>1360</left>
+                <top>124</top>
+                <width>390</width>
+                <height>85</height>
+                <font>font60</font>
                 <textcolor>ffffffff</textcolor>
-
                 <scroll>true</scroll>
-
-                <visible>
-                    String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
-                </visible>
-
+                <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
                 <label>[B]$INFO[Window(Home).Property(RNSE.Music.SourceLabel)][/B]</label>
             </control>
-
-            <!-- Generischer Medien-Fallback -->
             <control type="label">
-                <left>1365</left>
-                <top>72</top>
-                <width>430</width>
-                <height>65</height>
-
-                <font>font45</font>
+                <left>1360</left>
+                <top>124</top>
+                <width>390</width>
+                <height>85</height>
+                <font>font60</font>
                 <textcolor>ffffffff</textcolor>
-
-                <visible>
-                    !String.IsEqual(Window(Home).Property(RNSE.Music.Connected),true)
-                    + String.IsEmpty(Window(Home).Property(RNSE.RadioStation))
-                    + String.IsEmpty(MusicPlayer.ChannelName)
-                    + !String.Contains(Player.FilenameAndPath,plugin.audio.radiode)
-                </visible>
-
+                <visible>!String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + String.IsEmpty(MusicPlayer.ChannelName) + !String.Contains(Player.FilenameAndPath,plugin.audio.radiode)</visible>
                 <label>[B]MEDIA[/B]</label>
             </control>
-
-            <!-- Andere Medien: LIVE bei Streams ohne Dauer -->
             <control type="label">
-                <left>1365</left>
-                <top>145</top>
-                <width>430</width>
-                <height>50</height>
+                <left>1360</left>
+                <top>230</top>
+                <width>390</width>
+                <height>55</height>
                 <font>font36_title</font>
                 <textcolor>ffff8a32</textcolor>
                 <visible>!String.IsEqual(Window(Home).Property(RNSE.Music.Connected),true) + String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + String.IsEmpty(Player.Duration)</visible>
                 <label>[B]LIVE[/B]</label>
             </control>
-
-            <!-- Unified Music Laufzeit -->
             <control type="label">
-                <left>1365</left>
-                <top>145</top>
-                <width>430</width>
-                <height>50</height>
-
-                <font>font30_title</font>
+                <left>1360</left>
+                <top>230</top>
+                <width>390</width>
+                <height>55</height>
+                <font>font36_title</font>
                 <textcolor>ffd5dae0</textcolor>
-
                 <visible>
-                    String.IsEqual(Window(Home).Property(RNSE.Music.Connected),true)
+                    String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
                 </visible>
-
                 <label>$INFO[Window(Home).Property(RNSE.Music.PositionText)] / $INFO[Window(Home).Property(RNSE.Music.DurationText)]</label>
             </control>
-
-
-            <!-- Andere Medien: Laufzeit -->
             <control type="label">
-                <left>1365</left>
-                <top>145</top>
-                <width>430</width>
-                <height>50</height>
-                <font>font30_title</font>
+                <left>1360</left>
+                <top>230</top>
+                <width>390</width>
+                <height>55</height>
+                <font>font36_title</font>
                 <textcolor>ffd5dae0</textcolor>
                 <visible>!String.IsEqual(Window(Home).Property(RNSE.Music.Connected),true) + String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEmpty(Player.Duration)</visible>
                 <label>$INFO[Player.Time]  /  $INFO[Player.Duration]</label>
             </control>
-
-            <!-- untere Akzentlinie -->
-            <control type="image">
-                <left>255</left>
-                <top>205</top>
-                <width>930</width>
-                <height>3</height>
-                <texture colordiffuse="338d99ae">colors/white.png</texture>
-            </control>
-
-        </control>
-
-
-        <!-- =========================================================
-             FOOTER
-             ========================================================= -->
-
-        <control type="group">
-
-            <left>30</left>
-            <right>30</right>
-            <bottom>18</bottom>
-            <height>124</height>
-
-
-            <!-- obere MMI Linie -->
-            <control type="image">
-                <left>0</left>
-                <top>0</top>
-                <width>100%</width>
-                <height>5</height>
-                <texture colordiffuse="aaffffff">colors/white.png</texture>
-            </control>
-
-
-            <!-- Einstellungen links: normal -->
-            <control type="label">
-                <left>15</left>
-                <top>20</top>
-                <width>500</width>
-                <height>82</height>
-                <aligny>center</aligny>
-                <font>font55</font>
-                <textcolor>fff0f2f5</textcolor>
-                <label>[B]Einstellungen[/B]</label>
-                <visible>!Control.HasFocus(9100)</visible>
-            </control>
-
-            <!-- Einstellungen links: Fokus -->
-            <control type="label">
-                <left>15</left>
-                <top>20</top>
-                <width>500</width>
-                <height>82</height>
-                <aligny>center</aligny>
-                <font>font55</font>
-                <textcolor>ffff8800</textcolor>
-                <label>[B]Einstellungen[/B]</label>
-                <visible>Control.HasFocus(9100)</visible>
-            </control>
-
-            <!-- Unsichtbares Fokus-Control -->
-            <control type="button" id="9100">
-                <left>15</left>
-                <top>20</top>
-                <width>500</width>
-                <height>82</height>
-
-                <label></label>
-                <texturefocus>-</texturefocus>
-                <texturenofocus>-</texturenofocus>
-
-                <onup>9101</onup>
-                <ondown>9101</ondown>
-                <onleft>9101</onleft>
-                <onright>9101</onright>
-
-                <onclick>ActivateWindow(Settings)</onclick>
-            </control>
-
-
-
-            <!-- EXAKT ZENTRIERTER Statusblock
-                 520px breit, Bildschirmmitte 960:
-                 960 - 260 - 30 Gruppenoffset = 670
-            -->
-
-            <control type="group">
-                <left>720</left>
-                <top>20</top>
-                <width>420</width>
-                <height>82</height>
-
-                <!-- Wettericon -->
-                <control type="image">
-                    <left>0</left>
-                    <top>0</top>
-                    <width>82</width>
-                    <height>82</height>
-                    <aspectratio>keep</aspectratio>
-                    <texture>$INFO[Weather.ConditionsIcon]</texture>
-                </control>
-
-                <!-- Temperatur -->
-                <control type="label">
-                    <left>88</left>
-                    <top>0</top>
-                    <width>124</width>
-                    <height>82</height>
-                    <align>center</align>
-                    <aligny>center</aligny>
-                    <font>font55</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <label>[B]$INFO[Weather.Temperature][/B]</label>
-                </control>
-
-                <!-- Trennlinie -->
-                <control type="image">
-                    <left>238</left>
-                    <top>12</top>
-                    <width>2</width>
-                    <height>58</height>
-                    <texture colordiffuse="55ffffff">colors/white.png</texture>
-                </control>
-
-                <!-- Uhrzeit -->
-                <control type="label">
-                    <left>260</left>
-                    <top>0</top>
-                    <width>160</width>
-                    <height>82</height>
-                    <align>center</align>
-                    <aligny>center</aligny>
-                    <font>font55</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <label>[B]$INFO[System.Time(hh:mm)][/B]</label>
-                </control>
-
-            </control>
-
-        
-
-
-            
-            <!-- Smartphone-Softkey: unsichtbares Fokus-Control -->
-            <control type="button" id="9101">
-                <right>0</right>
-                <top>20</top>
-                <width>520</width>
-                <height>82</height>
-
-                <label></label>
-                <texturefocus>-</texturefocus>
-                <texturenofocus>-</texturenofocus>
-
-                <onup>9100</onup>
-                <ondown>9100</ondown>
-                <onleft>9100</onleft>
-                <onright>9100</onright>
-
-                <onclick>ActivateWindow(1160)</onclick>
-            </control>
-
-
-
-            <!-- =====================================================
-                 SMARTPHONE STATUS RECHTS
-                 ===================================================== -->
-
-            <control type="group">
-                <right>0</right>
-                <top>20</top>
-                <width>520</width>
-                <height>82</height>
-
-                <!-- Telefon verbunden -->
-                <control type="group">
-                    <left>0</left>
-                    <top>0</top>
-                    <width>520</width>
-                    <height>82</height>
-
-                    <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Connected),true) + !Control.HasFocus(9101)</visible>
-
-                    <!-- Netzbetreiber -->
-                    <control type="label">
-                        <left>0</left>
-                        <top>0</top>
-                        <width>350</width>
-                        <height>82</height>
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <font>font55</font>
-                        <textcolor>fff0f2f5</textcolor>
-                        <label>[B]$INFO[Window(Home).Property(RNSE.Phone.Operator)][/B]</label>
-                    </control>
-
-                    <!-- Mobilfunkempfang -->
-                    <control type="group">
-                        <left>375</left>
-                        <top>23</top>
-                        <width>62</width>
-                        <height>36</height>
-
-                        <control type="image">
-                            <left>0</left>
-                            <bottom>0</bottom>
-                            <width>8</width>
-                            <height>10</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal1),true)</visible>
-                        </control>
-
-                        <control type="image">
-                            <left>13</left>
-                            <bottom>0</bottom>
-                            <width>8</width>
-                            <height>16</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal2),true)</visible>
-                        </control>
-
-                        <control type="image">
-                            <left>26</left>
-                            <bottom>0</bottom>
-                            <width>8</width>
-                            <height>22</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal3),true)</visible>
-                        </control>
-
-                        <control type="image">
-                            <left>39</left>
-                            <bottom>0</bottom>
-                            <width>8</width>
-                            <height>28</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal4),true)</visible>
-                        </control>
-
-                        <control type="image">
-                            <left>52</left>
-                            <bottom>0</bottom>
-                            <width>8</width>
-                            <height>34</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal5),true)</visible>
-                        </control>
-                    </control>
-
-                    <!-- Akku hochkant -->
-                    <control type="group">
-                        <left>455</left>
-                        <top>11</top>
-                        <width>50</width>
-                        <height>60</height>
-
-                        <!-- Kopf -->
-                        <control type="image">
-                            <left>15</left>
-                            <top>0</top>
-                            <width>16</width>
-                            <height>6</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                        </control>
-
-                        <!-- Rahmen -->
-                        <control type="image">
-                            <left>4</left>
-                            <top>6</top>
-                            <width>38</width>
-                            <height>3</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                        </control>
-
-                        <control type="image">
-                            <left>4</left>
-                            <top>56</top>
-                            <width>38</width>
-                            <height>3</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                        </control>
-
-                        <control type="image">
-                            <left>4</left>
-                            <top>6</top>
-                            <width>3</width>
-                            <height>53</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                        </control>
-
-                        <control type="image">
-                            <left>39</left>
-                            <top>6</top>
-                            <width>3</width>
-                            <height>53</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                        </control>
-
-                        <!-- 1/5 -->
-                        <control type="image">
-                            <left>10</left>
-                            <top>46</top>
-                            <width>26</width>
-                            <height>7</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery1),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery2),true)</visible>
-                        </control>
-
-                        <!-- 2/5 -->
-                        <control type="image">
-                            <left>10</left>
-                            <top>38</top>
-                            <width>26</width>
-                            <height>15</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery2),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery3),true)</visible>
-                        </control>
-
-                        <!-- 3/5 -->
-                        <control type="image">
-                            <left>10</left>
-                            <top>30</top>
-                            <width>26</width>
-                            <height>23</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery3),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery4),true)</visible>
-                        </control>
-
-                        <!-- 4/5 -->
-                        <control type="image">
-                            <left>10</left>
-                            <top>22</top>
-                            <width>26</width>
-                            <height>31</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery4),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery5),true)</visible>
-                        </control>
-
-                        <!-- 5/5 -->
-                        <control type="image">
-                            <left>10</left>
-                            <top>14</top>
-                            <width>26</width>
-                            <height>39</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery5),true)</visible>
-                        </control>
-
-                    </control>
-
-                </control>
-
-
-
-                <!-- =================================================
-                     RNSE PHONE FOCUS OVERLAY
-                     Nur sichtbar bei Fokus auf Smartphone-Softkey
-                     ================================================= -->
-
-                <control type="group">
-                    <left>0</left>
-                    <top>0</top>
-                    <width>520</width>
-                    <height>82</height>
-
-                    <visible>
-                        Control.HasFocus(9101) +
-                        String.IsEqual(Window(Home).Property(RNSE.Phone.Connected),true)
-                    </visible>
-
-                    <!-- Netzbetreiber -->
-                    <control type="label">
-                        <left>0</left>
-                        <top>0</top>
-                        <width>350</width>
-                        <height>82</height>
-                        <align>right</align>
-                        <aligny>center</aligny>
-                        <font>font55</font>
-                        <textcolor>ffff8800</textcolor>
-                        <label>[B]$INFO[Window(Home).Property(RNSE.Phone.Operator)][/B]</label>
-                    </control>
-
-                    <!-- Mobilfunkempfang -->
-                    <control type="group">
-                        <left>375</left>
-                        <top>23</top>
-                        <width>62</width>
-                        <height>36</height>
-
-                        <control type="image">
-                            <left>0</left>
-                            <bottom>0</bottom>
-                            <width>8</width>
-                            <height>10</height>
-                            <texture colordiffuse="ffff8800">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal1),true)</visible>
-                        </control>
-
-                        <control type="image">
-                            <left>13</left>
-                            <bottom>0</bottom>
-                            <width>8</width>
-                            <height>16</height>
-                            <texture colordiffuse="ffff8800">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal2),true)</visible>
-                        </control>
-
-                        <control type="image">
-                            <left>26</left>
-                            <bottom>0</bottom>
-                            <width>8</width>
-                            <height>22</height>
-                            <texture colordiffuse="ffff8800">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal3),true)</visible>
-                        </control>
-
-                        <control type="image">
-                            <left>39</left>
-                            <bottom>0</bottom>
-                            <width>8</width>
-                            <height>28</height>
-                            <texture colordiffuse="ffff8800">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal4),true)</visible>
-                        </control>
-
-                        <control type="image">
-                            <left>52</left>
-                            <bottom>0</bottom>
-                            <width>8</width>
-                            <height>34</height>
-                            <texture colordiffuse="ffff8800">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal5),true)</visible>
-                        </control>
-                    </control>
-
-                    <!-- Akku -->
-                    <control type="group">
-                        <left>455</left>
-                        <top>11</top>
-                        <width>50</width>
-                        <height>60</height>
-
-                        <!-- Kopf -->
-                        <control type="image">
-                            <left>15</left>
-                            <top>0</top>
-                            <width>16</width>
-                            <height>6</height>
-                            <texture colordiffuse="ffff8800">colors/white.png</texture>
-                        </control>
-
-                        <!-- Rahmen -->
-                        <control type="image">
-                            <left>4</left>
-                            <top>6</top>
-                            <width>38</width>
-                            <height>3</height>
-                            <texture colordiffuse="ffff8800">colors/white.png</texture>
-                        </control>
-
-                        <control type="image">
-                            <left>4</left>
-                            <top>56</top>
-                            <width>38</width>
-                            <height>3</height>
-                            <texture colordiffuse="ffff8800">colors/white.png</texture>
-                        </control>
-
-                        <control type="image">
-                            <left>4</left>
-                            <top>6</top>
-                            <width>3</width>
-                            <height>53</height>
-                            <texture colordiffuse="ffff8800">colors/white.png</texture>
-                        </control>
-
-                        <control type="image">
-                            <left>39</left>
-                            <top>6</top>
-                            <width>3</width>
-                            <height>53</height>
-                            <texture colordiffuse="ffff8800">colors/white.png</texture>
-                        </control>
-
-                        <!-- 1/5 -->
-                        <control type="image">
-                            <left>10</left>
-                            <top>46</top>
-                            <width>26</width>
-                            <height>7</height>
-                            <texture colordiffuse="ffff8800">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery1),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery2),true)</visible>
-                        </control>
-
-                        <!-- 2/5 -->
-                        <control type="image">
-                            <left>10</left>
-                            <top>38</top>
-                            <width>26</width>
-                            <height>15</height>
-                            <texture colordiffuse="ffff8800">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery2),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery3),true)</visible>
-                        </control>
-
-                        <!-- 3/5 -->
-                        <control type="image">
-                            <left>10</left>
-                            <top>30</top>
-                            <width>26</width>
-                            <height>23</height>
-                            <texture colordiffuse="ffff8800">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery3),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery4),true)</visible>
-                        </control>
-
-                        <!-- 4/5 -->
-                        <control type="image">
-                            <left>10</left>
-                            <top>22</top>
-                            <width>26</width>
-                            <height>31</height>
-                            <texture colordiffuse="ffff8800">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery4),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery5),true)</visible>
-                        </control>
-
-                        <!-- 5/5 -->
-                        <control type="image">
-                            <left>10</left>
-                            <top>14</top>
-                            <width>26</width>
-                            <height>39</height>
-                            <texture colordiffuse="ffff8800">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery5),true)</visible>
-                        </control>
-
-                    </control>
-
-                </control>
-
-                <!-- Kein Telefon verbunden -->
-                <control type="label">
-                    <left>0</left>
-                    <top>0</top>
-                    <width>505</width>
-                    <height>82</height>
-                    <align>right</align>
-                    <aligny>center</aligny>
-                    <font>font55</font>
-                    <textcolor>ff8d99ae</textcolor>
-                    <label>[B]Kein Telefon[/B]</label>
-                    <visible>!String.IsEqual(Window(Home).Property(RNSE.Phone.Connected),true)</visible>
-                </control>
-
-            </control>
-
-
-        </control>
-
+        <control type="image"><left>24</left><top>45</top><width>260</width><height>260</height><texture>home/nowplaying_cover_corners_v43.png</texture></control><control type="group" id="9240"><left>315</left><top>269</top><width>950</width><height>18</height><control type="image"><left>0</left><top>0</top><width>950</width><height>18</height><texture>home/nowplaying_progress_bg_v42.png</texture><visible>[String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00)] | [!String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + Player.HasMedia + !String.IsEmpty(Player.Duration) + !String.IsEqual(Player.Duration,0:00) + !String.IsEqual(Player.Duration,00:00) + String.IsEmpty(Window(Home).Property(RNSE.RadioStation))]</visible></control><control type="image"><left>0</left><top>0</top><width>10</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),1)</visible></control><control type="image"><left>0</left><top>0</top><width>19</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),2)</visible></control><control type="image"><left>0</left><top>0</top><width>28</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),3)</visible></control><control type="image"><left>0</left><top>0</top><width>38</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),4)</visible></control><control type="image"><left>0</left><top>0</top><width>48</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),5)</visible></control><control type="image"><left>0</left><top>0</top><width>57</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),6)</visible></control><control type="image"><left>0</left><top>0</top><width>66</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),7)</visible></control><control type="image"><left>0</left><top>0</top><width>76</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),8)</visible></control><control type="image"><left>0</left><top>0</top><width>86</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),9)</visible></control><control type="image"><left>0</left><top>0</top><width>95</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),10)</visible></control><control type="image"><left>0</left><top>0</top><width>104</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),11)</visible></control><control type="image"><left>0</left><top>0</top><width>114</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),12)</visible></control><control type="image"><left>0</left><top>0</top><width>124</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),13)</visible></control><control type="image"><left>0</left><top>0</top><width>133</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),14)</visible></control><control type="image"><left>0</left><top>0</top><width>142</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),15)</visible></control><control type="image"><left>0</left><top>0</top><width>152</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),16)</visible></control><control type="image"><left>0</left><top>0</top><width>162</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),17)</visible></control><control type="image"><left>0</left><top>0</top><width>171</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),18)</visible></control><control type="image"><left>0</left><top>0</top><width>180</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),19)</visible></control><control type="image"><left>0</left><top>0</top><width>190</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),20)</visible></control><control type="image"><left>0</left><top>0</top><width>200</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),21)</visible></control><control type="image"><left>0</left><top>0</top><width>209</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),22)</visible></control><control type="image"><left>0</left><top>0</top><width>218</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),23)</visible></control><control type="image"><left>0</left><top>0</top><width>228</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),24)</visible></control><control type="image"><left>0</left><top>0</top><width>238</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),25)</visible></control><control type="image"><left>0</left><top>0</top><width>247</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),26)</visible></control><control type="image"><left>0</left><top>0</top><width>256</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),27)</visible></control><control type="image"><left>0</left><top>0</top><width>266</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),28)</visible></control><control type="image"><left>0</left><top>0</top><width>276</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),29)</visible></control><control type="image"><left>0</left><top>0</top><width>285</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),30)</visible></control><control type="image"><left>0</left><top>0</top><width>294</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),31)</visible></control><control type="image"><left>0</left><top>0</top><width>304</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),32)</visible></control><control type="image"><left>0</left><top>0</top><width>314</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),33)</visible></control><control type="image"><left>0</left><top>0</top><width>323</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),34)</visible></control><control type="image"><left>0</left><top>0</top><width>332</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),35)</visible></control><control type="image"><left>0</left><top>0</top><width>342</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),36)</visible></control><control type="image"><left>0</left><top>0</top><width>352</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),37)</visible></control><control type="image"><left>0</left><top>0</top><width>361</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),38)</visible></control><control type="image"><left>0</left><top>0</top><width>370</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),39)</visible></control><control type="image"><left>0</left><top>0</top><width>380</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),40)</visible></control><control type="image"><left>0</left><top>0</top><width>390</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),41)</visible></control><control type="image"><left>0</left><top>0</top><width>399</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),42)</visible></control><control type="image"><left>0</left><top>0</top><width>408</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),43)</visible></control><control type="image"><left>0</left><top>0</top><width>418</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),44)</visible></control><control type="image"><left>0</left><top>0</top><width>428</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),45)</visible></control><control type="image"><left>0</left><top>0</top><width>437</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),46)</visible></control><control type="image"><left>0</left><top>0</top><width>446</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),47)</visible></control><control type="image"><left>0</left><top>0</top><width>456</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),48)</visible></control><control type="image"><left>0</left><top>0</top><width>466</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),49)</visible></control><control type="image"><left>0</left><top>0</top><width>475</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),50)</visible></control><control type="image"><left>0</left><top>0</top><width>484</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),51)</visible></control><control type="image"><left>0</left><top>0</top><width>494</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),52)</visible></control><control type="image"><left>0</left><top>0</top><width>504</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),53)</visible></control><control type="image"><left>0</left><top>0</top><width>513</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),54)</visible></control><control type="image"><left>0</left><top>0</top><width>522</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),55)</visible></control><control type="image"><left>0</left><top>0</top><width>532</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),56)</visible></control><control type="image"><left>0</left><top>0</top><width>542</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),57)</visible></control><control type="image"><left>0</left><top>0</top><width>551</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),58)</visible></control><control type="image"><left>0</left><top>0</top><width>560</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),59)</visible></control><control type="image"><left>0</left><top>0</top><width>570</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),60)</visible></control><control type="image"><left>0</left><top>0</top><width>580</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),61)</visible></control><control type="image"><left>0</left><top>0</top><width>589</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),62)</visible></control><control type="image"><left>0</left><top>0</top><width>598</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),63)</visible></control><control type="image"><left>0</left><top>0</top><width>608</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),64)</visible></control><control type="image"><left>0</left><top>0</top><width>618</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),65)</visible></control><control type="image"><left>0</left><top>0</top><width>627</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),66)</visible></control><control type="image"><left>0</left><top>0</top><width>636</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),67)</visible></control><control type="image"><left>0</left><top>0</top><width>646</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),68)</visible></control><control type="image"><left>0</left><top>0</top><width>656</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),69)</visible></control><control type="image"><left>0</left><top>0</top><width>665</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),70)</visible></control><control type="image"><left>0</left><top>0</top><width>674</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),71)</visible></control><control type="image"><left>0</left><top>0</top><width>684</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),72)</visible></control><control type="image"><left>0</left><top>0</top><width>694</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),73)</visible></control><control type="image"><left>0</left><top>0</top><width>703</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),74)</visible></control><control type="image"><left>0</left><top>0</top><width>712</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),75)</visible></control><control type="image"><left>0</left><top>0</top><width>722</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),76)</visible></control><control type="image"><left>0</left><top>0</top><width>732</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),77)</visible></control><control type="image"><left>0</left><top>0</top><width>741</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),78)</visible></control><control type="image"><left>0</left><top>0</top><width>750</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),79)</visible></control><control type="image"><left>0</left><top>0</top><width>760</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),80)</visible></control><control type="image"><left>0</left><top>0</top><width>770</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),81)</visible></control><control type="image"><left>0</left><top>0</top><width>779</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),82)</visible></control><control type="image"><left>0</left><top>0</top><width>788</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),83)</visible></control><control type="image"><left>0</left><top>0</top><width>798</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),84)</visible></control><control type="image"><left>0</left><top>0</top><width>808</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),85)</visible></control><control type="image"><left>0</left><top>0</top><width>817</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),86)</visible></control><control type="image"><left>0</left><top>0</top><width>826</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),87)</visible></control><control type="image"><left>0</left><top>0</top><width>836</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),88)</visible></control><control type="image"><left>0</left><top>0</top><width>846</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),89)</visible></control><control type="image"><left>0</left><top>0</top><width>855</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),90)</visible></control><control type="image"><left>0</left><top>0</top><width>864</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),91)</visible></control><control type="image"><left>0</left><top>0</top><width>874</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),92)</visible></control><control type="image"><left>0</left><top>0</top><width>884</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),93)</visible></control><control type="image"><left>0</left><top>0</top><width>893</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),94)</visible></control><control type="image"><left>0</left><top>0</top><width>902</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),95)</visible></control><control type="image"><left>0</left><top>0</top><width>912</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),96)</visible></control><control type="image"><left>0</left><top>0</top><width>922</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),97)</visible></control><control type="image"><left>0</left><top>0</top><width>931</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),98)</visible></control><control type="image"><left>0</left><top>0</top><width>940</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),99)</visible></control><control type="image"><left>0</left><top>0</top><width>950</width><height>18</height><texture>home/nowplaying_progress_fill_v42.png</texture><visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.Music.DurationText)) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),0:00) + !String.IsEqual(Window(Home).Property(RNSE.Music.DurationText),00:00) + String.IsEqual(Window(Home).Property(RNSE.Music.Progress),100)</visible></control><control type="progress"><left>0</left><top>0</top><width>950</width><height>18</height><info>Player.Progress</info><visible>!String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + Player.HasMedia + !String.IsEmpty(Player.Duration) + !String.IsEqual(Player.Duration,0:00) + !String.IsEqual(Player.Duration,00:00) + String.IsEmpty(Window(Home).Property(RNSE.RadioStation))</visible><texturebg>home/nowplaying_progress_bg_v42.png</texturebg><textureleft>home/nowplaying_progress_fill_v42.png</textureleft><texturemid>home/nowplaying_progress_fill_v42.png</texturemid><textureright>home/nowplaying_progress_fill_v42.png</textureright></control></control></control>
+        <control type="button" id="9201"><left>45</left><right>40</right><bottom>190</bottom><height>350</height><label /><texturefocus>-</texturefocus><texturenofocus>-</texturenofocus><onup>9201</onup><ondown>9201</ondown><onleft>9201</onleft><onright>9201</onright><visible>Player.Playing | String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible><onclick condition="String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) | String.IsEmpty(Window(Home).Property(RNSE.RadioStation))">ActivateWindow(11199)</onclick><onclick condition="!String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) + !String.IsEmpty(Window(Home).Property(RNSE.RadioStation))">ActivateWindow(11198)</onclick></control><include content="RNSE_GlobalFooter">
+            <param name="footer_left_id" value="9100" />
+            <param name="footer_right_id" value="9101" />
+        </include>
     </controls>
 </window>
