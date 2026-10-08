@@ -9183,14 +9183,11 @@ def get_kodi_radio_station():
 
 async def kodi_radio_station_watch_loop():
     """
-    Beobachtet ausschließlich Senderwechsel.
+    RNSE_KODI_INSTANT_RADIO_METADATA_V2
 
-    Bei einem neuen Sender:
-      - alten Scroll sofort abbrechen
-      - laufendes Media-Carousel abbrechen
-      - FIS1 leeren
-      - Sender-Intro zurücksetzen
-      - Carousel sofort neu starten
+    Beobachtet Sender, Titel und Interpret alle 100 ms.
+    Senderwechsel behalten das bestehende Sender-Intro.
+    Inhaltswechsel starten den FIS1-Medienzyklus sofort neu.
     """
 
     global kodi_station_watch_last
@@ -9199,64 +9196,114 @@ async def kodi_radio_station_watch_loop():
     global kodi_radio_last_station
     global kodi_radio_station_intro_until
 
-    while not stop_flag:
+    last_metadata = ()
 
+    while not stop_flag:
         await asyncio.sleep(0.10)
 
-        # Nur relevant, solange Kodi tatsächlich läuft.
         if not kodi_process_running():
             kodi_station_watch_last = ""
+            last_metadata = ()
             continue
 
         station = get_kodi_radio_station()
 
         if not station:
+            kodi_station_watch_last = ""
+            last_metadata = ()
             continue
 
-        # Erster bekannter Sender nach Start:
-        # nur merken, noch nichts gewaltsam abbrechen.
+        try:
+            payload = json.loads(
+                KODI_RADIO_METADATA_PATH.read_text(
+                    encoding="utf-8"
+                )
+            )
+        except (OSError, ValueError):
+            continue
+
+        title_value = str(
+            payload.get("title", "") or ""
+        ).strip()
+
+        artist_value = str(
+            payload.get("artist", "") or ""
+        ).strip()
+
+        # Sendernamen als Platzhalter ignorieren.
+        if title_value.casefold() == station.casefold():
+            title_value = ""
+
+        if artist_value.casefold() == station.casefold():
+            artist_value = ""
+
+        signature = (title_value, artist_value)
+
+        station_changed = (
+            bool(kodi_station_watch_last)
+            and station.casefold()
+            != kodi_station_watch_last.casefold()
+        )
+
         if not kodi_station_watch_last:
             kodi_station_watch_last = station
+            last_metadata = signature
             continue
 
-        # Gleicher Sender -> nichts tun.
+        if station_changed:
+            old_station = kodi_station_watch_last
+            kodi_station_watch_last = station
+            last_metadata = signature
+
+            # Sender-Intro beim Senderwechsel erzwingen.
+            kodi_radio_last_station = ""
+            kodi_radio_station_intro_until = 0.0
+
+            if ENABLE_LOGGING:
+                logger.info(
+                    "KODI_RADIO_FIS_V2: Senderwechsel %r -> %r",
+                    old_station,
+                    station
+                )
+
+        else:
+            if signature == last_metadata:
+                continue
+
+            old_metadata = last_metadata
+            last_metadata = signature
+
+            # Das Sender-Intro darf durch eintreffende
+            # Titel-/Radiotext-Updates nicht unterbrochen werden.
+            if (
+                time.monotonic()
+                < kodi_radio_station_intro_until
+            ):
+                continue
+
+            if ENABLE_LOGGING:
+                logger.info(
+                    "KODI_RADIO_FIS_V2: Metadata %r -> %r",
+                    old_metadata,
+                    signature
+                )
+
+        # Alten Scrollvorgang stoppen.
+        old_scroll = scroll_task_fis1
+
         if (
-            station.casefold()
-            == kodi_station_watch_last.casefold()
+            old_scroll is not None
+            and not old_scroll.done()
         ):
-            continue
+            old_scroll.cancel()
 
-        old_station = kodi_station_watch_last
-        kodi_station_watch_last = station
+            with contextlib.suppress(
+                asyncio.CancelledError,
+                Exception
+            ):
+                await old_scroll
 
-        if ENABLE_LOGGING:
-            logger.info(
-                "KODI_RADIO_FIS: Senderwechsel %r -> %r, "
-                "altes Carousel wird sofort abgebrochen.",
-                old_station,
-                station
-            )
-
-        # ----------------------------------------------------
-        # Sender-Intro für neuen Sender erzwingen
-        # ----------------------------------------------------
-        kodi_radio_last_station = ""
-        kodi_radio_station_intro_until = 0.0
-
-        # ----------------------------------------------------
-        # Laufenden Textscroll sofort stoppen
-        # ----------------------------------------------------
-        if (
-            scroll_task_fis1 is not None
-            and not scroll_task_fis1.done()
-        ):
-            scroll_task_fis1.cancel()
-
-        # ----------------------------------------------------
-        # Auch das komplette Carousel abbrechen.
-        # Damit warten wir NICHT noch die Standzeit des alten
-        # Radiotexts ab.
-        # ----------------------------------------------------
+        # Vorheriges Karussell vollständig abbrechen.
         old_carousel = media_carousel_task
 
         if (
@@ -9273,13 +9320,17 @@ async def kodi_radio_station_watch_loop():
 
         media_carousel_task = None
 
-        if send_on_canbus and can_functional:
+        if (
+            send_on_canbus
+            and can_functional
+            and toggle_fis1 == 6
+        ):
             clear_content(FIS1)
 
-        # Sofort mit dem neuen Sender neu beginnen.
         await media_to_dis1()
 
 
+# RNSE_KODI_INSTANT_RADIO_METADATA_V2 END
 
 
 # RNSE_KODI_INSTANT_MUSIC_SWITCH_V1
