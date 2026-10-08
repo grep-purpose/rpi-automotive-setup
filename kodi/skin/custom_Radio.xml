@@ -62,7 +62,7 @@
                 <height>72</height>
                 <font>font55</font>
                 <textcolor>ff8d99ae</textcolor>
-                <label>[B]LIVE[/B]  •  $INFO[Window(Home).Property(RNSE.RadioStation)]</label>
+                <label>[B][COLOR=FFFF4444]●[/COLOR] LIVE[/B]  •  $INFO[Window(Home).Property(RNSE.RadioStation)]</label>
                 <scroll>true</scroll>
             </control>
             <control type="label">
