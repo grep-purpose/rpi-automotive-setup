@@ -186,6 +186,8 @@ script_fullpath = os.path.realpath(__file__)
 # Status / Configuration
 # ---------------------------
 welcome_active = False
+# RNSE_WELCOME_V2: Die Begruessung endet beim ersten Medieninhalt.
+welcome_finished = False
 stop_flag = False
 shutdown_script = False
 # Startup is not complete until welcome_message() has finished.
@@ -3303,6 +3305,9 @@ async def read_cpu_loop():
 def set_fis1(text, align=None, trace=None):
     global fis1_pending
 
+    # RNSE_WELCOME_V2
+    if welcome_active and str(text) != str(welcome_message_1st_line):
+        return
 
     if align is None:
         align = "right"
@@ -3317,6 +3322,11 @@ def set_fis1(text, align=None, trace=None):
 
 def set_fis2(text, align=None, trace=None, nav_overlay=False):
     global fis2_pending
+
+    # RNSE_WELCOME_V2
+    if welcome_active and str(text) != str(welcome_message_2nd_line):
+        return
+
     if not nav_overlay:
         nav_fis2_normal[toggle_fis2] = (text, align, trace)
         if nav_fis2_overlay:
@@ -4059,58 +4069,63 @@ def log_fis_send(arb_id, data_content):
     return line
 
 
+# RNSE_WELCOME_V2
+def finish_welcome_v2():
+    """Begruessung genau einmal pro Prozessstart beenden."""
+    global welcome_active, welcome_finished
+
+    if welcome_finished:
+        return False
+
+    welcome_finished = True
+
+    if not welcome_active:
+        return False
+
+    welcome_active = False
+    clear_content(FIS1)
+    clear_content(FIS2)
+
+    if ENABLE_LOGGING:
+        logger.info(
+            "RNSE_WELCOME_V2: Erste Medienmetadaten -> "
+            "Begruessung beendet."
+        )
+
+    return True
+
+
 @handle_errors
 async def welcome_message():
-    global script_started, pause_fis1, pause_fis2, welcome_active
+    global script_started, pause_fis1, pause_fis2
+    global welcome_active, welcome_finished
 
     if script_started:
         return
 
-    # In receive-only mode no FIS welcome message can or should be sent.
-    # CAN callbacks must nevertheless be released immediately.
     if not (send_on_canbus and can_functional):
         script_started = True
         welcome_active = False
         pause_fis1 = False
         pause_fis2 = False
-        if ENABLE_LOGGING:
-            logger.info(
-                "Welcome message skipped because CAN sending is disabled; "
-                "script callbacks are now active."
-            )
         return
 
-    logger.info("Sending welcome message.")
-    logger.info("")
+    # RNSE_WELCOME_V2
+    # Keine Wartezeit und keine blockierten CAN-Callbacks.
+    pause_fis1 = False
+    pause_fis2 = False
 
-    pause_fis1 = True
-    pause_fis2 = True
-    welcome_active = False
-
-    try:
+    if not welcome_finished:
+        welcome_active = True
         set_fis1(welcome_message_1st_line, "center")
         set_fis2(welcome_message_2nd_line, "center")
 
-        await asyncio.sleep(3)
+        if ENABLE_LOGGING:
+            logger.info(
+                "RNSE_WELCOME_V2: WELCOME / AUDI A4 aktiv."
+            )
 
-        clear_content(FIS1)
-        clear_content(FIS2)
-
-        if show_label:
-            await asyncio.sleep(0.2)
-            await toggle_fis2_label()
-            set_fis1(value_of_toggle_fis2, "center")
-
-    finally:
-        # A failed or skipped display operation must never keep all CAN callbacks blocked.
-        script_started = True
-        welcome_active = False
-        pause_fis1 = False
-        pause_fis2 = False
-
-    # Danach den inzwischen empfangenen aktuellen Inhalt anzeigen.
-    await refresh_fis1_current_value()
-    await refresh_fis2_current_value()
+    script_started = True
 
 
 # ------------------------------------------------------------
@@ -4224,10 +4239,22 @@ def define_event_handler_class():
         def on_media_metadata(self, _client, message):
             global title, artist, album, duration, welcome_active
             
-            if welcome_active and (getattr(message, 'title', '') or getattr(message, 'artist', '')):
-                welcome_active = False
-                if ENABLE_LOGGING:
-                    logger.info('Erstes Medienevent empfangen -> Begruessung beendet.')
+            # RNSE_WELCOME_V2
+            # HUDIY darf die Begruessung nur bei aktiver HUDIY-Quelle
+            # beenden, nicht mit alten Events waehrend Kodi aktiv ist.
+            if (
+                not kodi_process_running()
+                and (
+                    getattr(message, 'title', '')
+                    or getattr(message, 'artist', '')
+                )
+            ):
+                if finish_welcome_v2():
+                    fire_and_forget(
+                        self.main_loop,
+                        refresh_fis2_current_value(),
+                        "welcome_v2_fis2_refresh"
+                    )
             
             title = getattr(message, 'title', '') or ''
             artist = getattr(message, 'artist', '') or ''
@@ -9734,6 +9761,12 @@ async def media_carousel_loop():
                         ),
                         active_items
                     )
+
+            # RNSE_WELCOME_V2
+            # Gilt fuer Kodi-Radio, Kodi-Musik und HUDIY.
+            if active_items and not welcome_finished:
+                if finish_welcome_v2():
+                    await refresh_fis2_current_value()
 
             if not active_items:
                 await asyncio.sleep(1.0)
