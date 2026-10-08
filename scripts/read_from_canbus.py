@@ -188,6 +188,12 @@ script_fullpath = os.path.realpath(__file__)
 welcome_active = False
 # RNSE_WELCOME_V2: Die Begruessung endet beim ersten Medieninhalt.
 welcome_finished = False
+
+# RNSE_BT_FIS_NOTIFY_V1
+bt_fis_notice_active = False
+bt_fis_notice_writing = False
+bt_fis_notice_task = None
+
 stop_flag = False
 shutdown_script = False
 # Startup is not complete until welcome_message() has finished.
@@ -3116,6 +3122,12 @@ async def start_send_to_dis():
             "kodi_music_watch"
         )
 
+    # RNSE_BT_FIS_NOTIFY_V1: unabhaengig von Kodi und HUDIY
+    track_task(
+        bt_fis_watch_loop(),
+        "bt_fis_watch_loop"
+    )
+
     if ENABLE_LOGGING:
         logger.info("send_to_dis tasks started with FIS1=%s and FIS2=%s", FIS1, FIS2)
 
@@ -3305,8 +3317,16 @@ async def read_cpu_loop():
 def set_fis1(text, align=None, trace=None):
     global fis1_pending
 
+    # RNSE_BT_FIS_NOTIFY_V1: temporaere Top-Prioritaet
+    if bt_fis_notice_active and not bt_fis_notice_writing:
+        return
+
     # RNSE_WELCOME_V2
-    if welcome_active and str(text) != str(welcome_message_1st_line):
+    if (
+        welcome_active
+        and not bt_fis_notice_writing
+        and str(text) != str(welcome_message_1st_line)
+    ):
         return
 
     if align is None:
@@ -3323,8 +3343,16 @@ def set_fis1(text, align=None, trace=None):
 def set_fis2(text, align=None, trace=None, nav_overlay=False):
     global fis2_pending
 
+    # RNSE_BT_FIS_NOTIFY_V1: temporaere Top-Prioritaet
+    if bt_fis_notice_active and not bt_fis_notice_writing:
+        return
+
     # RNSE_WELCOME_V2
-    if welcome_active and str(text) != str(welcome_message_2nd_line):
+    if (
+        welcome_active
+        and not bt_fis_notice_writing
+        and str(text) != str(welcome_message_2nd_line)
+    ):
         return
 
     if not nav_overlay:
@@ -4093,6 +4121,255 @@ def finish_welcome_v2():
         )
 
     return True
+
+
+
+# ============================================================
+# RNSE_BT_FIS_NOTIFY_V1
+# Bluetooth-Ereignisse systemweit ueber BlueZ erkennen.
+# ============================================================
+
+BT_FIS_NOTICE_SECONDS = 10.0
+BT_FIS_POLL_SECONDS = 1.0
+
+
+def bt_fis_connected_devices():
+    """Liefert verbundene BlueZ-Geraete als MAC -> Name."""
+    try:
+        result = subprocess.run(
+            ["bluetoothctl", "devices", "Connected"],
+            capture_output=True,
+            text=True,
+            timeout=3.0,
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+
+    if result.returncode != 0:
+        return None
+
+    devices = {}
+
+    for line in result.stdout.splitlines():
+        match = re.match(
+            r"^Device\s+([0-9A-Fa-f:]{17})\s+(.+)$",
+            line.strip(),
+        )
+
+        if match:
+            mac = match.group(1).upper()
+            name = match.group(2).strip()
+            devices[mac] = name or "Bluetooth"
+
+    return devices
+
+
+def bt_fis_write(line1, line2):
+    """Ausschliesslich der BT-Monitor darf das Overlay schreiben."""
+    global bt_fis_notice_writing
+
+    bt_fis_notice_writing = True
+
+    try:
+        set_fis1(line1, "center")
+        set_fis2(line2, "center", nav_overlay=True)
+    finally:
+        bt_fis_notice_writing = False
+
+
+def bt_fis_frame(text, offset):
+    """Acht sichtbare ASCII-Zeichen mit horizontalem Lauftext."""
+    text = (
+        str(text or "Bluetooth")
+        .encode("ascii", "replace")
+        .decode("ascii")
+    )
+
+    if len(text) <= 8:
+        return text
+
+    padded = text + "   "
+    return (
+        (padded + padded)[offset:offset + 8]
+    )
+
+
+async def bt_fis_notice(name, connected):
+    """Zehn Sekunden anzeigen, danach aktuelle FIS-Daten laden."""
+    global bt_fis_notice_active, bt_fis_notice_writing
+    global media_carousel_task, nav_carousel_task
+    global scroll_task_fis1, scroll_task_fis2
+
+    bt_fis_notice_active = True
+
+    try:
+        # Alte Scroller und Karussells anhalten, damit die
+        # Anzeige nach dem Overlay frisch starten kann.
+        tasks = [
+            scroll_task_fis1,
+            scroll_task_fis2,
+            media_carousel_task,
+            nav_carousel_task,
+        ]
+
+        current = asyncio.current_task()
+
+        for task in tasks:
+            if (
+                task is not None
+                and task is not current
+                and not task.done()
+            ):
+                task.cancel()
+
+        for task in tasks:
+            if task is not None and task is not current:
+                with contextlib.suppress(
+                    asyncio.CancelledError, Exception
+                ):
+                    await task
+
+        scroll_task_fis1 = None
+        scroll_task_fis2 = None
+        media_carousel_task = None
+        nav_carousel_task = None
+
+        status = "BT AKTIV" if connected else "GETRENNT"
+        name = str(name or "Bluetooth")
+
+        logger.info(
+            "RNSE_BT_FIS_NOTIFY_V1: %s - %s",
+            name,
+            status,
+        )
+
+        start = time.monotonic()
+        tick = 0
+
+        while (
+            not stop_flag
+            and time.monotonic() - start < BT_FIS_NOTICE_SECONDS
+        ):
+            # Name scrollt, Status bleibt lesbar und scrollt
+            # nur, falls er mehr als acht Zeichen hat.
+            name_offset = max(0, tick - 5)
+
+            line1 = bt_fis_frame(name, name_offset)
+            line2 = bt_fis_frame(status, max(0, tick // 8))
+
+            bt_fis_write(line1, line2)
+
+            tick += 1
+            await asyncio.sleep(0.35)
+
+    except asyncio.CancelledError:
+        raise
+
+    except Exception:
+        logger.exception("RNSE_BT_FIS_NOTIFY_V1: Overlayfehler")
+
+    finally:
+        # Nur die aktuell gueltige Overlay-Task darf
+        # den Anzeigeschutz wieder freigeben.
+        if asyncio.current_task() is bt_fis_notice_task:
+            bt_fis_notice_active = False
+
+            if send_on_canbus and can_functional:
+                if welcome_active:
+                    set_fis1(welcome_message_1st_line, "center")
+                    set_fis2(
+                        welcome_message_2nd_line,
+                        "center",
+                    )
+                else:
+                    clear_content(FIS1)
+                    clear_content(FIS2)
+
+                    await refresh_fis1_current_value()
+                    await refresh_fis2_current_value()
+
+                    # Die regulären Karussells starten nach
+                    # dem Overlay mit aktuellen Daten.
+                    if toggle_fis1 == 6:
+                        if media_carousel_task is not None:
+                            if not media_carousel_task.done():
+                                media_carousel_task.cancel()
+                        media_carousel_task = None
+                        await media_to_dis1()
+
+
+async def bt_fis_watch_loop():
+    """Geraeteverbindungen erkennen, auch im Launcher."""
+    global bt_fis_notice_task
+
+    previous = None
+    candidate = None
+    stable_count = 0
+
+    while not stop_flag:
+        try:
+            current = await asyncio.to_thread(
+                bt_fis_connected_devices
+            )
+
+            # Fehlerhafte Bluetooth-Abfragen nicht als
+            # echten Verbindungsverlust interpretieren.
+            if current is None:
+                await asyncio.sleep(BT_FIS_POLL_SECONDS)
+                continue
+
+            keys = frozenset(current)
+
+            if keys == candidate:
+                stable_count += 1
+            else:
+                candidate = keys
+                stable_count = 1
+
+            # Zwei gleiche Messungen: kleine Entprellung.
+            if stable_count < 2:
+                await asyncio.sleep(BT_FIS_POLL_SECONDS)
+                continue
+
+            if previous is None:
+                previous = {}
+
+            added = sorted(set(current) - set(previous))
+            removed = sorted(set(previous) - set(current))
+
+            # Ereignisse merken, solange Namen bekannt sind.
+            events = (
+                [(current[mac], True) for mac in added]
+                + [(previous[mac], False) for mac in removed]
+            )
+
+            previous = dict(current)
+
+            for name, connected in events:
+                if (
+                    bt_fis_notice_task is not None
+                    and not bt_fis_notice_task.done()
+                ):
+                    bt_fis_notice_task.cancel()
+                    with contextlib.suppress(
+                        asyncio.CancelledError
+                    ):
+                        await bt_fis_notice_task
+
+                bt_fis_notice_task = asyncio.create_task(
+                    bt_fis_notice(name, connected)
+                )
+
+        except asyncio.CancelledError:
+            raise
+
+        except Exception:
+            logger.exception(
+                "RNSE_BT_FIS_NOTIFY_V1: Monitorfehler"
+            )
+
+        await asyncio.sleep(BT_FIS_POLL_SECONDS)
 
 
 @handle_errors
