@@ -9196,7 +9196,9 @@ async def kodi_radio_station_watch_loop():
     global kodi_radio_last_station
     global kodi_radio_station_intro_until
 
+    # RNSE_KODI_RADIO_PAUSE_RESUME_V3
     last_metadata = ()
+    radio_was_active = False
 
     while not stop_flag:
         await asyncio.sleep(0.10)
@@ -9209,9 +9211,68 @@ async def kodi_radio_station_watch_loop():
         station = get_kodi_radio_station()
 
         if not station:
+            if radio_was_active:
+                radio_was_active = False
+
+                # Pausiert: bisherigen Scroll und
+                # das laufende Karussell beenden.
+                old_scroll = scroll_task_fis1
+                if old_scroll is not None and not old_scroll.done():
+                    old_scroll.cancel()
+                    with contextlib.suppress(
+                        asyncio.CancelledError, Exception
+                    ):
+                        await old_scroll
+
+                old_carousel = media_carousel_task
+                if old_carousel is not None and not old_carousel.done():
+                    old_carousel.cancel()
+                    with contextlib.suppress(
+                        asyncio.CancelledError, Exception
+                    ):
+                        await old_carousel
+
+                media_carousel_task = None
+
+                if (
+                    send_on_canbus
+                    and can_functional
+                    and toggle_fis1 == 6
+                ):
+                    clear_content(FIS1)
+
+                if ENABLE_LOGGING:
+                    logger.info("KODI_RADIO_FIS_V3: Radio inaktiv")
+
             kodi_station_watch_last = ""
             last_metadata = ()
             continue
+
+        # Resume ist ein neues Wiedergabeereignis,
+        # auch wenn Titel und Interpret gleich bleiben.
+        resumed = not radio_was_active
+        radio_was_active = True
+
+        if resumed:
+            kodi_radio_last_station = ""
+            kodi_radio_station_intro_until = 0.0
+            kodi_station_watch_last = ""
+            last_metadata = ()
+
+            old_carousel = media_carousel_task
+            if old_carousel is not None and not old_carousel.done():
+                old_carousel.cancel()
+                with contextlib.suppress(
+                    asyncio.CancelledError, Exception
+                ):
+                    await old_carousel
+
+            media_carousel_task = None
+
+            if ENABLE_LOGGING:
+                logger.info("KODI_RADIO_FIS_V3: Radio aktiv")
+
+            await media_to_dis1()
 
         try:
             payload = json.loads(
