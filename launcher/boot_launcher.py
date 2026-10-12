@@ -1,4 +1,10 @@
 import json
+# MIRA is optional: keep the original menu available if loading fails.
+try:
+    from mira_splash import MiraSplash
+except Exception as exc:
+    MiraSplash = None
+    print("MIRA import skipped:", exc, flush=True)
 #!/usr/bin/env python3
 
 import os
@@ -100,6 +106,12 @@ class AudiLauncher(QOpenGLWidget):
 
         self.selected = 0
         self.launching = False
+        self._mira = None
+        if MiraSplash is not None:
+            try:
+                self._mira = MiraSplash(self)
+            except Exception as exc:
+                print("MIRA startup skipped:", exc, flush=True)
 
         self.setFixedSize(
             800,
@@ -201,6 +213,13 @@ class AudiLauncher(QOpenGLWidget):
         )
 
         self.draw_can_health(painter)
+
+        if self._mira is not None:
+            try:
+                self._mira.paint(painter)
+            except Exception as exc:
+                self._mira.finish()
+                print("MIRA drawing skipped:", exc, flush=True)
 
         painter.end()
 
@@ -624,6 +643,11 @@ class AudiLauncher(QOpenGLWidget):
     ):
 
         if self.launching:
+            return
+
+        if self._mira is not None and self._mira.active:
+            self._mira.finish()
+            self.update()
             return
 
         key = event.key()

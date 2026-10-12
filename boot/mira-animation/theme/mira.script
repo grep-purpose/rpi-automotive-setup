@@ -1,0 +1,58 @@
+Window.SetBackgroundTopColor(0.063, 0.078, 0.098);
+Window.SetBackgroundBottomColor(0.063, 0.078, 0.098);
+state.tick = 0;
+state.last = -1;
+state.prompt = 0;
+screen = Sprite();
+screen.SetZ(-10);
+notice = Sprite();
+notice.SetZ(100);
+
+fun show_notice(text) {
+    local.image = Image.Text(text, 1, 1, 1);
+    notice.SetImage(local.image);
+    notice.SetPosition(Window.GetX() + (Window.GetWidth() - local.image.GetWidth()) / 2,
+                       Window.GetY() + Window.GetHeight() - local.image.GetHeight() - 12, 100);
+    notice.SetOpacity(1);
+}
+
+fun refresh() {
+    local.index = Math.Int(state.tick / 2) % 156;
+    if (local.index != state.last) {
+        local.image = Image("frame-" + local.index + ".png");
+        local.scale = Window.GetWidth() / 800;
+        if (Window.GetHeight() / 480 < local.scale)
+            local.scale = Window.GetHeight() / 480;
+        if (local.scale != 1)
+            local.image = local.image.Scale(Math.Int(800 * local.scale), Math.Int(480 * local.scale));
+        screen.SetImage(local.image);
+        screen.SetPosition(Window.GetX() + (Window.GetWidth() - local.image.GetWidth()) / 2,
+                           Window.GetY() + (Window.GetHeight() - local.image.GetHeight()) / 2, -10);
+        state.last = local.index;
+    }
+    local.opacity = state.tick / 36;
+    if (local.opacity > 1) local.opacity = 1;
+    if (state.prompt) local.opacity = 0.25;
+    screen.SetOpacity(local.opacity);
+    state.tick++;
+}
+Plymouth.SetRefreshFunction(refresh);
+
+fun password(prompt, count) {
+    state.prompt = 1;
+    local.mask = "";
+    for (local.i = 0; local.i < count; local.i++) local.mask += "*";
+    show_notice(prompt + " " + local.mask);
+}
+fun question(prompt, entry) {
+    state.prompt = 1;
+    show_notice(prompt + " " + entry);
+}
+fun normal() {
+    state.prompt = 0;
+    notice.SetOpacity(0);
+}
+Plymouth.SetDisplayPasswordFunction(password);
+Plymouth.SetDisplayQuestionFunction(question);
+Plymouth.SetDisplayNormalFunction(normal);
+Plymouth.SetMessageFunction(show_notice);

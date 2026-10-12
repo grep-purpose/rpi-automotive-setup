@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=MIRA Automotive
+Description=MIRA 800x480 boot animation
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/mira
+ScriptFile=/usr/share/plymouth/themes/mira/mira.script
