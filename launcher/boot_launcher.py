@@ -1,3 +1,8 @@
+# MIRA_TRACE: monotonic seconds since boot
+import time as _mira_trace_time
+def _mira_trace(label):
+    print("MIRA_TRACE %.3f %s" % (_mira_trace_time.monotonic(), label), flush=True)
+_mira_trace("PYTHON_ENTRY")
 import json
 # MIRA is optional: keep the original menu available if loading fails.
 try:
@@ -28,6 +33,8 @@ from PyQt5.QtWidgets import (
 # ============================================================
 # Pfade
 # ============================================================
+
+_mira_trace("IMPORTS_DONE")
 
 BASE_DIR = os.path.dirname(
     os.path.abspath(__file__)
@@ -794,9 +801,11 @@ class AudiLauncher(QOpenGLWidget):
 
 def main():
 
+    _mira_trace("QAPPLICATION_BEGIN")
     app = QApplication(
         sys.argv
     )
+    _mira_trace("QAPPLICATION_DONE")
 
     # Cursor zusätzlich global verstecken
     QApplication.setOverrideCursor(
@@ -809,7 +818,13 @@ def main():
         flush=True
     )
 
+    _mira_trace("LAUNCHER_BEGIN")
     launcher = AudiLauncher()
+    _mira_trace("LAUNCHER_CREATED")
+    def _mira_first_swap():
+        _mira_trace("FIRST_FRAME_SWAPPED")
+        launcher.frameSwapped.disconnect(_mira_first_swap)
+    launcher.frameSwapped.connect(_mira_first_swap)
 
     launcher.showFullScreen()
 
