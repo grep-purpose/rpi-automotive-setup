@@ -1,0 +1,27 @@
+#!/bin/sh
+# BEGIN MIRA_BACKGROUND_BRIDGE
+# Start behind applications; no browser or input capture.
+if [ -x /usr/bin/swaybg ] && [ -r /usr/share/plymouth/themes/mira/frame-0.png ]; then
+    /usr/bin/swaybg -i /usr/share/plymouth/themes/mira/frame-0.png -m fit -c 101419 &
+fi
+# END MIRA_BACKGROUND_BRIDGE
+# MIRA_TRACE: timestamp before starting any applications
+read mira_uptime mira_idle < /proc/uptime
+/usr/bin/logger -t mira-start "MIRA_TRACE $mira_uptime AUTOSTART_ENTRY"
+
+# Display-Konfiguration
+/usr/bin/kanshi &
+
+# Automotive Boot Launcher
+exec /usr/bin/env \
+HOME=/home/pi \
+XDG_RUNTIME_DIR=/run/user/1000 \
+QT_QPA_PLATFORM=wayland \
+QT_WAYLAND_DISABLE_WINDOWDECORATION=1 \
+python3 /home/pi/rpi-automotive-setup/launcher/boot_launcher.py
+
+# AUTOMOTIVE_HIDE_CURSOR
+(
+    sleep 0.7
+    wtype -M alt -M logo -P h -m alt -m logo
+) &
