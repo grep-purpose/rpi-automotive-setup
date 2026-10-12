@@ -18,7 +18,7 @@ BACKUP = Path('/var/backups/mira-uebergang')
 BLOCK = '''# BEGIN MIRA_BACKGROUND_BRIDGE
 # Start behind applications; no browser or input capture.
 if [ -x /usr/bin/swaybg ] && [ -r /usr/share/plymouth/themes/mira/frame-0.png ]; then
-    /usr/bin/swaybg -i /usr/share/plymouth/themes/mira/frame-0.png -m fit -c 101419 &
+    /usr/bin/swaybg -i /usr/share/plymouth/themes/mira/frame-0.png -m fit -c '#101419' &
 fi
 # END MIRA_BACKGROUND_BRIDGE
 '''
