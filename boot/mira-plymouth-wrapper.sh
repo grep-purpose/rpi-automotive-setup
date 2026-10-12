@@ -1,17 +1,7 @@
 #!/bin/sh
 
-# Keep the MIRA animation running until the launcher is ready.
-if [ "$#" -eq 1 ] &&
-   [ "$1" = "deactivate" ] &&
-   [ ! -e /run/user/1000/mira-launcher-ready ]; then
-
-    /usr/bin/logger -t mira-plymouth-wrapper \
-      "Keeping Plymouth active until MIRA launcher is ready"
-
-    exit 0
-fi
-
-# Defer the final retained-splash handoff until the launcher is ready.
+# Let LightDM deactivate Plymouth normally so the graphical
+# session can start. Only defer the final retained-splash quit.
 if [ "$#" -eq 2 ] &&
    [ "$1" = "quit" ] &&
    [ "$2" = "--retain-splash" ]; then
