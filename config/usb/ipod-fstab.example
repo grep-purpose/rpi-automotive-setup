@@ -1,0 +1,1 @@
+UUID=3845-4167 /mnt/ipod vfat ro,nofail,x-systemd.automount,x-systemd.device-bound=yes,x-systemd.device-timeout=5s 0 0

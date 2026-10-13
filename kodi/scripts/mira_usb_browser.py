@@ -75,6 +75,154 @@ def render(folder, offset=0):
             )
         HOME.setProperty(f"Mira.USB.Row{i+1}", value)
 
+
+
+def play_selected_usb_file(folder, selected):
+    """Bestehende Playlist-Logik inklusive Cover-Fix."""
+
+    from urllib.parse import quote
+
+    tracks = [
+        entry for entry in entries(folder)
+        if entry.is_file()
+    ]
+
+    if selected not in tracks:
+        return
+
+    position = tracks.index(selected)
+
+    playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
+    playlist.clear()
+
+    for track in tracks:
+        art_url = (
+            "image://music@"
+            + quote(str(track), safe="")
+            + "/"
+        )
+
+        playlist_item = xbmcgui.ListItem(
+            path=str(track)
+        )
+
+        playlist_item.setArt({
+            "thumb": art_url
+        })
+
+        playlist.add(
+            str(track),
+            listitem=playlist_item
+        )
+
+    xbmc.Player().play(
+        playlist,
+        startpos=position
+    )
+
+    xbmc.executebuiltin(
+        "ActivateWindow(1170)"
+    )
+
+
+class MiraUSBListV3(xbmcgui.WindowXMLDialog):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.folder = ROOT
+        self.files = []
+
+    def onInit(self):
+        self.list_control = self.getControl(9300)
+        self.show_folder()
+
+    def show_folder(self):
+        self.files = entries(self.folder)
+
+        self.setProperty(
+            "Mira.USB.Path",
+            "/" if self.folder == ROOT
+            else "/" + str(self.folder.relative_to(ROOT))
+        )
+
+        self.list_control.reset()
+
+        items = []
+
+        for path in self.files:
+            if path.is_dir():
+                label = "[Ordner]   " + path.name
+            else:
+                label = "[Musik]   " + path.stem
+
+            items.append(
+                xbmcgui.ListItem(label=label)
+            )
+
+        if items:
+            self.list_control.addItems(items)
+            self.list_control.selectItem(0)
+
+        self.setFocusId(9300)
+
+    def onClick(self, control_id):
+        if control_id != 9300:
+            return
+
+        index = self.list_control.getSelectedPosition()
+
+        if index < 0 or index >= len(self.files):
+            return
+
+        selected = self.files[index]
+
+        if selected.is_dir():
+            if inside(selected):
+                self.folder = selected
+                self.show_folder()
+            return
+
+        if selected.is_file() and inside(selected):
+            self.close()
+            play_selected_usb_file(
+                self.folder,
+                selected
+            )
+
+    def onAction(self, action):
+        action_id = action.getId()
+
+        if action_id in (9, 10, 92):
+            if self.folder == ROOT:
+                self.close()
+            else:
+                self.folder = self.folder.parent
+                self.show_folder()
+
+
+def open_mira_usb_list():
+    dialog = MiraUSBListV3(
+        "MiraUSBListV3.xml",
+        str(Path(__file__).resolve().parent),
+        "default",
+        "1080i"
+    )
+
+    HOME.setProperty(
+        "Mira.USB.BrowserActive",
+        "true"
+    )
+
+    try:
+        dialog.doModal()
+    finally:
+        HOME.clearProperty(
+            "Mira.USB.BrowserActive"
+        )
+        del dialog
+
+
+
 def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "open"
 
@@ -85,8 +233,7 @@ def main():
                 xbmcgui.NOTIFICATION_WARNING, 4000
             )
             return
-        render(ROOT)
-        xbmc.executebuiltin("ActivateWindow(1166)")
+        open_mira_usb_list()
         return
 
     folder, offset = read_state()

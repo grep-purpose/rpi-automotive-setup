@@ -1,0 +1,7 @@
+[Unit]
+Description=Mira: iPod Automount nach Wiederanschluss aktivieren
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl start mnt-ipod.automount
+TimeoutStartSec=15

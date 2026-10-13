@@ -1,0 +1,8 @@
+[Unit]
+Description=Mira: iPod sicher aushängen
+ConditionPathExists=/dev/disk/by-uuid/3845-4167
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/mira-ipod-eject-root
+TimeoutStartSec=30

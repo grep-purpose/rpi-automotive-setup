@@ -1,0 +1,62 @@
+#!/bin/bash
+set -euo pipefail
+
+UUID="3845-4167"
+MOUNT="/mnt/ipod"
+AUTO="mnt-ipod.automount"
+MOUNT_UNIT="mnt-ipod.mount"
+
+fail() {
+    echo "MIRA EJECT: $*" >&2
+    exit 1
+}
+
+# Nur das vorgesehene Dateisystem akzeptieren.
+SOURCE="$(findmnt -rn -t vfat -o SOURCE --mountpoint "$MOUNT" || true)"
+
+[[ "$SOURCE" == /dev/* ]] || fail "iPod nicht eingebunden"
+
+DEVICE="$(readlink -f "$SOURCE")"
+EXPECTED="$(readlink -f "/dev/disk/by-uuid/$UUID" 2>/dev/null || true)"
+
+[[ -b "$DEVICE" ]] || fail "Kein Blockgeraet"
+[[ "$DEVICE" == "$EXPECTED" ]] || fail "UUID-Zuordnung falsch"
+
+ACTUAL_UUID="$(blkid -s UUID -o value "$DEVICE" 2>/dev/null || true)"
+[[ "$ACTUAL_UUID" == "$UUID" ]] || fail "UUID-Pruefung fehlgeschlagen"
+
+FSTYPE="$(lsblk -dnro FSTYPE "$DEVICE" | head -1 | xargs)"
+[[ "$FSTYPE" == "vfat" ]] || fail "Unerwartetes Dateisystem"
+
+PARENT="$(lsblk -no PKNAME "$DEVICE" | head -1 | xargs)"
+[[ -n "$PARENT" && -b "/dev/$PARENT" ]] || fail "Kein Laufwerksparent"
+
+TRAN="$(lsblk -dnro TRAN "/dev/$PARENT" | head -1 | xargs)"
+[[ "$TRAN" == "usb" ]] || fail "Kein USB-Massenspeicher"
+
+echo "MIRA EJECT: Verifiziert $DEVICE ($UUID), USB"
+
+# Verhindert, dass ein weiterer Dateizugriff das
+# Laufwerk unmittelbar wieder einhaengt.
+systemctl stop "$AUTO"
+
+# Falls das Dateisystem noch eingebunden ist,
+# systemd um kontrolliertes Aushaengen bitten.
+if findmnt -rn -t vfat --mountpoint "$MOUNT" >/dev/null; then
+    if ! systemctl stop "$MOUNT_UNIT"; then
+        systemctl start "$AUTO" || true
+        fail "Aushaengen fehlgeschlagen, Automount wiederhergestellt"
+    fi
+fi
+
+# Erfolg nur melden, wenn wirklich ausgehängt.
+if findmnt -rn -t vfat --mountpoint "$MOUNT" >/dev/null; then
+    systemctl start "$AUTO" || true
+    fail "Dateisystem noch eingebunden"
+fi
+
+if systemctl is-active --quiet "$AUTO"; then
+    fail "Automount ist noch aktiv"
+fi
+
+echo "MIRA EJECT: Sicher ausgehaengt. Geraet kann abgezogen werden."

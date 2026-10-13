@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="block", ENV{DEVTYPE}=="partition", ENV{ID_FS_UUID}=="3845-4167", TAG+="systemd", ENV{SYSTEMD_WANTS}+="mira-ipod-rearm.service"

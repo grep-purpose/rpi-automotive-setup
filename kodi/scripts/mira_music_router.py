@@ -109,7 +109,14 @@ def open_now_playing():
     )
 
 def handle_back():
-    """RETURN im USB-Player direkt zu Home."""
+    """RETURN: zuerst USB-Dateibrowser berücksichtigen."""
+
+    if HOME.getProperty(
+        "Mira.USB.BrowserActive"
+    ).strip().lower() == "true":
+        xbmc.executebuiltin("Action(Back)")
+        return
+
 
     if xbmc.getCondVisibility(
         "Window.IsActive(1170)"
