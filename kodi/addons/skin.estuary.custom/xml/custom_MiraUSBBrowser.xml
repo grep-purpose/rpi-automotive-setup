@@ -1,0 +1,172 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window id="1166" type="dialog">
+  <defaultcontrol always="true">9301</defaultcontrol>
+  <controls>
+    <control type="image">
+      <left>0</left><top>0</top>
+      <width>1920</width><height>1080</height>
+      <texture colordiffuse="99000000">colors/white.png</texture>
+    </control>
+    <control type="image">
+      <left>210</left><top>130</top>
+      <width>1500</width><height>820</height>
+      <texture border="45" colordiffuse="b3ffffff">music/transport_normal.png</texture>
+    </control>
+    <control type="image">
+      <left>210</left><top>130</top>
+      <width>1500</width><height>820</height>
+      <texture border="45" colordiffuse="e6ffffff">music/transport_normal.png</texture>
+    </control>
+    <control type="label">
+      <left>310</left><top>190</top>
+      <width>1300</width><height>90</height>
+      <font>font60</font><textcolor>ffffffff</textcolor>
+      <align>center</align><aligny>center</aligny>
+      <label>[B]iPod Classic[/B]</label>
+    </control>
+    <control type="label">
+      <left>310</left><top>275</top>
+      <width>1300</width><height>55</height>
+      <font>font45</font><textcolor>ffcad3dd</textcolor>
+      <align>center</align><aligny>center</aligny>
+      <label>$INFO[Window(Home).Property(Mira.USB.Folder)]</label>
+    </control>
+    
+    <control type="button" id="9301">
+      <left>310</left><top>340</top>
+      <width>1300</width><height>92</height>
+      <font>font50</font>
+      <textcolor>ffffffff</textcolor>
+      <focusedcolor>ffffffff</focusedcolor>
+      <align>left</align><aligny>center</aligny>
+      <textoffsetx>35</textoffsetx>
+      <texturenofocus>music/transport_normal.png</texturenofocus>
+      <texturefocus>music/transport_focus.png</texturefocus>
+      <label>$INFO[Window(Home).Property(Mira.USB.Row1)]</label>
+      <visible>!String.IsEmpty(Window(Home).Property(Mira.USB.Row1))</visible>
+      <onup>9305</onup>
+      <ondown>9302</ondown>
+      <onleft>9305</onleft>
+      <onright>9302</onright>
+      <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_usb_browser.py,select,1)</onclick>
+    </control>
+    
+
+    <control type="button" id="9302">
+      <left>310</left><top>442</top>
+      <width>1300</width><height>92</height>
+      <font>font50</font>
+      <textcolor>ffffffff</textcolor>
+      <focusedcolor>ffffffff</focusedcolor>
+      <align>left</align><aligny>center</aligny>
+      <textoffsetx>35</textoffsetx>
+      <texturenofocus>music/transport_normal.png</texturenofocus>
+      <texturefocus>music/transport_focus.png</texturefocus>
+      <label>$INFO[Window(Home).Property(Mira.USB.Row2)]</label>
+      <visible>!String.IsEmpty(Window(Home).Property(Mira.USB.Row2))</visible>
+      <onup>9301</onup>
+      <ondown>9303</ondown>
+      <onleft>9301</onleft>
+      <onright>9303</onright>
+      <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_usb_browser.py,select,2)</onclick>
+    </control>
+    
+
+    <control type="button" id="9303">
+      <left>310</left><top>544</top>
+      <width>1300</width><height>92</height>
+      <font>font50</font>
+      <textcolor>ffffffff</textcolor>
+      <focusedcolor>ffffffff</focusedcolor>
+      <align>left</align><aligny>center</aligny>
+      <textoffsetx>35</textoffsetx>
+      <texturenofocus>music/transport_normal.png</texturenofocus>
+      <texturefocus>music/transport_focus.png</texturefocus>
+      <label>$INFO[Window(Home).Property(Mira.USB.Row3)]</label>
+      <visible>!String.IsEmpty(Window(Home).Property(Mira.USB.Row3))</visible>
+      <onup>9302</onup>
+      <ondown>9304</ondown>
+      <onleft>9302</onleft>
+      <onright>9304</onright>
+      <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_usb_browser.py,select,3)</onclick>
+    </control>
+    
+
+    <control type="button" id="9304">
+      <left>310</left><top>646</top>
+      <width>1300</width><height>92</height>
+      <font>font50</font>
+      <textcolor>ffffffff</textcolor>
+      <focusedcolor>ffffffff</focusedcolor>
+      <align>left</align><aligny>center</aligny>
+      <textoffsetx>35</textoffsetx>
+      <texturenofocus>music/transport_normal.png</texturenofocus>
+      <texturefocus>music/transport_focus.png</texturefocus>
+      <label>$INFO[Window(Home).Property(Mira.USB.Row4)]</label>
+      <visible>!String.IsEmpty(Window(Home).Property(Mira.USB.Row4))</visible>
+      <onup>9303</onup>
+      <ondown>9305</ondown>
+      <onleft>9303</onleft>
+      <onright>9305</onright>
+      <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_usb_browser.py,select,4)</onclick>
+    </control>
+    
+
+    <control type="button" id="9305">
+      <left>310</left><top>748</top>
+      <width>1300</width><height>92</height>
+      <font>font50</font>
+      <textcolor>ffffffff</textcolor>
+      <focusedcolor>ffffffff</focusedcolor>
+      <align>left</align><aligny>center</aligny>
+      <textoffsetx>35</textoffsetx>
+      <texturenofocus>music/transport_normal.png</texturenofocus>
+      <texturefocus>music/transport_focus.png</texturefocus>
+      <label>$INFO[Window(Home).Property(Mira.USB.Row5)]</label>
+      <visible>!String.IsEmpty(Window(Home).Property(Mira.USB.Row5))</visible>
+      <onup>9304</onup>
+      <ondown>9390</ondown>
+      <onleft>9304</onleft>
+      <onright>9390</onright>
+      <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_usb_browser.py,select,5)</onclick>
+    </control>
+    
+    <control type="button" id="9390">
+      <left>710</left><top>865</top>
+      <width>500</width><height>70</height>
+      <font>font45</font><label>Zurück</label>
+      <textcolor>ffffffff</textcolor>
+      <focusedcolor>ffffffff</focusedcolor>
+      <align>center</align><aligny>center</aligny>
+      <texturenofocus>music/transport_normal.png</texturenofocus>
+      <texturefocus>music/transport_focus.png</texturefocus>
+      <onup>9305</onup><ondown>9301</ondown>
+      <onleft>9305</onleft><onright>9301</onright>
+      <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_usb_browser.py,back)</onclick>
+    </control>
+  <control type="button" id="9391">
+      <left>320</left><top>865</top>
+      <width>350</width><height>70</height>
+      <font>font45</font><label>Vorherige</label>
+      <textcolor>ffffffff</textcolor>
+      <focusedcolor>ffffffff</focusedcolor>
+      <align>center</align><aligny>center</aligny>
+      <texturenofocus>music/transport_normal.png</texturenofocus>
+      <texturefocus>music/transport_focus.png</texturefocus>
+      <onup>9305</onup><ondown>9301</ondown>
+      <onleft>9390</onleft><onright>9390</onright>
+      <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_usb_browser.py,previous)</onclick>
+    </control><control type="button" id="9392">
+      <left>1250</left><top>865</top>
+      <width>350</width><height>70</height>
+      <font>font45</font><label>Weitere</label>
+      <textcolor>ffffffff</textcolor>
+      <focusedcolor>ffffffff</focusedcolor>
+      <align>center</align><aligny>center</aligny>
+      <texturenofocus>music/transport_normal.png</texturenofocus>
+      <texturefocus>music/transport_focus.png</texturefocus>
+      <onup>9305</onup><ondown>9301</ondown>
+      <onleft>9390</onleft><onright>9390</onright>
+      <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_usb_browser.py,next)</onclick>
+    </control></controls>
+</window>

@@ -1,16 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
+<?xml version='1.0' encoding='UTF-8'?>
 <window id="1199">
     <defaultcontrol always="true">9101</defaultcontrol>
-
     <onload>RunScript(/home/pi/.kodi/userdata/scripts/music_status.py,monitor)</onload>
-
+    <onload>SetProperty(RNSE.Music.PlayerActive,true,home)</onload>
+    <onunload>ClearProperty(RNSE.Music.PlayerActive,home)</onunload>
     <controls>
-
-        <!-- =====================================================
-             BACKGROUND
-             ===================================================== -->
-
         <control type="image">
             <left>0</left>
             <top>0</top>
@@ -18,273 +12,120 @@
             <height>1080</height>
             <texture colordiffuse="ff05070a">colors/black.png</texture>
         </control>
-
-
-        <!-- =====================================================
-             HEADER
-             ===================================================== -->
-
+        <include content="RNSE_AppHeader">
+            <param name="header_left_id" value="9001" />
+            <param name="header_right_id" value="9003" />
+            <param name="header_left_label" value="Quelle" />
+            <param name="header_right_label" value="Radio" />
+            <param name="header_title" value="Musik" />
+            <param name="header_left_action" value="ActivateWindow(1165)" />
+            <param name="header_right_action" value="RunScript(/home/pi/.kodi/userdata/scripts/radio_player.py,resume-last)" />
+        </include>
         <control type="group">
-
-            <left>30</left>
-            <right>30</right>
-            <top>18</top>
-            <height>105</height>
-
-            <!-- linke Linie -->
-            <control type="image">
-                <left>0</left>
-                <top>82</top>
-                <width>525</width>
-                <height>3</height>
-                <texture colordiffuse="99ffffff">colors/white.png</texture>
-            </control>
-
-            <!-- Quelle -->
-            <control type="button" id="9001">
-                <left>15</left>
-                <top>0</top>
-                <width>500</width>
-                <height>82</height>
-
-                <align>left</align>
-                <aligny>center</aligny>
-
-                <font>font55</font>
-                <textcolor>fff0f2f5</textcolor>
-                <focusedcolor>ffff8800</focusedcolor>
-
-                <label>[B]Quelle[/B]</label>
-
-                
-                
-
-                <ondown>9001</ondown>
-                <onright>9001</onright>
-
-                                
-                <texturefocus />
-                <texturenofocus />
-<onclick>Notification(Quelle,Bluetooth,2000)</onclick>
-                            <onleft>9001</onleft>
-                <onup>9001</onup>
-</control>
-
-            <!-- Titel -->
-            <control type="label">
-                <left>540</left>
-                <top>0</top>
-                <width>780</width>
-                <height>100</height>
-
-                <align>center</align>
-                <aligny>center</aligny>
-
-                <font>font60</font>
-                <textcolor>ffd90429</textcolor>
-
-                <label>[B]Musik[/B]</label>
-            </control>
-
-            <!-- rechte Linie -->
-            <control type="image">
-                <right>0</right>
-                <top>82</top>
-                <width>525</width>
-                <height>3</height>
-                <texture colordiffuse="99ffffff">colors/white.png</texture>
-            </control>
-
-        </control>
-
-
-        <!-- =====================================================
-             PLAYER CONTENT
-             ===================================================== -->
-
-        <control type="group">
-
             <left>63</left>
             <top>135</top>
             <width>1860</width>
             <height>800</height>
-
-
-            <!-- =================================================
-                 ARTWORK
-                 ================================================= -->
-
-            <!-- Schatten -->
             <control type="image">
                 <left>10</left>
                 <top>60</top>
                 <width>720</width>
                 <height>720</height>
-
                 <texture colordiffuse="99000000">colors/black.png</texture>
             </control>
-
-            <!-- Artwork-Fläche -->
             <control type="image">
                 <left>0</left>
                 <top>50</top>
                 <width>710</width>
                 <height>710</height>
-
                 <texture colordiffuse="ff111820">colors/white.png</texture>
             </control>
-
-            <!-- echtes Artwork, später vorbereitet -->
             <control type="image">
                 <left>24</left>
                 <top>74</top>
                 <width>662</width>
                 <height>662</height>
-
                 <aspectratio>keep</aspectratio>
-
                 <texture>$INFO[Window(Home).Property(RNSE.Music.Artwork)]</texture>
-
                 <visible>!String.IsEmpty(Window(Home).Property(RNSE.Music.Artwork))</visible>
             </control>
-
-            <!-- Fallback -->
             <control type="image">
                 <left>122</left>
                 <top>182</top>
                 <width>470</width>
                 <height>470</height>
-
                 <aspectratio>keep</aspectratio>
-
                 <texture colordiffuse="ffc8cfd8">DefaultAlbumCover.png</texture>
-
                 <visible>String.IsEmpty(Window(Home).Property(RNSE.Music.Artwork))</visible>
             </control>
-
-
-            <!-- =================================================
-                 METADATEN
-                 ================================================= -->
-
-            <!-- Einheitliche Quellenanzeige -->
-
             <control type="label">
                 <left>770</left>
                 <top>55</top>
                 <width>1100</width>
                 <height>72</height>
-
                 <font>font55</font>
                 <textcolor>ff8d99ae</textcolor>
-
                 <label>$INFO[Window(Home).Property(RNSE.Music.SourceLabel)]</label>
             </control>
-
-
-            <!-- Titel -->
-                        <!-- RNSE STATIC MUSIC METADATA START: title -->
-<control type="label">
+            <control type="label">
                 <left>770</left>
                 <top>185</top>
                 <width>940</width>
                 <height>130</height>
-
                 <font>font75</font>
                 <textcolor>ffffffff</textcolor>
-
                 <label>$INFO[Window(Home).Property(RNSE.Music.Title)]</label>
             </control>
-            <!-- RNSE STATIC MUSIC METADATA END: title -->
-
-
-            <!-- Interpret -->
-                        <!-- RNSE STATIC MUSIC METADATA START: artist -->
-<control type="label">
+            <control type="label">
                 <left>770</left>
                 <top>305</top>
                 <width>940</width>
                 <height>105</height>
-
                 <font>font60</font>
                 <textcolor>ffff8a32</textcolor>
-
                 <label>$INFO[Window(Home).Property(RNSE.Music.Artist)]</label>
             </control>
-            <!-- RNSE STATIC MUSIC METADATA END: artist -->
-
-
-            <!-- Album -->
-                        <!-- RNSE STATIC MUSIC METADATA START: album -->
-<control type="label">
+            <control type="label">
                 <left>770</left>
                 <top>400</top>
                 <width>940</width>
                 <height>90</height>
-
                 <font>font55</font>
                 <textcolor>ffd5dae0</textcolor>
-
                 <label>$INFO[Window(Home).Property(RNSE.Music.Album)]</label>
             </control>
-            <!-- RNSE STATIC MUSIC METADATA END: album -->
-
-
-            <!-- Kein Player -->
             <control type="label">
                 <left>770</left>
                 <top>180</top>
                 <width>1100</width>
                 <height>120</height>
-
                 <font>font60</font>
                 <textcolor>ff8d99ae</textcolor>
-
                 <label>[B]Kein Bluetooth-Audio[/B]</label>
-
                 <visible>!String.IsEqual(Window(Home).Property(RNSE.Music.Connected),true)</visible>
             </control>
-
-
-            <!-- =================================================
-                 PROGRESS
-                 ================================================= -->
-
-            <!-- aktuelle Zeit -->
             <control type="label">
                 <left>770</left>
                 <top>545</top>
                 <width>190</width>
                 <height>70</height>
-
                 <align>left</align>
                 <aligny>center</aligny>
-
                 <font>font55</font>
                 <textcolor>fff0f2f5</textcolor>
-
                 <label>$INFO[Window(Home).Property(RNSE.Music.PositionText)]</label>
             </control>
-
-
-            <!-- Dauer -->
             <control type="label">
                 <left>1580</left>
                 <top>545</top>
                 <width>190</width>
                 <height>70</height>
-
                 <align>right</align>
                 <aligny>center</aligny>
-
                 <font>font55</font>
                 <textcolor>fff0f2f5</textcolor>
-
                 <label>$INFO[Window(Home).Property(RNSE.Music.DurationText)]</label>
             </control>
-
-
-            <!-- Fortschrittsbalken Hintergrund -->
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -292,9 +133,6 @@
                 <height>22</height>
                 <texture colordiffuse="448d99ae">colors/white.png</texture>
             </control>
-
-            <!-- Fortschritt 1-100 Prozent -->
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -303,7 +141,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),1)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -312,7 +149,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),2)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -321,7 +157,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),3)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -330,7 +165,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),4)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -339,7 +173,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),5)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -348,7 +181,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),6)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -357,7 +189,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),7)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -366,7 +197,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),8)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -375,7 +205,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),9)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -384,7 +213,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),10)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -393,7 +221,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),11)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -402,7 +229,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),12)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -411,7 +237,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),13)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -420,7 +245,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),14)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -429,7 +253,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),15)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -438,7 +261,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),16)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -447,7 +269,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),17)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -456,7 +277,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),18)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -465,7 +285,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),19)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -474,7 +293,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),20)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -483,7 +301,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),21)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -492,7 +309,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),22)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -501,7 +317,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),23)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -510,7 +325,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),24)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -519,7 +333,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),25)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -528,7 +341,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),26)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -537,7 +349,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),27)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -546,7 +357,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),28)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -555,7 +365,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),29)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -564,7 +373,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),30)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -573,7 +381,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),31)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -582,7 +389,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),32)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -591,7 +397,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),33)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -600,7 +405,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),34)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -609,7 +413,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),35)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -618,7 +421,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),36)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -627,7 +429,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),37)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -636,7 +437,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),38)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -645,7 +445,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),39)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -654,7 +453,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),40)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -663,7 +461,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),41)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -672,7 +469,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),42)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -681,7 +477,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),43)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -690,7 +485,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),44)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -699,7 +493,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),45)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -708,7 +501,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),46)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -717,7 +509,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),47)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -726,7 +517,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),48)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -735,7 +525,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),49)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -744,7 +533,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),50)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -753,7 +541,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),51)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -762,7 +549,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),52)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -771,7 +557,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),53)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -780,7 +565,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),54)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -789,7 +573,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),55)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -798,7 +581,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),56)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -807,7 +589,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),57)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -816,7 +597,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),58)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -825,7 +605,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),59)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -834,7 +613,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),60)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -843,7 +621,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),61)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -852,7 +629,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),62)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -861,7 +637,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),63)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -870,7 +645,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),64)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -879,7 +653,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),65)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -888,7 +661,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),66)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -897,7 +669,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),67)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -906,7 +677,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),68)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -915,7 +685,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),69)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -924,7 +693,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),70)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -933,7 +701,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),71)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -942,7 +709,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),72)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -951,7 +717,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),73)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -960,7 +725,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),74)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -969,7 +733,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),75)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -978,7 +741,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),76)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -987,7 +749,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),77)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -996,7 +757,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),78)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1005,7 +765,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),79)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1014,7 +773,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),80)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1023,7 +781,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),81)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1032,7 +789,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),82)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1041,7 +797,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),83)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1050,7 +805,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),84)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1059,7 +813,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),85)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1068,7 +821,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),86)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1077,7 +829,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),87)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1086,7 +837,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),88)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1095,7 +845,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),89)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1104,7 +853,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),90)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1113,7 +861,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),91)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1122,7 +869,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),92)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1131,7 +877,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),93)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1140,7 +885,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),94)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1149,7 +893,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),95)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1158,7 +901,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),96)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1167,7 +909,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),97)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1176,7 +917,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),98)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1185,7 +925,6 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),99)</visible>
             </control>
-
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -1194,34 +933,20 @@
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Progress),100)</visible>
             </control>
-
-
-            <!-- =================================================
-                 TRANSPORT
-                 ================================================= -->
-
-            <!-- Previous -->
             <control type="button" id="9100">
                 <left>915</left>
                 <top>735</top>
                 <width>220</width>
                 <height>145</height>
-
-                <label></label>
-
-                
-                
-
+                <label />
                 <onright>9002</onright>
                 <onleft>9001</onleft>
                 <onup>9101</onup>
-
-                                <texturenofocus>music/transport_normal.png</texturenofocus>
+                <texturenofocus>music/transport_normal.png</texturenofocus>
                 <texturefocus>music/transport_focus.png</texturefocus>
-<onclick>RunScript(/home/pi/.kodi/userdata/scripts/music_status.py,previous)</onclick>
-                            <ondown>9102</ondown>
-</control>
-
+                <onclick>RunScript(/home/pi/.kodi/userdata/scripts/music_status.py,previous)</onclick>
+                <ondown>9102</ondown>
+            </control>
             <control type="image">
                 <left>960</left>
                 <top>765</top>
@@ -1230,73 +955,52 @@
                 <aspectratio>keep</aspectratio>
                 <texture>music/previous.png</texture>
             </control>
-
-
-            <!-- Play / Pause -->
             <control type="button" id="9101">
                 <left>1160</left>
-                <top>732</top>
+                <top>735</top>
                 <width>220</width>
                 <height>145</height>
-
-                <label></label>
-
-                
-                
-
+                <label />
                 <onleft>9001</onleft>
                 <onright>9002</onright>
                 <onup>9102</onup>
-
-                                <texturenofocus>music/transport_normal.png</texturenofocus>
+                <texturenofocus>music/transport_normal.png</texturenofocus>
                 <texturefocus>music/transport_focus.png</texturefocus>
-<onclick>RunScript(/home/pi/.kodi/userdata/scripts/music_status.py,toggle)</onclick>
-                            <ondown>9100</ondown>
-</control>
-
+                <onclick>RunScript(/home/pi/.kodi/userdata/scripts/music_status.py,toggle)</onclick>
+                <ondown>9100</ondown>
+            </control>
             <control type="image">
-                <left>1210</left>
-                <top>753</top>
-                <width>120</width>
-                <height>104</height>
+                <left>1205</left>
+                <top>765</top>
+                <width>130</width>
+                <height>85</height>
                 <aspectratio>keep</aspectratio>
                 <texture>music/play.png</texture>
                 <visible>!String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
             </control>
-
             <control type="image">
-                <left>1210</left>
-                <top>753</top>
-                <width>120</width>
-                <height>104</height>
+                <left>1205</left>
+                <top>765</top>
+                <width>130</width>
+                <height>85</height>
                 <aspectratio>keep</aspectratio>
                 <texture>music/pause.png</texture>
                 <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
             </control>
-
-
-            <!-- Next -->
             <control type="button" id="9102">
                 <left>1405</left>
                 <top>735</top>
                 <width>220</width>
                 <height>145</height>
-
-                <label></label>
-
-                
-                
-
+                <label />
                 <onleft>9001</onleft>
                 <onright>9002</onright>
                 <onup>9100</onup>
-
-                                <texturenofocus>music/transport_normal.png</texturenofocus>
+                <texturenofocus>music/transport_normal.png</texturenofocus>
                 <texturefocus>music/transport_focus.png</texturefocus>
-<onclick>RunScript(/home/pi/.kodi/userdata/scripts/music_status.py,next)</onclick>
-                            <ondown>9101</ondown>
-</control>
-
+                <onclick>RunScript(/home/pi/.kodi/userdata/scripts/music_status.py,next)</onclick>
+                <ondown>9101</ondown>
+            </control>
             <control type="image">
                 <left>1450</left>
                 <top>765</top>
@@ -1305,373 +1009,7 @@
                 <aspectratio>keep</aspectratio>
                 <texture>music/next.png</texture>
             </control>
-
-
         </control>
-
-
-        <!-- =====================================================
-             GLOBAL FOOTER
-             ===================================================== -->
-
-        <control type="group">
-
-            <left>30</left>
-            <right>30</right>
-            <bottom>18</bottom>
-            <height>124</height>
-
-
-            <!-- obere Footer-Linie -->
-            <control type="image">
-                <left>0</left>
-                <top>0</top>
-                <width>100%</width>
-                <height>5</height>
-
-                <texture colordiffuse="99ffffff">colors/white.png</texture>
-            </control>
-
-
-
-            <!-- Einstellungen links -->
-            <control type="label">
-                <left>15</left>
-                <top>20</top>
-                <width>500</width>
-                <height>82</height>
-
-                <aligny>center</aligny>
-
-                <font>font55</font>
-                <textcolor>fff0f2f5</textcolor>
-
-                <label>[B]Einstellungen[/B]</label>
-            </control>
-            <!-- RNSE SETTINGS FOCUS LABEL START -->
-<control type="label">
-                <left>15</left>
-                <top>20</top>
-                <width>500</width>
-                <height>82</height>
-
-                <aligny>center</aligny>
-
-                <font>font55</font>
-                <textcolor>ffff8800</textcolor>
-
-                <label>[B]Einstellungen[/B]</label>
-                            <visible>Control.HasFocus(9002)</visible>
-            </control>
-            <!-- RNSE SETTINGS FOCUS LABEL END -->
-
-
-            <!-- unsichtbares Fokus-Control Einstellungen -->
-            <control type="button" id="9002">
-                <left>15</left>
-                <top>20</top>
-                <width>500</width>
-                <height>82</height>
-
-                <label></label>
-
-                
-                
-
-                <onup>9002</onup>
-                <ondown>9002</ondown>
-                <onleft>9002</onleft>
-                <onright>9002</onright>
-
-                                <textcolor>fff0f2f5</textcolor>
-                <focusedcolor>ffff8800</focusedcolor>
-                <texturefocus />
-                <texturenofocus />
-<onclick>ActivateWindow(Settings)</onclick>
-            </control>
-
-            <!-- Fokuslinie Einstellungen -->
-            
-
-            <!-- exakt global zentrierter Wetter/Uhrzeit-Block -->
-            <control type="group">
-
-                <left>720</left>
-                <top>20</top>
-                <width>420</width>
-                <height>82</height>
-
-                <control type="image">
-                    <left>0</left>
-                    <top>0</top>
-                    <width>82</width>
-                    <height>82</height>
-
-                    <aspectratio>keep</aspectratio>
-
-                    <texture>$INFO[Weather.ConditionsIcon]</texture>
-                </control>
-
-                <control type="label">
-                    <left>88</left>
-                    <top>0</top>
-                    <width>124</width>
-                    <height>82</height>
-
-                    <align>center</align>
-                    <aligny>center</aligny>
-
-                    <font>font55</font>
-                    <textcolor>fff0f2f5</textcolor>
-
-                    <label>[B]$INFO[Weather.Temperature][/B]</label>
-                </control>
-
-                <control type="image">
-                    <left>238</left>
-                    <top>12</top>
-                    <width>2</width>
-                    <height>58</height>
-
-                    <texture colordiffuse="55ffffff">colors/white.png</texture>
-                </control>
-
-                <control type="label">
-                    <left>260</left>
-                    <top>0</top>
-                    <width>160</width>
-                    <height>82</height>
-
-                    <align>center</align>
-                    <aligny>center</aligny>
-
-                    <font>font55</font>
-                    <textcolor>fff0f2f5</textcolor>
-
-                    <label>[B]$INFO[System.Time(hh:mm)][/B]</label>
-                </control>
-
-            </control>
-
-
-            <!-- =================================================
-                 TELEFONSTATUS
-                 ================================================= -->
-
-            <control type="group">
-
-                <right>0</right>
-                <top>20</top>
-                <width>520</width>
-                <height>82</height>
-
-
-                <!-- verbunden -->
-                <control type="group">
-
-                    <width>520</width>
-                    <height>82</height>
-
-                    <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Connected),true)</visible>
-
-
-                    <!-- Provider -->
-                    <control type="label">
-
-                        <left>0</left>
-                        <top>0</top>
-                        <width>350</width>
-                        <height>82</height>
-
-                        <align>right</align>
-                        <aligny>center</aligny>
-
-                        <font>font55</font>
-                        <textcolor>fff0f2f5</textcolor>
-
-                        <label>[B]$INFO[Window(Home).Property(RNSE.Phone.Operator)][/B]</label>
-
-                    </control>
-
-
-                    <!-- Signal -->
-                    <control type="group">
-
-                        <left>375</left>
-                        <top>23</top>
-                        <width>62</width>
-                        <height>36</height>
-
-                        <control type="image">
-                            <left>0</left>
-                            <bottom>0</bottom>
-                            <width>8</width>
-                            <height>10</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal1),true)</visible>
-                        </control>
-
-                        <control type="image">
-                            <left>13</left>
-                            <bottom>0</bottom>
-                            <width>8</width>
-                            <height>16</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal2),true)</visible>
-                        </control>
-
-                        <control type="image">
-                            <left>26</left>
-                            <bottom>0</bottom>
-                            <width>8</width>
-                            <height>22</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal3),true)</visible>
-                        </control>
-
-                        <control type="image">
-                            <left>39</left>
-                            <bottom>0</bottom>
-                            <width>8</width>
-                            <height>28</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal4),true)</visible>
-                        </control>
-
-                        <control type="image">
-                            <left>52</left>
-                            <bottom>0</bottom>
-                            <width>8</width>
-                            <height>34</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Signal5),true)</visible>
-                        </control>
-
-                    </control>
-
-
-                    <!-- Akku -->
-                    <control type="group">
-
-                        <left>455</left>
-                        <top>11</top>
-                        <width>50</width>
-                        <height>60</height>
-
-                        <control type="image">
-                            <left>15</left>
-                            <top>0</top>
-                            <width>16</width>
-                            <height>6</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                        </control>
-
-                        <control type="image">
-                            <left>4</left>
-                            <top>6</top>
-                            <width>38</width>
-                            <height>3</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                        </control>
-
-                        <control type="image">
-                            <left>4</left>
-                            <top>56</top>
-                            <width>38</width>
-                            <height>3</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                        </control>
-
-                        <control type="image">
-                            <left>4</left>
-                            <top>6</top>
-                            <width>3</width>
-                            <height>53</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                        </control>
-
-                        <control type="image">
-                            <left>39</left>
-                            <top>6</top>
-                            <width>3</width>
-                            <height>53</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                        </control>
-
-                        <control type="image">
-                            <left>10</left>
-                            <top>46</top>
-                            <width>26</width>
-                            <height>7</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery1),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery2),true)</visible>
-                        </control>
-
-                        <control type="image">
-                            <left>10</left>
-                            <top>38</top>
-                            <width>26</width>
-                            <height>15</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery2),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery3),true)</visible>
-                        </control>
-
-                        <control type="image">
-                            <left>10</left>
-                            <top>30</top>
-                            <width>26</width>
-                            <height>23</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery3),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery4),true)</visible>
-                        </control>
-
-                        <control type="image">
-                            <left>10</left>
-                            <top>22</top>
-                            <width>26</width>
-                            <height>31</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery4),true) + !String.IsEqual(Window(Home).Property(RNSE.Phone.Battery5),true)</visible>
-                        </control>
-
-                        <control type="image">
-                            <left>10</left>
-                            <top>14</top>
-                            <width>26</width>
-                            <height>39</height>
-                            <texture colordiffuse="fff0f2f5">colors/white.png</texture>
-                            <visible>String.IsEqual(Window(Home).Property(RNSE.Phone.Battery5),true)</visible>
-                        </control>
-
-                    </control>
-
-                </control>
-
-
-                <!-- nicht verbunden -->
-                <control type="label">
-
-                    <left>0</left>
-                    <top>0</top>
-                    <width>505</width>
-                    <height>82</height>
-
-                    <align>right</align>
-                    <aligny>center</aligny>
-
-                    <font>font55</font>
-                    <textcolor>ff8d99ae</textcolor>
-
-                    <label>[B]Kein Telefon[/B]</label>
-
-                    <visible>!String.IsEqual(Window(Home).Property(RNSE.Phone.Connected),true)</visible>
-
-                </control>
-
-            </control>
-
-        </control>
-
+        <include content="RNSE_GlobalFooter" />
     </controls>
-
 </window>

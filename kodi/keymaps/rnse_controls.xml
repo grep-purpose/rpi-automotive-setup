@@ -1,11 +1,11 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version='1.0' encoding='utf-8'?>
 <keymap>
   <global>
     <keyboard>
       <one>Down</one>
       <two>Up</two>
       <return>Select</return>
-      <escape>RunScript(/home/pi/.kodi/userdata/scripts/radio_player.py,back)</escape>
+      <escape>RunScript(/home/pi/.kodi/userdata/scripts/mira_music_router.py,back)</escape>
       <m>ActivateWindow(1150)</m>
       <up>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,up)</up>
       <down>RunScript(/home/pi/.kodi/userdata/rnse_zone_nav.py,down)</down>
