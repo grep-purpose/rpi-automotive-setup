@@ -45,31 +45,20 @@ def get_disk_name(source):
     return name
 
 def get_device_label():
-    source = get_mount_source()
-
-    if not source:
-        return "Kein USB-Gerät erkannt"
+    import sys
+    sys.path.insert(0, "/home/pi")
+    from mira_usb_status import get_devices
 
     try:
-        label = run_command(
-            ["lsblk", "-no", "LABEL", source]
-        ).stdout.strip()
+        devices = get_devices()
+        if len(devices) == 1:
+            return devices[0]["name"]
+        if len(devices) > 1:
+            return "Mehrere USB-Geräte"
+        return "Kein USB-Gerät erkannt"
     except Exception:
-        label = ""
+        return "USB-Gerät nicht eindeutig erkannt"
 
-    base = Path(source).name
-    disk = get_disk_name(source)
-
-    if label == "IPOD":
-        return "iPod Classic"
-
-    if label:
-        return f"{label} ({base})"
-
-    if disk:
-        return f"{base} auf {disk}"
-
-    return base
 
 def notify(title, message, level=xbmcgui.NOTIFICATION_INFO, ms=3500):
     xbmcgui.Dialog().notification(title, message, level, ms)
@@ -89,60 +78,74 @@ def open_dialog():
     xbmc.executebuiltin(f"ActivateWindow({DIALOG_ID})")
 
 def safe_eject():
-    # Auch bei einem Fehlklick ausschließlich den
-    # derzeit eingebundenen iPod berücksichtigen.
-    source = get_mount_source()
+    import sys
+    sys.path.insert(0, "/home/pi")
+    from mira_usb_status import get_devices
 
-    expected = os.path.realpath(
-        "/dev/disk/by-uuid/3845-4167"
-    )
+    try:
+        devices = get_devices()
 
-    if not source or os.path.realpath(source) != expected:
-        notify(
-            "Mira USB",
-            "iPod nicht eindeutig erkannt",
-            xbmcgui.NOTIFICATION_WARNING, 4500
+        if len(devices) != 1:
+            notify(
+                "Mira USB",
+                "USB-Gerät nicht eindeutig erkannt",
+                xbmcgui.NOTIFICATION_WARNING, 4500
+            )
+            return
+
+        device = devices[0]
+        mount = device["mount"]
+
+        # Wiedergabe ausschließlich für dieses Medium stoppen.
+        current = xbmc.getInfoLabel(
+            "Player.FilenameAndPath"
+        ).strip()
+
+        if current.startswith(mount.rstrip("/") + "/"):
+            xbmc.Player().stop()
+            xbmc.sleep(600)
+
+        result = subprocess.run(
+            [
+                "sudo", "-n",
+                "/usr/local/sbin/mira-usb-eject-root"
+            ],
+            text=True,
+            capture_output=True,
+            timeout=60,
+            check=False
         )
-        return
 
-    if get_partition_transport(source) != "usb":
-        notify(
-            "Mira USB",
-            "Abbruch: kein USB-Massenspeicher",
-            xbmcgui.NOTIFICATION_ERROR, 4500
-        )
-        return
+        if result.returncode == 0:
+            HOME.setProperty(
+                "Mira.USB.DeviceName",
+                "Keine USB-Quelle"
+            )
+            notify(
+                "Mira USB",
+                "Sicher ausgehängt - jetzt abziehen",
+                xbmcgui.NOTIFICATION_INFO, 5000
+            )
+        else:
+            xbmc.log(
+                "[Mira USB Eject] "
+                + (result.stderr or result.stdout),
+                xbmc.LOGERROR
+            )
+            notify(
+                "Mira USB",
+                "Auswerfen fehlgeschlagen - nicht abziehen",
+                xbmcgui.NOTIFICATION_ERROR, 5000
+            )
 
-    # Nur Wiedergabe von diesem Datenträger stoppen.
-    playing_path = xbmc.getInfoLabel(
-        "Player.FilenameAndPath"
-    ).strip()
-
-    if playing_path.startswith("/mnt/ipod/"):
-        xbmc.Player().stop()
-        xbmc.sleep(600)
-
-    # Keine frei wählbaren sudo-Parameter oder Gerätepfade.
-    result = run_command([
-        "sudo", "-n", "/usr/bin/systemctl",
-        "start", "mira-ipod-eject.service"
-    ])
-
-    if result.returncode == 0:
-        notify(
-            "Mira USB",
-            "iPod sicher ausgehängt – jetzt abziehen",
-            xbmcgui.NOTIFICATION_INFO, 5000
-        )
-    else:
+    except Exception as exc:
         xbmc.log(
-            "[Mira USB Eject] " +
-            (result.stderr or result.stdout or "Fehlgeschlagen"),
+            "[Mira USB Eject] " + str(exc),
             xbmc.LOGERROR
         )
         notify(
             "Mira USB",
-            "Auswerfen fehlgeschlagen – Gerät nicht abziehen",
+            "Auswerfen fehlgeschlagen - nicht abziehen",
             xbmcgui.NOTIFICATION_ERROR, 5000
         )
 

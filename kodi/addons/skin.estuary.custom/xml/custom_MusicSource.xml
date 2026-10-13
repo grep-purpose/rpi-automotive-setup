@@ -42,7 +42,7 @@
             <texturefocus>music/transport_focus.png</texturefocus>
             <onleft>9161</onleft><onright>9161</onright>
             <onup>9162</onup><ondown>9162</ondown>
-            <onclick>Close</onclick><onclick>ActivateWindow(11199)</onclick></control>
+            <onclick>Close</onclick><onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_music_router.py,select,bluetooth)</onclick></control>
 
         <control type="button" id="9161">
             <left>985</left><top>435</top>
@@ -56,7 +56,7 @@
             <texturefocus>music/transport_focus.png</texturefocus>
             <onleft>9160</onleft><onright>9160</onright>
             <onup>9162</onup><ondown>9162</ondown>
-            <onclick>Close</onclick><onclick>ActivateWindow(1170)</onclick></control>
+            <onclick>Close</onclick><onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_music_router.py,select,usb)</onclick></control>
 
         <control type="button" id="9162">
         <left>710</left><top>765</top>

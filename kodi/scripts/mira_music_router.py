@@ -7,7 +7,12 @@ from urllib.parse import unquote
 import xbmc
 import xbmcgui
 
-USB_ROOT = Path("/mnt/ipod")
+USB_ROOTS = (
+    Path("/mnt/ipod"),
+    Path("/mnt/mira-nano-test"),
+    Path("/media/pi"),
+    Path("/run/media/pi"),
+)
 
 BT_WINDOW = 11199
 USB_WINDOW = 1170
@@ -18,30 +23,49 @@ HOME = xbmcgui.Window(10000)
 
 
 def kodi_usb_playing():
-    """Ist tatsächlich Musik vom iPod aktiv?"""
+    """USB-Musik anhand des aktuell verbundenen Geräts erkennen."""
 
     try:
-        path = unquote(
-            xbmc.getInfoLabel(
-                "Player.FilenameAndPath"
-            )
-        )
+        import sys
+        sys.path.insert(0, "/home/pi")
+        from mira_usb_status import get_devices
 
-        if not path:
+        if not (
+            xbmc.getCondVisibility("Player.HasAudio")
+            and xbmc.getCondVisibility("Player.Playing")
+            and not xbmc.getCondVisibility("Player.Paused")
+        ):
             return False
 
-        # Nur echte Dateien vom iPod akzeptieren.
-        file_path = Path(path)
+        filename = unquote(
+            xbmc.getInfoLabel("Player.FilenameAndPath")
+        ).strip()
 
-        if not file_path.is_relative_to(USB_ROOT):
+        if not filename.startswith("/"):
             return False
+
+        # Nur physisch vorhandene und korrekt
+        # schreibgeschützt eingebundene USB-Geräte.
+        devices = get_devices()
+
+        if len(devices) != 1:
+            return False
+
+        device = devices[0]
+        mount = Path(device["mount"]).resolve()
+        current = Path(filename).resolve()
 
         return (
-            xbmc.getCondVisibility("Player.Playing")
-            and not xbmc.getCondVisibility("Player.Paused")
+            current.is_relative_to(mount)
+            and current != mount
         )
 
-    except Exception:
+    except Exception as exc:
+        xbmc.log(
+            "[Mira USB Router] Erkennung fehlgeschlagen: "
+            + str(exc),
+            xbmc.LOGWARNING
+        )
         return False
 
 
@@ -55,21 +79,80 @@ def bluetooth_playing():
     )
 
 
-def open_music():
-    """Passenden Musikplayer auswählen."""
+# MIRA_HYBRID_ROUTING_R3
 
-    if kodi_usb_playing():
-        target = USB_WINDOW
+LAST_SOURCE_PROPERTY = "Mira.Music.LastSource"
 
-    elif bluetooth_playing():
+
+def usb_connected():
+    """Ein eindeutig erkanntes USB-Musikgerät ist verbunden."""
+    try:
+        sys.path.insert(0, "/home/pi")
+        from mira_usb_status import get_devices
+
+        devices = get_devices()
+        return len(devices) == 1
+    except Exception as exc:
+        xbmc.log(
+            "[Mira Hybrid] USB-Status: " + str(exc),
+            xbmc.LOGWARNING
+        )
+        return False
+
+
+def select_source(source):
+    """Bewusste Quellenauswahl für diese Kodi-Sitzung merken."""
+    source = source.strip().lower()
+
+    if source == "bluetooth":
+        HOME.setProperty(LAST_SOURCE_PROPERTY, source)
         target = BT_WINDOW
 
+    elif source == "usb":
+        HOME.setProperty(LAST_SOURCE_PROPERTY, source)
+        target = USB_WINDOW
+
     else:
-        target = SOURCE_WINDOW
+        return
 
     xbmc.executebuiltin(
         "ActivateWindow({})".format(target)
     )
+
+
+def open_music():
+    """Musikkachel: aktive Quelle vor Benutzerpräferenz."""
+
+    if bluetooth_playing():
+        target = BT_WINDOW
+
+    elif kodi_usb_playing():
+        target = USB_WINDOW
+
+    else:
+        last = HOME.getProperty(
+            LAST_SOURCE_PROPERTY
+        ).strip().lower()
+
+        connected = usb_connected()
+
+        if last == "bluetooth":
+            target = BT_WINDOW
+
+        elif last == "usb" and connected:
+            target = USB_WINDOW
+
+        elif connected:
+            target = USB_WINDOW
+
+        else:
+            target = BT_WINDOW
+
+    xbmc.executebuiltin(
+        "ActivateWindow({})".format(target)
+    )
+
+# MIRA_HYBRID_ROUTING_R3 END
 
 
 
@@ -92,14 +175,16 @@ def radio_playing():
 def open_now_playing():
     """Zur tatsächlich laufenden Medienquelle."""
 
-    if kodi_usb_playing():
+    # Bluetooth hat Vorrang vor einem eventuell
+    # noch vorhandenen Kodi-USB-Wiedergabestatus.
+    if bluetooth_playing():
+        target = BT_WINDOW
+
+    elif kodi_usb_playing():
         target = USB_WINDOW
 
     elif radio_playing():
         target = RADIO_WINDOW
-
-    elif bluetooth_playing():
-        target = BT_WINDOW
 
     else:
         target = SOURCE_WINDOW
@@ -143,6 +228,10 @@ def main():
 
     if mode == "open":
         open_music()
+
+    elif mode == "select":
+        if len(sys.argv) >= 3:
+            select_source(sys.argv[2])
 
     elif mode == "nowplaying":
         open_now_playing()

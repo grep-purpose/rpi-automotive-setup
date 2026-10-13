@@ -108,6 +108,162 @@ def show_list():
 
 
 
+# MIRA_RADIO_RESUME_R1
+
+def radio_play_button():
+    """Radio Play/Pause oder letzten Sender neu starten."""
+
+    stream_url = HOME.getProperty(
+        "RNSE.RadioStreamUrl"
+    ).strip()
+
+    station = HOME.getProperty(
+        "RNSE.RadioStation"
+    ).strip()
+
+    current = get_playing_file()
+
+    if not current:
+        current = xbmc.getInfoLabel(
+            "Player.FilenameAndPath"
+        ).strip()
+
+    has_media = xbmc.getCondVisibility(
+        "Player.HasMedia"
+    )
+
+    # Ein tatsaechlich geladener Radiostream:
+    # Vorhandene Play/Pause-Bedienung beibehalten.
+    current_is_radio = bool(
+        current
+        and (
+            "plugin.audio.radiode" in current
+            or (
+                stream_url
+                and current == stream_url
+            )
+        )
+    )
+
+    if has_media and current_is_radio:
+        xbmc.executebuiltin("PlayerControl(Play)")
+        return
+
+    # Kein Radiostream geladen:
+    # Letzten Sender bewusst erneut starten.
+    if not stream_url or not station:
+        xbmc.log(
+            "[Mira Radio Resume R1] Kein letzter Sender "
+            "mit Stream-URL gespeichert",
+            xbmc.LOGWARNING
+        )
+        return
+
+    xbmc.log(
+        "[Mira Radio Resume R1] Starte: " + station,
+        xbmc.LOGINFO
+    )
+
+    try:
+        xbmc.Player().play(stream_url)
+    except Exception as exc:
+        xbmc.log(
+            "[Mira Radio Resume R1] Start fehlgeschlagen: "
+            + str(exc),
+            xbmc.LOGERROR
+        )
+
+
+def resume_last():
+    """
+    Radio-Softkey aus dem Musikplayer.
+
+    - Läuft Radio bereits:
+        Player öffnen.
+    - Letzter Sender / Stream bekannt:
+        Stream erneut starten und danach automatisch
+        den Radio-Player öffnen.
+    - Kein letzter Sender bekannt:
+        Senderliste öffnen.
+    """
+
+    if radio_active():
+
+        clear_list_state()
+
+        xbmc.executebuiltin(
+            f"ActivateWindow({RADIO_WINDOW})"
+        )
+
+        return
+
+
+    station = HOME.getProperty(
+        "RNSE.RadioStation"
+    ).strip()
+
+    stream_url = HOME.getProperty(
+        "RNSE.RadioStreamUrl"
+    ).strip()
+
+
+    if station and stream_url:
+
+        xbmc.log(
+            "[RNSE Radio] Letzten Sender wieder starten: "
+            + station,
+            xbmc.LOGINFO
+        )
+
+        HOME.clearProperty(
+            "RNSE.Radio.ListRequested"
+        )
+
+        HOME.clearProperty(
+            "RNSE.Radio.ListWatch"
+        )
+
+        HOME.setProperty(
+            "RNSE.Radio.OpenPlayerPending",
+            "true"
+        )
+
+        try:
+
+            xbmc.Player().play(
+                stream_url
+            )
+
+            return
+
+        except Exception as exc:
+
+            xbmc.log(
+                "[RNSE Radio] Resume fehlgeschlagen: "
+                + str(exc),
+                xbmc.LOGWARNING
+            )
+
+
+    # Kein letzter Sender verfügbar:
+    # normale radio.de-Senderliste öffnen.
+
+    HOME.setProperty(
+        "RNSE.Radio.OpenPlayerPending",
+        "true"
+    )
+
+    xbmc.executebuiltin(
+        'ActivateWindow('
+        '10502,'
+        '"plugin://plugin.audio.radiode/'
+        '?data=%7b%22name%22%3a%20%22Local%20stations%22%7d'
+        '&mode=get_local_stations",'
+        'return)'
+    )
+
+
+
 def show_player():
     """
     Manueller Rückfall-Shortcut im Senderlisten-Header.
@@ -245,8 +401,17 @@ def main():
     elif action == "show-player":
         show_player()
 
+    elif action == "resume-last":
+        resume_last()
+
     elif action == "back":
         handle_back()
+
+
+# MIRA_RADIO_RESUME_R1_ENTRY
+if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "smart-play":
+    radio_play_button()
+    sys.exit(0)
 
 
 if __name__ == "__main__":

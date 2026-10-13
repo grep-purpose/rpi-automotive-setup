@@ -1,9 +1,8 @@
-<?xml version='1.0' encoding='utf-8'?>
 <window id="1170">
     <defaultcontrol always="true">9101</defaultcontrol>
 
 
-    <controls>
+    <onload>RunScript(/home/pi/.kodi/userdata/scripts/mira_usb_device_label.py)</onload><controls>
         <control type="image">
             <left>0</left>
             <top>0</top>
@@ -40,22 +39,22 @@
                 <texture colordiffuse="ff111820">colors/white.png</texture>
             </control>
             <control type="image">
-                <left>24</left>
-                <top>74</top>
-                <width>662</width>
-                <height>662</height>
-                <aspectratio>keep</aspectratio>
-                <texture>$INFO[MusicPlayer.Cover]</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [!String.IsEmpty(MusicPlayer.Cover)]</visible>
-            </control>
-            <control type="image">
                 <left>122</left>
                 <top>182</top>
                 <width>470</width>
                 <height>470</height>
                 <aspectratio>keep</aspectratio>
                 <texture colordiffuse="ffc8cfd8">DefaultAlbumCover.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [String.IsEmpty(MusicPlayer.Cover)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)]</visible>
+            </control>
+            <control type="image">
+                <left>24</left>
+                <top>74</top>
+                <width>662</width>
+                <height>662</height>
+                <aspectratio>keep</aspectratio>
+                <texture>$INFO[MusicPlayer.Cover]</texture>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + !String.IsEmpty(MusicPlayer.Cover)</visible>
             </control>
             <control type="label">
                 <left>770</left>
@@ -64,7 +63,7 @@
                 <height>72</height>
                 <font>font55</font>
                 <textcolor>ff8d99ae</textcolor>
-                <label>USB · iPod Classic</label>
+                <label>USB · $INFO[Window(Home).Property(Mira.USB.DeviceName)]</label>
             </control>
             <control type="label">
                 <left>770</left>
@@ -74,7 +73,7 @@
                 <font>font75</font>
                 <textcolor>ffffffff</textcolor>
                 <label>$INFO[MusicPlayer.Title]</label>
-            <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)]</visible></control>
+            <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + !String.IsEmpty(MusicPlayer.Title)</visible></control>
             <control type="label">
                 <left>770</left>
                 <top>305</top>
@@ -83,7 +82,7 @@
                 <font>font60</font>
                 <textcolor>ffff8a32</textcolor>
                 <label>$INFO[MusicPlayer.Artist]</label>
-            <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)]</visible></control>
+            <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + !String.IsEmpty(MusicPlayer.Artist)</visible></control>
             <control type="label">
                 <left>770</left>
                 <top>400</top>
@@ -92,7 +91,7 @@
                 <font>font55</font>
                 <textcolor>ffd5dae0</textcolor>
                 <label>$INFO[MusicPlayer.Album]</label>
-            <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)]</visible></control>
+            <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + !String.IsEmpty(MusicPlayer.Album)</visible></control>
             <control type="label">
                 <left>770</left>
                 <top>180</top>
@@ -101,7 +100,7 @@
                 <font>font60</font>
                 <textcolor>ff8d99ae</textcolor>
                 <label>[B]Keine USB-Wiedergabe[/B]</label>
-                <visible>![String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)]</visible>
+                <visible>![Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)]]</visible>
             </control>
             <control type="label">
                 <left>770</left>
@@ -113,7 +112,7 @@
                 <font>font55</font>
                 <textcolor>fff0f2f5</textcolor>
                 <label>$INFO[Player.Time]</label>
-            <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)]</visible></control>
+            <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)]</visible></control>
             <control type="label">
                 <left>1580</left>
                 <top>545</top>
@@ -124,7 +123,7 @@
                 <font>font55</font>
                 <textcolor>fff0f2f5</textcolor>
                 <label>$INFO[Player.Duration]</label>
-            <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)]</visible></control>
+            <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)]</visible></control>
             <control type="image">
                 <left>770</left>
                 <top>650</top>
@@ -138,7 +137,7 @@
                 <width>10</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,0)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,0)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -146,7 +145,7 @@
                 <width>20</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,1)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,1)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -154,7 +153,7 @@
                 <width>30</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,2)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,2)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -162,7 +161,7 @@
                 <width>40</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,3)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,3)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -170,7 +169,7 @@
                 <width>50</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,4)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,4)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -178,7 +177,7 @@
                 <width>60</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,5)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,5)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -186,7 +185,7 @@
                 <width>70</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,6)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,6)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -194,7 +193,7 @@
                 <width>80</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,7)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,7)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -202,7 +201,7 @@
                 <width>90</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,8)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,8)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -210,7 +209,7 @@
                 <width>100</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,9)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,9)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -218,7 +217,7 @@
                 <width>110</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,10)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,10)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -226,7 +225,7 @@
                 <width>120</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,11)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,11)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -234,7 +233,7 @@
                 <width>130</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,12)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,12)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -242,7 +241,7 @@
                 <width>140</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,13)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,13)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -250,7 +249,7 @@
                 <width>150</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,14)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,14)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -258,7 +257,7 @@
                 <width>160</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,15)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,15)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -266,7 +265,7 @@
                 <width>170</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,16)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,16)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -274,7 +273,7 @@
                 <width>180</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,17)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,17)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -282,7 +281,7 @@
                 <width>190</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,18)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,18)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -290,7 +289,7 @@
                 <width>200</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,19)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,19)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -298,7 +297,7 @@
                 <width>210</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,20)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,20)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -306,7 +305,7 @@
                 <width>220</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,21)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,21)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -314,7 +313,7 @@
                 <width>230</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,22)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,22)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -322,7 +321,7 @@
                 <width>240</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,23)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,23)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -330,7 +329,7 @@
                 <width>250</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,24)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,24)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -338,7 +337,7 @@
                 <width>260</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,25)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,25)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -346,7 +345,7 @@
                 <width>270</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,26)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,26)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -354,7 +353,7 @@
                 <width>280</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,27)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,27)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -362,7 +361,7 @@
                 <width>290</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,28)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,28)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -370,7 +369,7 @@
                 <width>300</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,29)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,29)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -378,7 +377,7 @@
                 <width>310</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,30)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,30)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -386,7 +385,7 @@
                 <width>320</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,31)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,31)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -394,7 +393,7 @@
                 <width>330</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,32)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,32)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -402,7 +401,7 @@
                 <width>340</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,33)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,33)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -410,7 +409,7 @@
                 <width>350</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,34)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,34)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -418,7 +417,7 @@
                 <width>360</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,35)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,35)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -426,7 +425,7 @@
                 <width>370</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,36)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,36)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -434,7 +433,7 @@
                 <width>380</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,37)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,37)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -442,7 +441,7 @@
                 <width>390</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,38)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,38)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -450,7 +449,7 @@
                 <width>400</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,39)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,39)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -458,7 +457,7 @@
                 <width>410</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,40)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,40)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -466,7 +465,7 @@
                 <width>420</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,41)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,41)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -474,7 +473,7 @@
                 <width>430</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,42)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,42)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -482,7 +481,7 @@
                 <width>440</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,43)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,43)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -490,7 +489,7 @@
                 <width>450</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,44)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,44)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -498,7 +497,7 @@
                 <width>460</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,45)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,45)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -506,7 +505,7 @@
                 <width>470</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,46)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,46)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -514,7 +513,7 @@
                 <width>480</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,47)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,47)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -522,7 +521,7 @@
                 <width>490</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,48)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,48)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -530,7 +529,7 @@
                 <width>500</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,49)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,49)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -538,7 +537,7 @@
                 <width>510</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,50)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,50)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -546,7 +545,7 @@
                 <width>520</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,51)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,51)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -554,7 +553,7 @@
                 <width>530</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,52)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,52)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -562,7 +561,7 @@
                 <width>540</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,53)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,53)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -570,7 +569,7 @@
                 <width>550</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,54)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,54)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -578,7 +577,7 @@
                 <width>560</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,55)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,55)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -586,7 +585,7 @@
                 <width>570</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,56)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,56)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -594,7 +593,7 @@
                 <width>580</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,57)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,57)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -602,7 +601,7 @@
                 <width>590</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,58)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,58)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -610,7 +609,7 @@
                 <width>600</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,59)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,59)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -618,7 +617,7 @@
                 <width>610</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,60)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,60)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -626,7 +625,7 @@
                 <width>620</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,61)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,61)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -634,7 +633,7 @@
                 <width>630</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,62)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,62)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -642,7 +641,7 @@
                 <width>640</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,63)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,63)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -650,7 +649,7 @@
                 <width>650</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,64)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,64)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -658,7 +657,7 @@
                 <width>660</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,65)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,65)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -666,7 +665,7 @@
                 <width>670</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,66)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,66)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -674,7 +673,7 @@
                 <width>680</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,67)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,67)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -682,7 +681,7 @@
                 <width>690</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,68)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,68)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -690,7 +689,7 @@
                 <width>700</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,69)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,69)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -698,7 +697,7 @@
                 <width>710</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,70)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,70)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -706,7 +705,7 @@
                 <width>720</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,71)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,71)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -714,7 +713,7 @@
                 <width>730</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,72)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,72)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -722,7 +721,7 @@
                 <width>740</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,73)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,73)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -730,7 +729,7 @@
                 <width>750</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,74)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,74)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -738,7 +737,7 @@
                 <width>760</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,75)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,75)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -746,7 +745,7 @@
                 <width>770</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,76)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,76)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -754,7 +753,7 @@
                 <width>780</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,77)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,77)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -762,7 +761,7 @@
                 <width>790</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,78)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,78)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -770,7 +769,7 @@
                 <width>800</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,79)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,79)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -778,7 +777,7 @@
                 <width>810</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,80)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,80)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -786,7 +785,7 @@
                 <width>820</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,81)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,81)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -794,7 +793,7 @@
                 <width>830</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,82)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,82)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -802,7 +801,7 @@
                 <width>840</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,83)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,83)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -810,7 +809,7 @@
                 <width>850</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,84)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,84)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -818,7 +817,7 @@
                 <width>860</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,85)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,85)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -826,7 +825,7 @@
                 <width>870</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,86)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,86)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -834,7 +833,7 @@
                 <width>880</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,87)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,87)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -842,7 +841,7 @@
                 <width>890</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,88)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,88)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -850,7 +849,7 @@
                 <width>900</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,89)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,89)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -858,7 +857,7 @@
                 <width>910</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,90)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,90)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -866,7 +865,7 @@
                 <width>920</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,91)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,91)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -874,7 +873,7 @@
                 <width>930</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,92)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,92)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -882,7 +881,7 @@
                 <width>940</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,93)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,93)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -890,7 +889,7 @@
                 <width>950</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,94)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,94)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -898,7 +897,7 @@
                 <width>960</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,95)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,95)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -906,7 +905,7 @@
                 <width>970</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,96)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,96)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -914,7 +913,7 @@
                 <width>980</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,97)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,97)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -922,7 +921,7 @@
                 <width>990</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,98)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,98)</visible>
             </control>
             <control type="image">
                 <left>770</left>
@@ -930,9 +929,37 @@
                 <width>1000</width>
                 <height>22</height>
                 <texture colordiffuse="ffff6b00">colors/white.png</texture>
-                <visible>[String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + [Integer.IsGreater(Player.Progress,99)]</visible>
+                <visible>Player.HasMedia + [String.StartsWith(Player.FilenameAndPath,/mnt/ipod/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-nano-test/) | String.StartsWith(Player.FilenameAndPath,/mnt/mira-usb/) | String.StartsWith(Player.FilenameAndPath,/media/pi/) | String.StartsWith(Player.FilenameAndPath,/run/media/pi/)] + Integer.IsGreater(Player.Progress,99)</visible>
             </control>
-            <control type="button" id="9100">
+            <control type="button" id="9111">
+    <left>740</left>
+    <top>735</top>
+    <width>145</width>
+    <height>145</height>
+
+    <label />
+    <font>font60</font>
+    <textcolor>ffffffff</textcolor>
+    <focusedcolor>ffffffff</focusedcolor>
+    <align>center</align>
+    <aligny>center</aligny>
+
+    <texturenofocus>-</texturenofocus>
+    <texturefocus>music/transport_focus.png</texturefocus>
+
+    <onup>9100</onup>
+    <ondown>9110</ondown>
+    <onleft>9100</onleft>
+    <onright>9100</onright>
+
+    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_usb_eject.py,open)</onclick></control><control type="image" id="9112">
+      <left>776</left>
+      <top>771</top>
+      <width>73</width>
+      <height>73</height>
+      <aspectratio>keep</aspectratio>
+      <texture colordiffuse="ffffffff">music/mira_eject.png</texture>
+    </control><control type="button" id="9100">
                 <left>915</left>
                 <top>735</top>
                 <width>220</width>
@@ -944,7 +971,7 @@
                 <texturenofocus>music/transport_normal.png</texturenofocus>
                 <texturefocus>music/transport_focus.png</texturefocus>
                 <onclick>PlayerControl(Previous)</onclick>
-                <ondown>9110</ondown>
+                <ondown>9111</ondown>
             </control>
             <control type="image">
                 <left>960</left>
@@ -1011,25 +1038,33 @@
         <control type="button" id="9110">
         <left>1650</left>
         <top>735</top>
-        <width>180</width>
+        <width>145</width>
         <height>145</height>
 
-        <label>≡♪</label>
+        <label />
         <font>font60</font>
         <textcolor>ffffffff</textcolor>
         <focusedcolor>ffffffff</focusedcolor>
         <align>center</align>
         <aligny>center</aligny>
 
-        <texturenofocus>music/transport_normal.png</texturenofocus>
+        <texturenofocus>-</texturenofocus>
         <texturefocus>music/transport_focus.png</texturefocus>
 
         <onleft>9102</onleft>
         <onright>9002</onright>
-        <onup>9100</onup>
+        <onup>9111</onup>
         <ondown>9102</ondown>
 
-        <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_usb_browser.py,open)</onclick>
+        <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_usb_open_browser.py)</onclick></control>
+
+    <control type="image">
+        <left>1686</left>
+        <top>771</top>
+        <width>73</width>
+        <height>73</height>
+        <aspectratio>keep</aspectratio>
+        <texture>music/usb_folder_music_v8.png</texture>
     </control></control>
         <include content="RNSE_GlobalFooter" />
     </controls>

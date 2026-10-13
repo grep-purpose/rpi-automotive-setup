@@ -123,6 +123,106 @@ def export_music_metadata(force=False):
         PREFIX + "Status"
     ).strip()
 
+    # MIRA_FIS_U54_PROBE
+    try:
+        diagnostic = {
+            "pid": os.getpid(),
+            "time": time.time(),
+            "path": xbmc.getInfoLabel("Player.FilenameAndPath"),
+            "has_audio": bool(
+                xbmc.getCondVisibility("Player.HasAudio")
+            ),
+            "playing": bool(
+                xbmc.getCondVisibility("Player.Playing")
+            ),
+            "paused": bool(
+                xbmc.getCondVisibility("Player.Paused")
+            ),
+            "kodi_title": xbmc.getInfoLabel("MusicPlayer.Title"),
+            "bt_status": home_prop("RNSE.Music.Status"),
+        }
+
+        with open(
+            "/tmp/mira_fis_export_probe.json",
+            "w",
+            encoding="utf-8"
+        ) as debug_file:
+            json.dump(
+                diagnostic,
+                debug_file,
+                ensure_ascii=False,
+                indent=2
+            )
+    except Exception:
+        pass
+    # MIRA_FIS_U54_PROBE END
+
+    # RNSE_USB_FIS_EXPORT_V1
+    # Kodi-USB-Musik direkt exportieren.
+    # Bluetooth-/AirPlay-Properties bleiben unverändert.
+    try:
+        usb_path = urllib.parse.unquote(
+            xbmc.getInfoLabel("Player.FilenameAndPath")
+            or ""
+        ).strip()
+
+        usb_audio = (
+            xbmc.getCondVisibility("Player.HasAudio")
+            and usb_path.startswith("/mnt/mira-usb/")
+        )
+
+        if (
+            usb_audio
+            and xbmc.getCondVisibility("Player.Playing")
+            and not xbmc.getCondVisibility("Player.Paused")
+            and home_prop("RNSE.Music.Status").strip().casefold() != "playing"
+        ):
+            usb_title = (
+                kodi_label("MusicPlayer.Title")
+                or kodi_label("Player.Title")
+            )
+
+            usb_artist = (
+                kodi_label("MusicPlayer.Artist")
+                or kodi_label("MusicPlayer.AlbumArtist")
+            )
+
+            usb_album = kodi_label("MusicPlayer.Album")
+
+            usb_device = HOME.getProperty(
+                "Mira.USB.DeviceName"
+            ).strip()
+
+            if usb_device in (
+                "",
+                "Keine USB-Quelle",
+                "Mehrere USB-Geräte",
+            ):
+                usb_device = ""
+
+            title = usb_title
+            artist = usb_artist
+            album = usb_album
+            source = "usb"
+            source_label = (
+                "USB · " + usb_device
+                if usb_device else "USB"
+            )
+
+            if xbmc.getCondVisibility("Player.Paused"):
+                status = "paused"
+            elif xbmc.getCondVisibility("Player.Playing"):
+                status = "playing"
+            else:
+                status = "stopped"
+
+    except Exception as exc:
+        xbmc.log(
+            "[Mira USB FIS] Metadatenfehler: " + str(exc),
+            xbmc.LOGWARNING
+        )
+    # RNSE_USB_FIS_EXPORT_V1 END
+
     active = bool(
         title
         or artist
@@ -2171,10 +2271,9 @@ def audio_arbiter_update(player):
         # setzen, obwohl keine echte Musikwiedergabe gestartet wurde.
         #
         # Andere Kodi-Medien behalten das bisherige Verhalten.
-        if (
-            kodi_playing
-            and not _audio_arbiter_kodi_was_radio
-        ):
+        # MIRA_GLOBAL_AUDIO_FOCUS_V5
+        # Radio und USB erhalten dieselbe temporaere Pause.
+        if kodi_playing:
             pause_kodi_for_bluetooth()
             kodi_playing = False
 
@@ -2222,7 +2321,15 @@ def audio_arbiter_update(player):
         kodi_started
         and bt_playing
         and not bt_started
-        and kodi_current_is_radio()
+        and (
+            kodi_current_is_radio()
+            or (
+                xbmc.getCondVisibility("Player.HasAudio")
+                and xbmc.getInfoLabel(
+                    "Player.FilenameAndPath"
+                ).startswith("/mnt/mira-usb/")
+            )
+        )
     ):
 
         try:
@@ -2251,34 +2358,10 @@ def audio_arbiter_update(player):
 
 
     # --------------------------------------------------------
-    # RNSE_AUDIO_FOCUS_STABLE_BT_V4
-    #
-    # Echte Bluetooth-Musik nach stabiler Wiedergabe
-    # bestätigen, ohne auf BT-Ende warten zu müssen.
-    # Unabhängig vom geöffneten Kodi-Fenster.
-    # --------------------------------------------------------
-
-    if (
-        bt_playing
-        and _audio_arbiter_kodi_was_radio
-        and _audio_arbiter_bt_started_at > 0.0
-        and now - _audio_arbiter_bt_started_at >= 6.0
-        and (
-            _audio_arbiter_bt_peak_position
-            - _audio_arbiter_bt_start_position
-        ) >= 1500
-        and kodi_current_is_radio()
-    ):
-
-        xbmc.log(
-            "[RNSE Audio V4] Bluetooth stabil -> "
-            "Radio endgültig stoppen",
-            xbmc.LOGINFO
-        )
-
-        stop_old_radio_after_music_switch()
-
-        _audio_arbiter_kodi_was_radio = False
+    # MIRA V5:
+    # Keinen Radio-Stream vorzeitig aufgrund der Dauer
+    # eines Bluetooth-Ereignisses stoppen.
+    # Die Klassifizierung erfolgt bei BT-Ende.
 
     # --------------------------------------------------------
     # Bluetooth endet.
@@ -2474,9 +2557,10 @@ def monitor():
                 # Wenn wir gerade im Radio-Player sind und am
                 # Smartphone echte Bluetooth-Musik gestartet wird,
                 # automatisch auf den Musik-Player wechseln.
-                radio_to_music_autoswitch(
-                    player
-                )
+                # MIRA V5:
+                # Kein automatischer Fensterwechsel bei
+                # noch nicht klassifiziertem Bluetooth-Audio.
+                # Audio-Focus wird separat geregelt.
 
                 # Wenn echte Bluetooth-Musik neu startet,
                 # pausieren wir eine laufende Kodi-Quelle.

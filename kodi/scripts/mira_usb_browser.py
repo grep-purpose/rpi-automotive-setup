@@ -3,6 +3,7 @@ from urllib.parse import quote
 import json
 import os
 import sys
+import subprocess
 from pathlib import Path
 
 import xbmc
@@ -17,6 +18,65 @@ HIDDEN = {
     ".spotlight-v100", ".trashes",
     "$recycle.bin", "ipod_control", ".fseventsd"
 }
+
+
+METADATA_CACHE = {}
+
+def track_metadata(path):
+    """Titel, Interpret und Album lesen; nur lesender Zugriff."""
+    key = str(path)
+
+    if key in METADATA_CACHE:
+        return METADATA_CACHE[key]
+
+    result = {
+        "title": path.stem,
+        "artist": "",
+        "album": "",
+    }
+
+    try:
+        response = subprocess.run(
+            [
+                "ffprobe", "-v", "error",
+                "-show_entries",
+                "format_tags=title,artist,album:"
+                "stream_tags=title,artist,album",
+                "-of", "json",
+                str(path),
+            ],
+            capture_output=True,
+            text=True,
+            timeout=3,
+            check=False,
+        )
+
+        if response.returncode == 0:
+            data = json.loads(response.stdout or "{}")
+            tags = {}
+
+            for stream in data.get("streams", []):
+                for key_name, value in stream.get(
+                    "tags", {}
+                ).items():
+                    tags.setdefault(key_name.lower(), value)
+
+            for key_name, value in data.get(
+                "format", {}
+            ).get("tags", {}).items():
+                tags[key_name.lower()] = value
+
+            for field in ("title", "artist", "album"):
+                value = str(tags.get(field, "")).strip()
+                if value:
+                    result[field] = value
+
+    except (OSError, ValueError, subprocess.TimeoutExpired):
+        pass
+
+    METADATA_CACHE[key] = result
+    return result
+
 
 def inside(path):
     try:
@@ -110,6 +170,18 @@ def play_selected_usb_file(folder, selected):
             "thumb": art_url
         })
 
+        # Metadaten nur fuer den ausgewaehlten Titel lesen.
+        # Andere Titel bleiben schnell in der Playlist.
+        if track == selected:
+            info = track_metadata(track)
+            music_tag = playlist_item.getMusicInfoTag()
+            music_tag.setTitle(str(info["title"]))
+            if info["artist"]:
+                music_tag.setArtist(str(info["artist"]))
+            if info["album"]:
+                music_tag.setAlbum(str(info["album"]))
+
+
         playlist.add(
             str(track),
             listitem=playlist_item
@@ -149,14 +221,32 @@ class MiraUSBListV3(xbmcgui.WindowXMLDialog):
 
         items = []
 
-        for path in self.files:
+        for index, path in enumerate(self.files):
             if path.is_dir():
                 label = "[Ordner]   " + path.name
+                label2 = ""
             else:
-                label = "[Musik]   " + path.stem
+                # Nur den ersten sichtbaren Bereich sofort
+                # analysieren. Weitere Zeilen werden
+                # beim Scrollen nachgeladen.
+                if index < 8:
+                    info = track_metadata(path)
+                    label = info["title"]
+                    label2 = " · ".join(
+                        part for part in (
+                            info["artist"],
+                            info["album"]
+                        ) if part
+                    )
+                else:
+                    label = path.stem
+                    label2 = ""
 
             items.append(
-                xbmcgui.ListItem(label=label)
+                xbmcgui.ListItem(
+                    label=label,
+                    label2=label2
+                )
             )
 
         if items:
@@ -164,6 +254,35 @@ class MiraUSBListV3(xbmcgui.WindowXMLDialog):
             self.list_control.selectItem(0)
 
         self.setFocusId(9300)
+
+    def enrich_near_selection(self):
+        """Metadaten bei Navigation schrittweise ergänzen."""
+        index = self.list_control.getSelectedPosition()
+
+        if index < 0:
+            return
+
+        start = max(0, index - 1)
+        stop = min(len(self.files), index + 7)
+
+        for number in range(start, stop):
+            path = self.files[number]
+
+            if not path.is_file():
+                continue
+
+            info = track_metadata(path)
+
+            item = self.list_control.getListItem(number)
+            item.setLabel(info["title"])
+            item.setLabel2(
+                " · ".join(
+                    part for part in (
+                        info["artist"],
+                        info["album"]
+                    ) if part
+                )
+            )
 
     def onClick(self, control_id):
         if control_id != 9300:
@@ -191,6 +310,9 @@ class MiraUSBListV3(xbmcgui.WindowXMLDialog):
 
     def onAction(self, action):
         action_id = action.getId()
+
+        if action_id not in (9, 10, 92):
+            self.enrich_near_selection()
 
         if action_id in (9, 10, 92):
             if self.folder == ROOT:
@@ -224,12 +346,19 @@ def open_mira_usb_list():
 
 
 def main():
+    global ROOT
+
     mode = sys.argv[1] if len(sys.argv) > 1 else "open"
+
+    if mode == "nano":
+        ROOT = Path("/mnt/mira-nano-test")
+        HIDDEN.discard("ipod_control")
+        mode = "open"
 
     if mode == "open":
         if not os.path.ismount(ROOT):
             xbmcgui.Dialog().notification(
-                "Mira USB", "iPod nicht eingebunden",
+                "Mira USB", "Musikquelle nicht eingebunden",
                 xbmcgui.NOTIFICATION_WARNING, 4000
             )
             return
