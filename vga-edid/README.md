@@ -1,5 +1,10 @@
 # VGA Sync Combiner for Audi RNS-E, 74HCT86 based
 
+> Mira-Einordnung: [Architektur](../docs/ARCHITEKTUR.md) · [Display-/EDID-Installer](edid_installer/README.md).
+> Dieses Hardwaremodul kombiniert Synchronisationssignale. Es ist nicht durch den
+> Repository-Code als das externe Parking-Zwischengerät identifiziert.
+> [Parking-Gesamtsystem und offene Hardwareverbindungen](../docs/PARKING.md).
+
 
 <p align="center">
   <img src="docs/images/pcb.png" alt="PCB" width="1200">

@@ -1,5 +1,14 @@
 # MIRA boot integration
 
+> Einordnung: versionsgebundenes Boot-Paket, keine allgemeine Neuinstallation.
+> Die Aussagen zur damals untersuchten Umgebung sind historischer Kontext und
+> keine Bestätigung des heute laufenden Pi. Zuerst [Startwege](../../docs/STARTWEGE.md)
+> und [Recovery](../../recovery/README.md) lesen. Der unten genannte Ordner
+> `/home/pi/mira-install` muss separat vorhanden sein; ein Git-Clone legt ihn nicht an.
+> Der Git-Abschnitt dokumentiert den ursprünglichen Arbeitsablauf, nicht den
+> notwendigen Schritt zur Nutzung dieser Dokumentation. Keine pauschale Aktivierung
+> weiterer Launcher-/Autostartvarianten.
+
 Prepared for the uploaded 800-line PyQt5 launcher, Debian 12, Raspberry Pi 4,
 kernel rpi-v8, labwc/LightDM, and active automatic initramfs8 loading.
 

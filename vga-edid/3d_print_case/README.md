@@ -1,5 +1,9 @@
 # 3D Printed Case
 
+> Mira-Einordnung: mechanisches Zubehör des [Sync-Combiners](../README.md).
+> Die Softwareprüfung bestätigt weder Materialeignung noch Fahrzeugverdrahtung neu.
+> [Architektur und Navigation](../../docs/ARCHITEKTUR.md).
+
 <p align="center">
   <img src="/docs/images/case.png" alt="3D printable case" width="1200">
 </p>

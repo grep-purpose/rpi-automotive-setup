@@ -1,5 +1,10 @@
 # Audi RNS-E Display / EDID Manager
 
+> Mira-Einordnung: Display-Grundkonfiguration unter
+> [Boot/Plattform](../../docs/ARCHITEKTUR.md), keine Kamera-/OPS-Steuerung.
+> Vor Veränderungen [Recovery](../../recovery/README.md) und aktive Boot-Konfiguration prüfen.
+> Der Installer liegt im Repository unter `vga-edid/edid_installer/install_edid.sh`.
+
 Small shell script for configuring Raspberry Pi display output for the **Audi RNS-E**.
 
 The script was created for my Audi RNS-E Raspberry Pi project and helps switch between a custom `800x480` HDMI timing mode, forced EDID files, and the original/automatic display configuration.
