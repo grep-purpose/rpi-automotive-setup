@@ -823,6 +823,11 @@ def main():
     _mira_trace("LAUNCHER_CREATED")
     def _mira_first_swap():
         _mira_trace("FIRST_FRAME_SWAPPED")
+        try:
+            with open("/run/user/1000/mira-launcher-ready", "w", encoding="ascii") as marker:
+                marker.write("ready\\n")
+        except OSError as exc:
+            _mira_trace("MIRA_READY_MARKER_ERROR " + str(exc))
         launcher.frameSwapped.disconnect(_mira_first_swap)
     launcher.frameSwapped.connect(_mira_first_swap)
 
