@@ -19,7 +19,7 @@
             <param name="header_right_label" value="Radio" />
             <param name="header_title" value="Musik" />
             <param name="header_left_action" value="Notification(Quelle,Bluetooth,2000)" />
-            <param name="header_right_action" value="ReplaceWindow(1198)" />
+            <param name="header_right_action" value="RunScript(/home/pi/.kodi/userdata/scripts/radio_player.py,resume-last)" />
         </include>
         <control type="group">
             <left>63</left>
