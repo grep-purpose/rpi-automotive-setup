@@ -61,6 +61,22 @@ if XDG_RUNTIME_DIR="$RUNTIME_DIR" \
 
     echo "Mira: Screenshot gespeichert!"
     echo "$FILE"
+
+    # MIRA_SCREENSHOT_SOUND_V1
+    # Bestätigung erst nach erfolgreicher Speicherung.
+    # Wiedergabe ist optional und blockiert nicht.
+    SOUND_FILE="/usr/local/share/mira/sounds/mira-screenshot.wav"
+    SOUND_DISABLED="/home/pi/.config/mira/screenshot_sound.disabled"
+
+    if [ ! -e "$SOUND_DISABLED" ] && \
+       [ -s "$SOUND_FILE" ] && \
+       command -v pw-play >/dev/null 2>&1; then
+        (
+            XDG_RUNTIME_DIR="/run/user/$(id -u)" \
+            pw-play --volume 1.0 "$SOUND_FILE" \
+                >/dev/null 2>&1 || true
+        ) </dev/null >/dev/null 2>&1 &
+    fi
 else
     rm -f "$FILE"
     echo "Mira: Screenshot fehlgeschlagen."
