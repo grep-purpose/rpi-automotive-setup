@@ -1,0 +1,2 @@
+@reboot sh -c 'cd /home/pi/scripts && /home/pi/.venv-canbus/bin/python3 pi_control.py &'
+@reboot sh -c 'cd /home/pi/scripts && /home/pi/.venv-canbus/bin/python3 /home/pi/rpi-automotive-setup/scripts/read_from_canbus.py &'
