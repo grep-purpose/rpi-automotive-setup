@@ -1,0 +1,645 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<window>
+    <onload>RunScript(/home/pi/.kodi/userdata/scripts/music_status.py,monitor)</onload>
+    <onload>RunScript(/home/pi/.kodi/userdata/scripts/phone_status.py)</onload>
+    <defaultcontrol always="true">9000</defaultcontrol>
+    <views>9000</views>
+    <controls>
+        <!-- =========================================================
+             AUDI HOME v3
+             Modern MMI / RNS-E inspired interface
+             ========================================================= -->
+        <!-- BACKGROUND -->
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>1920</width>
+            <height>1080</height>
+            <texture colordiffuse="ff05070a">colors/black.png</texture>
+        </control>
+        <!-- =========================================================
+             HEADER
+             ========================================================= -->
+        <control type="group">
+            <left>30</left>
+            <right>30</right>
+            <top>18</top>
+            <height>105</height>
+            <!-- linke MMI-Linie: gleiche Position wie in den Apps -->
+            <control type="image">
+                <left>0</left>
+                <top>82</top>
+                <width>525</width>
+                <height>3</height>
+                <texture colordiffuse="99ffffff">colors/white.png</texture>
+            </control>
+            <!-- Haupttitel -->
+            <control type="label">
+                <left>540</left>
+                <top>0</top>
+                <width>780</width>
+                <height>100</height>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font60</font>
+                <textcolor>ffd90429</textcolor>
+                <label>[B]Hauptmenü[/B]</label>
+            </control>
+            <!-- rechte MMI-Linie: gleiche Position wie in den Apps -->
+            <control type="image">
+                <right>0</right>
+                <top>82</top>
+                <width>525</width>
+                <height>3</height>
+                <texture colordiffuse="99ffffff">colors/white.png</texture>
+            </control>
+        </control>
+        <!-- =========================================================
+             HAUPTKARUSSELL
+
+             240 px linker Rand
+             1440 px Nutzbreite
+             480 px je Element
+             Fokusposition 1 = Bildschirmmitte bei X=960
+             ========================================================= -->
+        <control type="wraplist" id="9000">
+            <left>30</left>
+            <top>170</top>
+            <top condition="Player.HasMedia | String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)">170</top>
+            <width>1860</width>
+            <height>495</height>
+            <height condition="Player.HasMedia | String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)">495</height>
+            <orientation>horizontal</orientation>
+            <onleft>Control.Move(9000,-1)</onleft>
+            <onright>Control.Move(9000,1)</onright>
+            <!-- vorerst weiterhin kompatibel mit bisheriger Bedienung -->
+            <onup>Control.Move(9000,-1)</onup>
+            <ondown>Control.Move(9000,1)</ondown>
+            <focusposition>2</focusposition>
+            <movement>0</movement>
+            <scrolltime tween="cubic" ease="out">220</scrolltime>
+            <!-- =============================================
+                 NICHT AUSGEWÄHLTE APP
+                 kleiner / weiter hinten
+                 ============================================= -->
+            <itemlayout width="372" height="480">
+        <control type="group">
+            <left>15</left>
+            <top>20</top>
+
+            <control type="image">
+                <left>0</left><top>0</top>
+                <width>342</width><height>410</height>
+                <texture>home/tile_normal.png</texture>
+            </control>
+
+            <control type="image">
+                <left>52</left>
+                <top>32</top>
+                <width>238</width>
+                <height>238</height>
+                <aspectratio>keep</aspectratio>
+                <texture>$INFO[ListItem.Icon]</texture>
+                <visible>String.IsEqual(ListItem.Label,Radio)</visible>
+            </control>
+<control type="image">
+                <left>61</left>
+                <top>32</top>
+                <width>219</width>
+                <height>219</height>
+                <aspectratio>keep</aspectratio>
+                <texture>$INFO[ListItem.Icon]</texture>
+                <visible>String.IsEqual(ListItem.Label,Android Auto)</visible>
+            </control>
+<control type="image">
+                <left>52</left>
+                <top>44</top>
+                <width>238</width>
+                <height>238</height>
+                <aspectratio>keep</aspectratio>
+                <texture>$INFO[ListItem.Icon]</texture>
+                <visible>!String.IsEqual(ListItem.Label,Radio) + !String.IsEqual(ListItem.Label,Android Auto)</visible>
+            </control>
+
+            <control type="label">
+                <left>8</left><top>292</top>
+                <width>326</width><height>75</height>
+                <align>center</align><aligny>center</aligny>
+                <font>font50</font>
+                <textcolor>ffffffff</textcolor>
+                <label>[B]$INFO[ListItem.Label][/B]</label>
+                <visible>!String.IsEqual(ListItem.Label,Android Auto)</visible>
+            </control>
+
+            <control type="label">
+                <left>8</left><top>289</top>
+                <width>326</width><height>46</height>
+                <align>center</align><aligny>center</aligny>
+                <font>font50</font>
+                <textcolor>ffffffff</textcolor>
+                <label>[B]Android[/B]</label>
+                <visible>String.IsEqual(ListItem.Label,Android Auto)</visible>
+            </control>
+
+            <control type="label">
+                <left>8</left><top>333</top>
+                <width>326</width><height>46</height>
+                <align>center</align><aligny>center</aligny>
+                <font>font50</font>
+                <textcolor>ffffffff</textcolor>
+                <label>[B]Auto[/B]</label>
+                <visible>String.IsEqual(ListItem.Label,Android Auto)</visible>
+            </control>
+        </control>
+    </itemlayout>
+            <!-- =============================================
+                 AUSGEWÄHLTE APP
+                 moderne MMI-Karte mit Tiefenwirkung
+                 ============================================= -->
+            <focusedlayout width="372" height="480">
+        <control type="group">
+            <left>15</left>
+            <top>20</top>
+
+            <control type="image">
+                <left>0</left><top>0</top>
+                <width>342</width><height>410</height>
+                <texture>home/tile_focus.png</texture>
+            </control>
+
+            <control type="image">
+                <left>36</left>
+                <top>14</top>
+                <width>270</width>
+                <height>270</height>
+                <aspectratio>keep</aspectratio>
+                <texture>$INFO[ListItem.Icon]</texture>
+                <visible>String.IsEqual(ListItem.Label,Radio)</visible>
+            </control>
+<control type="image">
+                <left>47</left>
+                <top>32</top>
+                <width>248</width>
+                <height>248</height>
+                <aspectratio>keep</aspectratio>
+                <texture>$INFO[ListItem.Icon]</texture>
+                <visible>String.IsEqual(ListItem.Label,Android Auto)</visible>
+            </control>
+<control type="image">
+                <left>36</left>
+                <top>32</top>
+                <width>270</width>
+                <height>270</height>
+                <aspectratio>keep</aspectratio>
+                <texture>$INFO[ListItem.Icon]</texture>
+                <visible>!String.IsEqual(ListItem.Label,Radio) + !String.IsEqual(ListItem.Label,Android Auto)</visible>
+            </control>
+
+            <control type="label">
+                <left>8</left><top>302</top>
+                <width>326</width><height>75</height>
+                <align>center</align><aligny>center</aligny>
+                <font>font60</font>
+                <textcolor>ffffffff</textcolor>
+                <label>[B]$INFO[ListItem.Label][/B]</label>
+                <visible>!String.IsEqual(ListItem.Label,Android Auto)</visible>
+            </control>
+
+            <control type="label">
+                <left>8</left><top>289</top>
+                <width>326</width><height>46</height>
+                <align>center</align><aligny>center</aligny>
+                <font>font50</font>
+                <textcolor>ffffffff</textcolor>
+                <label>[B]Android[/B]</label>
+                <visible>String.IsEqual(ListItem.Label,Android Auto)</visible>
+            </control>
+
+            <control type="label">
+                <left>8</left><top>333</top>
+                <width>326</width><height>46</height>
+                <align>center</align><aligny>center</aligny>
+                <font>font50</font>
+                <textcolor>ffffffff</textcolor>
+                <label>[B]Auto[/B]</label>
+                <visible>String.IsEqual(ListItem.Label,Android Auto)</visible>
+            </control>
+        </control>
+    </focusedlayout>
+            <!-- =====================================================
+                 APPS
+                 Funktionspfade bewusst aus funktionierendem Stand
+                 übernommen
+                 ===================================================== -->
+            <content>
+                <item>
+                    <label>Fernsehen</label>
+                    <icon>home/tv.png</icon>
+                    <onclick>ActivateWindow(TVChannels)</onclick>
+                </item>
+                <item>
+                    <label>YouTube</label>
+                    <icon>home/youtube.png</icon>
+                    <onclick>ActivateWindow(Videos,plugin://plugin.video.youtube/special/recommendations?category_label=Recommendations,return)</onclick>
+                </item>
+                <item>
+                    <label>Twitch</label>
+                    <icon>home/twitch.png</icon>
+                    <onclick>ActivateWindow(10025,"plugin://plugin.video.twitch/?content=live&amp;mode=followed",return)</onclick>
+                </item>
+                <item>
+                    <label>Radio</label>
+                    <icon>home/radio.png</icon>
+                    <onclick>ActivateWindow(10502,"plugin://plugin.audio.radiode/?data=%7b%22name%22%3a%20%22Local%20stations%22%7d&amp;mode=get_local_stations",return)</onclick>
+                </item>
+                <item>
+                    <label>Musik</label>
+                    <icon>DefaultAlbumCover.png</icon>
+                    <onclick>ActivateWindow(11199)</onclick>
+                </item>
+                <item>
+                    <label>Android Auto</label>
+                    <icon>home/android_auto.png</icon>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/android_auto_toggle.py)</onclick>
+                </item>
+                <item>
+                    <label>Wetter</label>
+                    <icon>home/weather.png</icon>
+                    <onclick>ActivateWindow(Weather)</onclick>
+                </item>
+                <item>
+                    <label>Spiele</label>
+                    <icon>home/games.png</icon>
+                    <onclick>RunScript(script.audi.games)</onclick>
+                </item>
+            </content>
+        </control>
+        <!-- =========================================================
+             NOW PLAYING
+             große Automotive-Informationszone
+             ========================================================= -->
+        <control type="group">
+            <left>30</left>
+            <right>30</right>
+            <bottom>175</bottom>
+            <height>250</height>
+            <visible>Player.HasMedia | !String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) | String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
+            <!-- Schatten -->
+            <control type="image">
+                <left>5</left>
+                <top>7</top>
+                <width>100%</width>
+                <height>230</height>
+                <texture colordiffuse="99000000">colors/black.png</texture>
+            </control>
+            <!-- Hauptfläche -->
+            <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>225</height>
+                <texture colordiffuse="f20b1016">colors/white.png</texture>
+            </control>
+            <!-- obere Lichtkante -->
+            <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>4</height>
+                <texture colordiffuse="668d99ae">colors/white.png</texture>
+            </control>
+            <!-- Audi-Orange links -->
+            <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>8</width>
+                <height>225</height>
+                <texture colordiffuse="ffff6b00">colors/white.png</texture>
+            </control>
+            <!-- Unified Music Artwork -->
+            <control type="image">
+                <left>22</left>
+                <top>20</top>
+                <width>195</width>
+                <height>195</height>
+                <aspectratio>keep</aspectratio>
+                <texture>$INFO[Window(Home).Property(RNSE.Music.Artwork)]</texture>
+                <visible>
+                    String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
+                    + !String.IsEmpty(Window(Home).Property(RNSE.Music.Artwork))
+                </visible>
+            </control>
+            <!-- Kodi Artwork Fallback -->
+            <control type="image">
+                <left>22</left>
+                <top>20</top>
+                <width>195</width>
+                <height>195</height>
+                <aspectratio>keep</aspectratio>
+                <texture>$INFO[Player.Art(thumb)]</texture>
+                <visible>
+                    Player.HasMedia
+                    + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
+                </visible>
+            </control>
+            <!-- Bluetooth ohne Cover -->
+            <control type="image">
+                <left>42</left>
+                <top>40</top>
+                <width>155</width>
+                <height>155</height>
+                <aspectratio>keep</aspectratio>
+                <texture colordiffuse="ffc8cfd8">DefaultAlbumCover.png</texture>
+                <visible>
+                    String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
+                    + String.IsEmpty(Window(Home).Property(RNSE.Music.Artwork))
+                </visible>
+            </control>
+            <!-- METADATEN MITTE -->
+            <!-- =====================================================
+                 NOW PLAYING METADATEN
+
+                 Einheitliche Hierarchie:
+                 oben  = Titel
+                 unten = Interpret / Sender
+                 ===================================================== -->
+            <!-- RNSE MUSIC: Titel -->
+            <control type="label">
+                <left>255</left>
+                <top>38</top>
+                <width>980</width>
+                <height>74</height>
+                <font>font45</font>
+                <textcolor>ffffffff</textcolor>
+                <scroll>true</scroll>
+                <label>[B]$INFO[Window(Home).Property(RNSE.Music.Title)][/B]</label>
+                <visible>
+                    String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
+                    + !String.IsEmpty(Window(Home).Property(RNSE.Music.Title))
+                </visible>
+            </control>
+            <!-- RNSE MUSIC: Interpret -->
+            <control type="label">
+                <left>255</left>
+                <top>116</top>
+                <width>980</width>
+                <height>74</height>
+                <font>font45</font>
+                <textcolor>ffff8a32</textcolor>
+                <scroll>true</scroll>
+                <label>[B]$INFO[Window(Home).Property(RNSE.Music.Artist)][/B]</label>
+                <visible>
+                    String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
+                    + !String.IsEmpty(Window(Home).Property(RNSE.Music.Artist))
+                </visible>
+            </control>
+            <!-- KODI / RADIO: Titel -->
+            <control type="label">
+                <left>255</left>
+                <top>38</top>
+                <width>980</width>
+                <height>74</height>
+                <font>font45</font>
+                <textcolor>ffffffff</textcolor>
+                <scroll>true</scroll>
+                <label>[B]$INFO[MusicPlayer.Title][/B]</label>
+                <visible>
+                    Player.HasMedia
+                    + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
+                    + !String.IsEmpty(MusicPlayer.Title)
+                </visible>
+            </control>
+            <!-- KODI / RADIO: Player.Title Fallback -->
+            <control type="label">
+                <left>255</left>
+                <top>38</top>
+                <width>980</width>
+                <height>74</height>
+                <font>font45</font>
+                <textcolor>ffffffff</textcolor>
+                <scroll>true</scroll>
+                <label>[B]$INFO[Player.Title][/B]</label>
+                <visible>
+                    Player.HasMedia
+                    + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
+                    + String.IsEmpty(MusicPlayer.Title)
+                </visible>
+            </control>
+            <!-- KODI / RADIO: Interpret -->
+            <control type="label">
+                <left>255</left>
+                <top>116</top>
+                <width>980</width>
+                <height>74</height>
+                <font>font45</font>
+                <textcolor>ffff8a32</textcolor>
+                <scroll>true</scroll>
+                <label>[B]$INFO[MusicPlayer.Artist][/B]</label>
+                <visible>
+                    Player.HasMedia
+                    + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
+                    + !String.IsEmpty(MusicPlayer.Artist)
+                </visible>
+            </control>
+            <!-- KODI / RADIO: Sender-Fallback -->
+            <control type="label">
+                <left>255</left>
+                <top>116</top>
+                <width>980</width>
+                <height>74</height>
+                <font>font45</font>
+                <textcolor>ffff8a32</textcolor>
+                <scroll>true</scroll>
+                <label>[B]$INFO[MusicPlayer.ChannelName][/B]</label>
+                <visible>
+                    Player.HasMedia
+                    + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
+                    + String.IsEmpty(MusicPlayer.Artist)
+                    + !String.IsEmpty(MusicPlayer.ChannelName)
+                </visible>
+            </control>
+            <!-- RECHTE STATUSZONE -->
+            <!-- vertikale Trennung -->
+            <control type="image">
+                <left>1325</left>
+                <top>24</top>
+                <width>3</width>
+                <height>178</height>
+                <texture colordiffuse="668d99ae">colors/white.png</texture>
+            </control>
+            <!-- =====================================================
+                 RECHTE STATUSZONE
+                 Radio: Sender / Provider / Live
+                 Andere Medien: bisherige Quellenanzeige
+                 ===================================================== -->
+            <!-- Radio: Überschrift -->
+            <control type="label">
+                <left>1365</left>
+                <top>30</top>
+                <width>400</width>
+                <height>45</height>
+                <font>font30_title</font>
+                <textcolor>ff9da6b2</textcolor>
+                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
+                <label>SENDER</label>
+            </control>
+            <!-- Andere Medien: Überschrift -->
+            <control type="label">
+                <left>1365</left>
+                <top>30</top>
+                <width>400</width>
+                <height>45</height>
+                <font>font30_title</font>
+                <textcolor>ff9da6b2</textcolor>
+                <visible>String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing) | String.IsEmpty(Window(Home).Property(RNSE.RadioStation))</visible>
+                <label>QUELLE</label>
+            </control>
+            <!-- Radio: echter Sendername aus Metadata Service -->
+            <control type="label">
+                <left>1365</left>
+                <top>72</top>
+                <width>430</width>
+                <height>65</height>
+                <font>font45</font>
+                <textcolor>ffffffff</textcolor>
+                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
+                <label>[B]$INFO[Window(Home).Property(RNSE.RadioStation)][/B]</label>
+            </control>
+            <!-- Radio: Provider -->
+            <control type="label">
+                <left>1365</left>
+                <top>145</top>
+                <width>190</width>
+                <height>50</height>
+                <font>font30_title</font>
+                <textcolor>ffd5dae0</textcolor>
+                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
+                <label>RADIO.DE</label>
+            </control>
+            <!-- Radio: Trenner -->
+            <control type="label">
+                <left>1535</left>
+                <top>145</top>
+                <width>35</width>
+                <height>50</height>
+                <font>font30_title</font>
+                <textcolor>ff7f8790</textcolor>
+                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
+                <label>·</label>
+            </control>
+            <!-- Radio: Live-Status -->
+            <control type="label">
+                <left>1570</left>
+                <top>145</top>
+                <width>150</width>
+                <height>50</height>
+                <font>font30_title</font>
+                <textcolor>ffff8a32</textcolor>
+                <visible>!String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)</visible>
+                <label>[B]LIVE[/B]</label>
+            </control>
+            <!-- Andere Medien: echter ChannelName, falls vorhanden -->
+            <control type="label">
+                <left>1365</left>
+                <top>72</top>
+                <width>430</width>
+                <height>65</height>
+                <font>font45</font>
+                <textcolor>ffffffff</textcolor>
+                <visible>String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEmpty(MusicPlayer.ChannelName)</visible>
+                <label>[B]$INFO[MusicPlayer.ChannelName][/B]</label>
+            </control>
+            <!-- Radio.de Fallback, falls Metadata Service einmal nichts liefert -->
+            <control type="label">
+                <left>1365</left>
+                <top>72</top>
+                <width>430</width>
+                <height>65</height>
+                <font>font45</font>
+                <textcolor>ffffffff</textcolor>
+                <visible>String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + String.IsEmpty(MusicPlayer.ChannelName) + String.Contains(Player.FilenameAndPath,plugin.audio.radiode)</visible>
+                <label>[B]RADIO.DE[/B]</label>
+            </control>
+            <!-- Unified Music Quelle -->
+            <control type="label">
+                <left>1365</left>
+                <top>72</top>
+                <width>430</width>
+                <height>65</height>
+                <font>font45</font>
+                <textcolor>ffffffff</textcolor>
+                <scroll>true</scroll>
+                <visible>
+                    String.IsEqual(Window(Home).Property(RNSE.Music.Status),playing)
+                </visible>
+                <label>[B]$INFO[Window(Home).Property(RNSE.Music.SourceLabel)][/B]</label>
+            </control>
+            <!-- Generischer Medien-Fallback -->
+            <control type="label">
+                <left>1365</left>
+                <top>72</top>
+                <width>430</width>
+                <height>65</height>
+                <font>font45</font>
+                <textcolor>ffffffff</textcolor>
+                <visible>
+                    !String.IsEqual(Window(Home).Property(RNSE.Music.Connected),true)
+                    + String.IsEmpty(Window(Home).Property(RNSE.RadioStation))
+                    + String.IsEmpty(MusicPlayer.ChannelName)
+                    + !String.Contains(Player.FilenameAndPath,plugin.audio.radiode)
+                </visible>
+                <label>[B]MEDIA[/B]</label>
+            </control>
+            <!-- Andere Medien: LIVE bei Streams ohne Dauer -->
+            <control type="label">
+                <left>1365</left>
+                <top>145</top>
+                <width>430</width>
+                <height>50</height>
+                <font>font36_title</font>
+                <textcolor>ffff8a32</textcolor>
+                <visible>!String.IsEqual(Window(Home).Property(RNSE.Music.Connected),true) + String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + String.IsEmpty(Player.Duration)</visible>
+                <label>[B]LIVE[/B]</label>
+            </control>
+            <!-- Unified Music Laufzeit -->
+            <control type="label">
+                <left>1365</left>
+                <top>145</top>
+                <width>430</width>
+                <height>50</height>
+                <font>font30_title</font>
+                <textcolor>ffd5dae0</textcolor>
+                <visible>
+                    String.IsEqual(Window(Home).Property(RNSE.Music.Connected),true)
+                </visible>
+                <label>$INFO[Window(Home).Property(RNSE.Music.PositionText)] / $INFO[Window(Home).Property(RNSE.Music.DurationText)]</label>
+            </control>
+            <!-- Andere Medien: Laufzeit -->
+            <control type="label">
+                <left>1365</left>
+                <top>145</top>
+                <width>430</width>
+                <height>50</height>
+                <font>font30_title</font>
+                <textcolor>ffd5dae0</textcolor>
+                <visible>!String.IsEqual(Window(Home).Property(RNSE.Music.Connected),true) + String.IsEmpty(Window(Home).Property(RNSE.RadioStation)) + !String.IsEmpty(Player.Duration)</visible>
+                <label>$INFO[Player.Time]  /  $INFO[Player.Duration]</label>
+            </control>
+            <!-- untere Akzentlinie -->
+            <control type="image">
+                <left>255</left>
+                <top>205</top>
+                <width>930</width>
+                <height>3</height>
+                <texture colordiffuse="338d99ae">colors/white.png</texture>
+            </control>
+        </control>
+        <!-- =========================================================
+             FOOTER
+             ========================================================= -->
+        <include content="RNSE_GlobalFooter">
+            <param name="footer_left_id" value="9100" />
+            <param name="footer_right_id" value="9101" />
+        </include>
+    </controls>
+</window>
