@@ -1,57 +1,52 @@
-# Raspberry Pi Automotive Setup (Audi RNS-E Integration)
+# Mira – Raspberry Pi im Audi A4 B7 / RNS-E 193
 
-Zentrales Konfigurations- und Quellcode-Repository für das Raspberry Pi Infotainment- und CAN-Bus-System.
+Ziel ist ein möglichst OEM-nahes Infotainment: HUDIY stellt die Android-Auto-Basis bereit, Kodi das Mediencenter. Globale Mira-Funktionen verbinden Bedienung, FIS und Medien mit dem Fahrzeug. Angeschlossen ist laut Projektbeschreibung derzeit der Infotainment-CAN.
 
----
+Dieses Repository enthält Quellcode, Konfigurationen, Startdateien und gesicherte Varianten. **Es ist kein vollständig installierbares Abbild des laufenden Pi.** Eine vorhandene systemd-Datei beweist nicht, dass der Dienst installiert oder eingeschaltet ist.
 
-## Modulübersicht & Funktionsbeschreibungen
+## Hier anfangen
 
-### 1. `can/` – CAN-Bus Core & Daemons
-* **`rns-e_can/can_handler.py`**: Zentraler Dispatcher für eingehende und ausgehende CAN-Frames.
-* **`rns-e_can/can_base_function.py`**: Liest Basissignale wie Zündungsstatus (Klemme 15), Beleuchtung und Geschwindigkeitspulse aus.
-* **`rns-e_can/can_keyboard_control.py`**: Übersetzt Dreh-/Drückrad- und Tasteneingaben des RNS-E in native Tastaturevents für Linux/Kodi.
-* **`audi-rns-overlay/can_daemon.py`**: Hintergrunddienst zur Statusüberwachung (z. B. Rückwärtsgang-Trigger für Rückfahrkamera und Overlays).
-* **`audi-rns-overlay/Api_pb2.py`**: Protobuf-Schnittstellendefinition für die Daemon-Kommunikation.
+| Ich suche … | Einstieg |
+|---|---|
+| Überblick und Zusammenhänge | [Architektur](docs/ARCHITEKTUR.md) |
+| Rückfahrkamera, Videoquellenumschaltung und OPS/PDC | [Das zusammenhängende Parking-System](docs/PARKING.md) |
+| Welche Datei gehört wohin? | [Navigation und alte/neue Pfade](docs/PFADZUORDNUNG.md) |
+| Welche Dienste starten was? | [Startwege und Abhängigkeiten](docs/STARTWEGE.md) |
+| Was ist belegt, widersprüchlich oder fehlt? | [Prüfbefunde](docs/PRUEFBEFUNDE.md) |
+| Sicherung und Wiederherstellung per Windows/SSH | [Recovery-Leitfaden](recovery/README.md) |
 
----
+## Fachliche Bereiche
 
-### 2. `dis_client/` – Kombiinstrument / FIS Anbindung
-* **`ddp_protocol.py`**: Low-Level-Implementierung des Bosch/Audi Display Data Protocol (DDP).
-* **`dis_display.py` & `dis_service.py`**: Hauptlogik zur Formatierung und Übertragung der oberen Textzeilen im Tacho-Display.
-* **`dis_client/apps/`**: Submodule für verschiedene FIS-Seiten (`nav.py`, `media.py`, `radio.py`, `car_info.py`, `phone.py`, `menu.py`, `settings.py`).
+- **Kodi:** [Konfiguration, Add-ons und Oberfläche](apps/kodi), einschließlich Wetter, Radio und Medienanbindung.
+- **HUDIY:** [Integrationsskripte und Menükonfiguration](apps/hudiy/integration); Bezugsquelle und Nutzungsrechte externer Bestandteile bleiben gesondert zu klären.
+- **Mira Core:** globale Tastensteuerung, FIS und Medienkoordination; unter [mira-core/](mira-core) mit Querverbindung zur [Vehicle-Schicht](vehicle).
+- **Vehicle:** CAN-Anbindung, Fahrzeugdaten, Zeit und Stromversorgung.
+- **Parking:** Kamera, OPS/PDC und Videoquellenumschaltung bilden **ein System**, mit mehreren vorhandenen Softwarepfaden und noch ungeklärter externer Hardwareverknüpfung.
+- **Boot/Launcher:** [Startauswahl](platform/launcher), [Animation und Übergänge](platform/boot), [Display-/EDID-Hardware](platform/display).
+- **Recovery:** [gesicherte Konfigurationen und Wiederanlauf](recovery).
 
----
+Die Dateien sind tatsächlich nach Funktionen eingeordnet. Bestehende Startpfade unter `launcher/` und `scripts/` bleiben als kleine Kompatibilitätseinstiege erhalten. `scripts/features.conf` bleibt die führende Laufzeitkonfiguration; der private Ordner `scripts/hudiy_api/` bleibt lokal. Diese Ausnahmen nicht löschen.
 
-### 3. `hudiy/` – Headunit & Video Interface
-* **`dark_mode_api.py` & `hudiy_data.py`**: Schnittstelle zur automatischen Tag/Nacht-Umschaltung über das Fahrzeuglicht und Weitergabe von Fahrzeugdaten an HUDIY.
-* **`hudiy_run.sh` / `hudiy_startup.sh`**: Startskripte mit Umgebungsvariablen für Wayland/X11-Ausgabe.
+```text
+apps/         Kodi und HUDIY-Integration
+mira-core/    Eingabe, FIS, Medien, Steuerung und Integration
+vehicle/      CAN, Stromversorgung und Plattformkonfiguration
+parking/      Kamera, Videoquellenumschaltung und OPS/PDC gemeinsam
+platform/     Boot, Launcher, Display und Sitzung
+deployment/   systemd und gesicherte Unit-Varianten
+recovery/     Sicherungen und Wiederherstellung
+docs/         Architektur, Befunde und Pfadinventar
+tools/        Diagnose und Strukturprüfung
+```
 
----
+[Umstellung, Kompatibilität und Rollback](docs/UMSTELLUNG.md). [Alle alten und neuen Dateipfade](docs/path-migration.json).
 
-### 4. `scripts/` – Steuerung & Testwerkzeuge
-* **`read_from_canbus.py`**: Logging- und Diagnosewerkzeug zum Auslesen und Parsen von CAN-Frames auf `can0`.
-* **`rnse_ops_switcher.py`**: Steuerung der Videoquellenumschaltung für optische Einparkhilfe (OPS) und Rückfahrkamera.
-* **`pi_control.py`**: Systemsteuerung für den Pi (kontrollierter Shutdown / Reboot).
-* **`testbench.py`**: CAN-Frame-Simulator für Tests am Schreibtisch ohne echtes Fahrzeugnetz.
+## Stand und Grenzen
 
----
+Quellprüfung vom 15.10.2026, Basis main bei [9abba0b](https://github.com/grep-purpose/rpi-automotive-setup/tree/9abba0b2790ebfdeee3efe1a1fbe9b17ea250104). Code, systemd, Cron und Konfigurationen wurden statisch abgeglichen. Zusätzlich wurden vom Betreiber gelieferte systemd-, Cron-, labwc- und Pfadauflösungs-Ausgaben ausgewertet. Kein eigener Zugriff auf den Pi, kein Fahrzeug- oder Boot-Test. Besonders CAN-Signale, externe Parking-Hardware und aktive Startwege benötigen Bestätigung am Fahrzeug.
 
-### 5. `system/`, `systemd/` & `vga-edid/` – Hardware & Autostart
-* **`vga-edid/install_edid.sh`**: Installiert und erzwingt RNS-E-kompatible Video-Timings über den VGA-Sync-Combiner.
-* **`system/config.txt`**: Boot-Konfiguration (MCP2515 Device-Tree-Overlays, Taktfrequenzen, DPI/KMS-Parameter).
-* **`system/udev/99-hudiy.rules`**: USB-Zugriffsregeln für Headunit-Konnektivität.
-* **`system/network/80-can.network`**: Systemd-Networkd-Definition für das `can0`-Interface.
-* **`systemd/*.service`**: Autostart-Units für alle Daemons, Overlay-Dienste und CPU-Performance-Profile.
+Es werden keine zusätzlichen HUDIY-Binärdateien, SDK-Dateien oder Zugangsdaten für diese Dokumentation übernommen. [Herkunft und offene Rechtefragen](recovery/HUDIY_SOURCE.md).
 
----
+## Bekannter Bedienungsprüfpunkt
 
-### 6. `kodi/` – Mediacenter Konfiguration & UI Skin
-* **`*.xml`**: Benutzereinstellungen (`advancedsettings.xml`, `guisettings.xml`, `favourites.xml`).
-* **`skin/Home.xml`**: Angepasste Startbildschirm- und Menü-Struktur für das Hauptmenü in Kodi.
-* **`keymaps/`**: Tastenbelegungen für die OEM-Steuerung.
-* **`playlists/`**: Angepasste Wiedergabelisten und Stream-Scanner.
-
-## TODO / Further down the road
-
-- **VirtualKeyboard Previous-Track / Backspace:** Die spezielle Kodi-Tastatursteuerung für WLAN funktioniert grundsätzlich gut. Die Previous-Track-Taste lässt sich aktuell jedoch noch nicht zuverlässig als Backspace/Delete nutzen und verhält sich teilweise wie Cursor-Left. Später die RNS-E-/uinput-Tastenlogik noch einmal genauer reverse-engineeren und nur für das aktive VirtualKeyboard sauber auf Backspace abbilden. Niedrige Priorität.
-
+Die bisherige README nennt ein Problem mit Previous-Track als Backspace/Delete in Kodis WLAN-Tastatur. Dieser Lauf hat es nicht am Gerät reproduziert; es bleibt ein offener Bedienungsprüfpunkt.

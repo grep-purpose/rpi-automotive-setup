@@ -9,3 +9,7 @@ venv/
 
 # Lokale Arbeitsbackups
 *.backup-*
+
+# Private HUDIY-Laufzeitdateien bleiben am bisherigen Ort.
+/scripts/hudiy_api/
+/scripts/logs/

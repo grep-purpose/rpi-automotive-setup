@@ -1,0 +1,160 @@
+#!/usr/bin/env python3
+
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+BASE = Path("/mnt/mira-usb")
+
+SUPPORTED = {
+    "vfat": ["ro", "nosuid", "nodev", "noexec"],
+    "exfat": ["ro", "nosuid", "nodev", "noexec"],
+    "ntfs": ["ro", "nosuid", "nodev", "noexec"],
+    "ext4": ["ro", "noload", "nosuid", "nodev", "noexec"],
+}
+
+
+def run(*args):
+    return subprocess.run(
+        args,
+        text=True,
+        capture_output=True,
+        timeout=15,
+        check=False
+    )
+
+
+def main():
+    if len(sys.argv) != 2:
+        raise SystemExit("STOP: Gerätename fehlt.")
+
+    name = sys.argv[1]
+
+    # Nur reguläre USB-SCSI-Partitionsnamen.
+    if not re.fullmatch(r"sd[a-z]+[0-9]+", name):
+        raise SystemExit("STOP: Gerätename nicht zugelassen.")
+
+    device = Path("/dev") / name
+
+    if not device.exists():
+        raise SystemExit("STOP: Gerät existiert nicht.")
+
+    info = run(
+        "lsblk", "-J", "-o",
+        "PATH,TYPE,FSTYPE,UUID,PKNAME",
+        str(device)
+    )
+
+    if info.returncode:
+        raise SystemExit("STOP: Geräteinformationen fehlen.")
+
+    import json
+
+    nodes = json.loads(
+        info.stdout
+    ).get("blockdevices", [])
+
+    if len(nodes) != 1:
+        raise SystemExit("STOP: Gerät nicht eindeutig.")
+
+    node = nodes[0]
+
+    if node.get("type") != "part":
+        raise SystemExit("STOP: Keine Partition.")
+
+    fstype = (node.get("fstype") or "").lower()
+    uuid = node.get("uuid") or ""
+    parent = node.get("pkname") or ""
+
+    if fstype not in SUPPORTED:
+        raise SystemExit(
+            f"STOP: Dateisystem {fstype} nicht freigegeben."
+        )
+
+    if not re.fullmatch(r"[A-Fa-f0-9-]{4,64}", uuid):
+        raise SystemExit("STOP: Ungültige UUID.")
+
+    if not re.fullmatch(r"sd[a-z]+", parent):
+        raise SystemExit("STOP: Laufwerkszuordnung unklar.")
+
+    transport = run(
+        "lsblk", "-dnro", "TRAN",
+        "/dev/" + parent
+    ).stdout.strip().lower()
+
+    if transport != "usb":
+        raise SystemExit("STOP: Kein USB-Laufwerk.")
+
+    # Zusätzliche UUID-Prüfung direkt am Blockgerät.
+    actual_uuid = run(
+        "blkid", "-s", "UUID",
+        "-o", "value", str(device)
+    ).stdout.strip()
+
+    if actual_uuid != uuid:
+        raise SystemExit("STOP: UUID-Prüfung fehlgeschlagen.")
+
+    # Bereits eingebundene Geräte niemals doppelt mounten.
+    existing = run(
+        "findmnt", "-rn", "-S", str(device),
+        "-o", "TARGET"
+    ).stdout.strip()
+
+    if existing:
+        print(f"Bereits eingebunden: {existing}")
+        return
+
+    target = BASE / uuid
+
+    if target.is_symlink():
+        raise SystemExit("STOP: Mountpoint ist ein Symlink.")
+
+    target.mkdir(parents=True, exist_ok=True)
+
+    if any(target.iterdir()):
+        raise SystemExit("STOP: Mountpoint ist nicht leer.")
+
+    options = ",".join(SUPPORTED[fstype])
+
+    result = run(
+        "mount",
+        "-t", fstype,
+        "-o", options,
+        str(device),
+        str(target)
+    )
+
+    if result.returncode:
+        raise SystemExit(
+            "Mount fehlgeschlagen: " +
+            (result.stderr or result.stdout).strip()
+        )
+
+    # Sicherheit: Mount muss tatsächlich read-only sein.
+    verify = run(
+        "findmnt", "-rn",
+        "--mountpoint", str(target),
+        "-o", "SOURCE,OPTIONS"
+    )
+
+    lines = verify.stdout.strip().splitlines()
+
+    if (
+        len(lines) != 1
+        or "ro" not in lines[0].split(None, 1)[-1].split(",")
+    ):
+        run("umount", str(target))
+        raise SystemExit("STOP: Schreibschutz nicht bestätigt.")
+
+    print(f"MIRA USB: {device} eingebunden unter {target}")
+
+    # Musikindex im Hintergrund aktualisieren.
+    subprocess.run([
+        "systemctl", "--no-block", "start",
+        "mira-usb-index.service"
+    ], check=False)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,32 +1,19 @@
-# HUDIY – Quellen und Wiederherstellung
+# HUDIY – Herkunft und Wiederherstellungsgrenzen
 
-## Herkunft
+[Startseite](../README.md) · [Recovery](README.md)
 
-HUDIY-API-Komponenten aus der bestehenden Mira-Installation.
+## Gesicherte Herkunftsangaben
 
-- Branch: `main`
-- Quellstand: `fc5b480`
+Die frühere Notiz nennt eine bestehende Mira-Installation, Branch main und Quellstand fc5b480 sowie die Einzelstände Api_pb2.py: fc5b480, Client.py: 303a9f5, Message.py: ef3b1e9. Eine eindeutig zugehörige externe Repository-Adresse und die Weiterverbreitungsbedingungen sind damit noch nicht belegt. Diese Angaben wurden in der aktuellen Prüfung nicht unabhängig bestätigt.
 
-Die originale Repository-Adresse wird vor einer
-Veröffentlichung gesondert überprüft.
+Als lokaler Quellpfad war /home/pi/rpi-automotive-setup/scripts/hudiy_api/ angegeben. Das ist ein Laufzeit-/Installationshinweis, kein hier vollständig vorhandener Quellordner.
 
-## Einzelne Quelldateien
+## Korrektur zum Repository-Bestand
 
-- `Api_pb2.py`: `fc5b480`
-- `Client.py`: `303a9f5`
-- `Message.py`: `ef3b1e9`
+Im geprüften main-Stand 9abba0b liegen bereits Dateien unter hudiy/api_files/common/ (Api.proto, Api_pb2.py, Client.py, Message.py). Die frühere pauschale Aussage, HUDIY-Quelldateien seien nicht übernommen worden, war deshalb unzutreffend.
+
+Die Existenz dieser Dateien ist **kein Nachweis einer Veröffentlichungserlaubnis**. Es werden mit dieser Strukturänderung keine weiteren HUDIY-Dateien übernommen, vervielfältigt oder in neue Produktordner verschoben. Rechte und Herkunft des vorhandenen Bestands bleiben gesondert zu prüfen; eine mögliche Bereinigung wäre eine eigene Änderung.
 
 ## Wiederherstellung
 
-Die exakte Bezugsquelle und deren Erreichbarkeit
-müssen noch bestätigt werden.
-
-Die HUDIY-Quelldateien werden bis zur Klärung
-ihrer Weiterverbreitungsbedingungen nicht
-in dieses Repository übernommen.
-
-Lokaler Quellpfad auf dem Raspberry Pi:
-`/home/pi/rpi-automotive-setup/scripts/hudiy_api/`
-
-Hinweis: Dies ist eine Herkunftsdokumentation,
-noch keine vollständige Installationsanleitung.
+Die Startskripte erwarten eine separat installierte Anwendung unter /home/pi/.hudiy/share/. Dieses Repository ersetzt weder deren Installation noch Lizenz oder Zugang. Benötigt werden die rechtmäßig verfügbare Bezugsquelle, passende Version und lokale private Sicherung. Bis diese Punkte geklärt sind, gibt es keine vollständige HUDIY-Neuinstallationsanleitung aus diesem Repository.

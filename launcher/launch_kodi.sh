@@ -1,17 +1,4 @@
-#!/bin/bash
-
-export HOME=/home/pi
-export XDG_RUNTIME_DIR=/run/user/1000
-export WAYLAND_DISPLAY=wayland-0
-
-echo "Stopping HUDIY..."
-
-pkill -x hudiy 2>/dev/null || true
-
-sleep 0.5
-
-echo "Starting Kodi in existing Wayland session..."
-
-echo "kodi" > /run/user/1000/rnse_active_app
-
-exec /usr/bin/kodi
+#!/bin/sh
+# Compatibility entry point; implementation: platform/launcher/launch_kodi.sh
+_mira_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd) || exit 1
+exec /bin/bash "$_mira_dir/../platform/launcher/launch_kodi.sh" "$@"

@@ -1,0 +1,5 @@
+# Preserve original hardware assets and installer manifests byte-for-byte.
+/platform/display/** -text
+/platform/display/**/*.md text eol=lf
+/platform/display/**/*.sh text eol=lf
+/platform/boot/mira-animation/manifest.json -text
