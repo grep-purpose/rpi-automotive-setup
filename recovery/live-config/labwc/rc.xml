@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<labwc_config>
+  <core>
+    <decoration>none</decoration>
+    <gap>0</gap>
+  </core>
+  <placement>
+    <policy>cascade</policy>
+  </placement>
+  <windowRules>
+    <windowRule identifier="*" serverDecoration="no" />
+    <windowRule identifier="*">
+      <action name="Maximize" />
+    </windowRule>
+  </windowRules>
+  <keyboard>
+    <keybind key="A-W-h">
+      <action name="HideCursor" />
+      <action name="WarpCursor" to="output" x="-1" y="-1" />
+    </keybind>
+  </keyboard>
+</labwc_config>
