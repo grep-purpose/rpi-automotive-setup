@@ -1,0 +1,12 @@
+[Unit]
+Description=Automotive Weather Radar and Live-GPS Fetcher
+After=network.target bluetooth.target
+
+[Service]
+Type=simple
+ExecStart=/bin/bash -c 'while true; do /usr/bin/python3 /home/pi/update_radar.py >> /tmp/radar_update.log 2>&1; sleep 900; done'
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

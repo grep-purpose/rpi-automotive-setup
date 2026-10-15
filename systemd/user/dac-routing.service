@@ -1,0 +1,10 @@
+[Unit]
+Description=Force DAC Routing and Volume for HU-DIY
+After=wireplumber.service pipewire.service
+
+[Service]
+Type=oneshot
+ExecStart=/home/pi/.config/dac-fix.sh
+
+[Install]
+WantedBy=default.target

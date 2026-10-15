@@ -1,0 +1,9 @@
+[Unit]
+Description=Mira USB: Medien erkennen und Musikindex aktualisieren
+
+[Service]
+Type=oneshot
+User=pi
+Group=pi
+ExecStart=/usr/bin/python3 /home/pi/mira_usb_manager.py
+TimeoutStartSec=10min

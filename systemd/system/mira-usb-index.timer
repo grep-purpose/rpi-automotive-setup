@@ -1,0 +1,10 @@
+[Unit]
+Description=Mira USB: automatische Bibliotheksprüfung
+
+[Timer]
+OnBootSec=30s
+OnUnitInactiveSec=30s
+Unit=mira-usb-index.service
+
+[Install]
+WantedBy=timers.target

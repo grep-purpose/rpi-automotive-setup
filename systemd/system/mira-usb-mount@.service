@@ -1,0 +1,9 @@
+[Unit]
+Description=Mira USB: Datenträger %I schreibgeschützt einbinden
+After=systemd-udevd.service
+Before=mira-usb-index.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/mira-usb-mount %I
+TimeoutStartSec=45
