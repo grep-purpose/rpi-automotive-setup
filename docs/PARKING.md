@@ -8,13 +8,13 @@ Das ist **ein zusammenhängendes System**: Rückwärtsgang erkennen, die passend
 
 | Teil | Eingang | Tatsächliche Wirkung | Quellbeleg |
 |---|---|---|---|
-| CAN-Handler | 0x359, Byte 0, Maske 0x02 | Sperrt aus ZeroMQ kommende Sendeaufträge für **0x602 und 0x604** während Rückwärtsfahrt und Nachlauf | [can_handler.py, main](../can/rns-e_can/can_handler.py) |
-| Video-Switcher | ebenfalls 0x359 / Byte 0 / 0x02 | vcgencmd display_power 0; nach Rückwärtsgang-Ende und 2 s display_power 1 | [rnse_ops_switcher.py](../scripts/rnse_ops_switcher.py) |
-| CanDaemon / Kamera-Overlay | 0x351, Byte 0 = 0x52 oder 0x02 | Startet Kamera-Pipeline; anderer Bytewert beendet sie | [can_daemon.py, can_listener](../can/audi-rns-overlay/can_daemon.py) |
+| CAN-Handler | 0x359, Byte 0, Maske 0x02 | Sperrt aus ZeroMQ kommende Sendeaufträge für **0x602 und 0x604** während Rückwärtsfahrt und Nachlauf | [can_handler.py, main](../vehicle/can/can_handler.py) |
+| Video-Switcher | ebenfalls 0x359 / Byte 0 / 0x02 | vcgencmd display_power 0; nach Rückwärtsgang-Ende und 2 s display_power 1 | [rnse_ops_switcher.py](../parking/video-switch/rnse_ops_switcher.py) |
+| CanDaemon / Kamera-Overlay | 0x351, Byte 0 = 0x52 oder 0x02 | Startet Kamera-Pipeline; anderer Bytewert beendet sie | [can_daemon.py, can_listener](../parking/overlay/can_daemon.py) |
 | Dynamische Führungslinien | 0x0C0, Bytes 1/2, vorzeichenbehaftet, Faktor 0,04375 | Aktualisiert Lenkwinkel für gezeichnete Linien | dieselbe Datei |
 | OPS/PDC | 0x6DA, Byte 1 = 0x92 vorn / 0x93 hinten, Bytes 2–5 | Aktualisiert je vier Sensorbereiche | dieselbe Datei |
-| Zweiter Kamerapfad | 0x351, Anfang 02 / 00, sofern Feature aktiv | Eigene lokale GStreamer-Kamera mit Nachlauf-/Geschwindigkeitslogik | [read_from_canbus.py, process_canid_351 / local_camera_action](../scripts/read_from_canbus.py) |
-| Manueller Befehl | HTTP /revcam_toggle | Sendet toggle_revcam_no_lines an TCP 23456; im vorhandenen Empfänger fehlt die Behandlung | [pi_control.py](../scripts/pi_control.py), read_from_canbus / handle_client |
+| Zweiter Kamerapfad | 0x351, Anfang 02 / 00, sofern Feature aktiv | Eigene lokale GStreamer-Kamera mit Nachlauf-/Geschwindigkeitslogik | [read_from_canbus.py, process_canid_351 / local_camera_action](../mira-core/integration/read_from_canbus.py) |
+| Manueller Befehl | HTTP /revcam_toggle | Sendet toggle_revcam_no_lines an TCP 23456; im vorhandenen Empfänger fehlt die Behandlung | [pi_control.py](../mira-core/control/pi_control.py), read_from_canbus / handle_client |
 
 Der Handler prüft seinen 2-s-Nachlauf nur innerhalb der Verarbeitung empfangener Nachrichten. Beim Switcher läuft die Zeitprüfung auch nach einem Empfangs-Timeout. Es gibt keinen gemeinsamen Zustandsautomaten.
 

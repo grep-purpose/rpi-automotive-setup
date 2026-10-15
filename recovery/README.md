@@ -98,9 +98,9 @@ Die beiden Hashwerte müssen übereinstimmen. Hashgleichheit bestätigt den Tran
 
 | Fehler | Vorgehen |
 |---|---|
-| Nur Dokumentation geändert | Keine Pi-Installation nötig; dieser PR ändert keine Laufzeitdateien |
+| Strukturupdate aus diesem PR | Zuerst [Umstellungsleitfaden](../docs/UMSTELLUNG.md) lesen; alte Einstiegspfade bleiben erhalten, separate Installationskopien werden nicht automatisch aktualisiert |
 | Einzelne Konfiguration beschädigt, SSH funktioniert | Betroffenen Startweg bestimmen, lokale Sicherung prüfen, nur diese Datei mit ursprünglichem Eigentümer/Rechten zurückholen; keine komplette Git-Kopie über /home/pi legen |
-| Boot-Animation nach Installer geändert | [Versionsgebundene Anleitung](../boot/mira-animation/README.md) und Sicherung unter /var/backups/mira-boot prüfen; Restore betrifft nur dort gesicherte Dateien |
+| Boot-Animation nach Installer geändert | [Versionsgebundene Anleitung](../platform/boot/mira-animation/README.md) und Sicherung unter /var/backups/mira-boot prüfen; Restore betrifft nur dort gesicherte Dateien |
 | Pi bootet nicht mehr | SD-Image oder bekannte vollständige Sicherung verwenden; einzelne initramfs-/config-Dateien nur mit passendem Kernel und dokumentiertem Ausgangszustand zurückspielen |
 | HUDIY fehlt | Rechtmäßig bezogene Installation separat wiederherstellen; [Herkunftsstatus](HUDIY_SOURCE.md) beachten |
 | Parking funktioniert nicht | Gesamtkette nach [Parking](../docs/PARKING.md) prüfen; keine weiteren konkurrierenden Dienste probeweise aktivieren |

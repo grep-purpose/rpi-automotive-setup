@@ -12,7 +12,7 @@ Als lokaler Quellpfad war /home/pi/rpi-automotive-setup/scripts/hudiy_api/ angeg
 
 Im geprüften main-Stand 9abba0b liegen bereits Dateien unter hudiy/api_files/common/ (Api.proto, Api_pb2.py, Client.py, Message.py). Die frühere pauschale Aussage, HUDIY-Quelldateien seien nicht übernommen worden, war deshalb unzutreffend.
 
-Die Existenz dieser Dateien ist **kein Nachweis einer Veröffentlichungserlaubnis**. Es werden mit dieser Dokumentationsänderung keine weiteren HUDIY-Dateien übernommen, vervielfältigt oder in neue Produktordner verschoben. Rechte und Herkunft des vorhandenen Bestands bleiben gesondert zu prüfen; eine mögliche Bereinigung wäre eine eigene Änderung.
+Die Existenz dieser Dateien ist **kein Nachweis einer Veröffentlichungserlaubnis**. Es werden mit dieser Strukturänderung keine weiteren HUDIY-Dateien übernommen, vervielfältigt oder in neue Produktordner verschoben. Rechte und Herkunft des vorhandenen Bestands bleiben gesondert zu prüfen; eine mögliche Bereinigung wäre eine eigene Änderung.
 
 ## Wiederherstellung
 

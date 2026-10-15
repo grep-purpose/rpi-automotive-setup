@@ -6,7 +6,7 @@ Alle Einträge sind **vorhandene Startdefinitionen**, kein Nachweis aktiver Dien
 
 ## Systemdienste
 
-Quellen: [systemd/](../systemd/) und [systemd/system/](../systemd/system/).
+Quellen: [systemd/](../deployment/systemd) und [systemd/system/](../systemd/system).
 
 | Unit | Programm / Laufzeitort | Abhängigkeit oder Prüfpunkt |
 |---|---|---|
@@ -32,11 +32,11 @@ Quellen: [systemd/](../systemd/) und [systemd/system/](../systemd/system/).
 | mira-usb-index | /home/pi/mira_usb_manager.py | Timer: 30 s nach Boot, 30 s nach letzter Inaktivität |
 | mira-usb-mount@ | /usr/local/sbin/mira-usb-mount | Mount-Helfer, Instanzparameter bezeichnet Gerät |
 
-Die USB-/iPod-Ergänzungen liegen unter [config/usb/](../config/usb/): Eject-/Rearm-Units, udev-Regel, Root-Helfer und fstab-/sudoers-Beispiele. Beispiele sind keine bereits installierte Konfiguration.
+Die USB-/iPod-Ergänzungen liegen unter [config/usb/](../mira-core/media/usb/deployment): Eject-/Rearm-Units, udev-Regel, Root-Helfer und fstab-/sudoers-Beispiele. Beispiele sind keine bereits installierte Konfiguration.
 
 ## Benutzerdienste
 
-Quellen: [systemd/user/](../systemd/user/).
+Quellen: [systemd/user/](../systemd/user).
 
 | Unit | Aufruf | Hinweis |
 |---|---|---|
@@ -53,9 +53,9 @@ Die [gesicherte pi.crontab](../recovery/live-config/cron/pi.crontab) enthält zw
 
 read_from_canbus lädt features.conf **neben seiner eigenen Datei**, nicht aus dem Cron-Arbeitsordner. Die Recovery-Kopie unter live-config/can/ ist eine separate Sicherungsvariante; ihre Existenz macht sie nicht zur aktiven Quelle.
 
-[config/labwc/autostart](../config/labwc/autostart) startet HUDIY direkt nach 3 Sekunden. [Recovery system-autostart](../recovery/live-config/labwc/system-autostart) startet stattdessen den Launcher mit exec. Im gespeicherten Benutzer-autostart steht nur ein Verweis auf den zentralen Start. Weitere Varianten: boot/mira-bridge/ und boot/mira-diagnostics/. Der Cursor-Block hinter exec wird bei erfolgreichem exec nicht mehr ausgeführt.
+[config/labwc/autostart](../platform/session/labwc/autostart) startet HUDIY direkt nach 3 Sekunden. [Recovery system-autostart](../recovery/live-config/labwc/system-autostart) startet stattdessen den Launcher mit exec. Im gespeicherten Benutzer-autostart steht nur ein Verweis auf den zentralen Start. Weitere Varianten: boot/mira-bridge/ und boot/mira-diagnostics/. Der Cursor-Block hinter exec wird bei erfolgreichem exec nicht mehr ausgeführt.
 
-[kodi/userdata/autoexec.py](../kodi/userdata/autoexec.py) enthält nur einen auskommentierten Wetterstart; es ist kein Beleg für einen aktiven Wetterdienst. Kodi-Add-ons haben eigene Einstiegspunkte in addon.xml. Das Medien-Add-on ist deshalb kein fehlender systemd-Dienst.
+[kodi/userdata/autoexec.py](../apps/kodi/userdata/autoexec.py) enthält nur einen auskommentierten Wetterstart; es ist kein Beleg für einen aktiven Wetterdienst. Kodi-Add-ons haben eigene Einstiegspunkte in addon.xml. Das Medien-Add-on ist deshalb kein fehlender systemd-Dienst.
 
 ## Schnittstellenkarte
 

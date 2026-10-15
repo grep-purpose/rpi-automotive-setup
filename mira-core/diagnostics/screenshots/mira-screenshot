@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# MIRA_SCREENSHOT_V12
+QUEUE="/usr/local/lib/mira/mira_screenshot_queue.py"
+SEND_MODE="auto"
+
+case "${1:-}" in
+    "")
+        ;;
+    --telegram)
+        SEND_MODE="telegram"
+        ;;
+    --local)
+        SEND_MODE="local"
+        ;;
+    --auto-on)
+        exec python3 "$QUEUE" auto-on
+        ;;
+    --auto-off)
+        exec python3 "$QUEUE" auto-off
+        ;;
+    --status)
+        exec python3 "$QUEUE" status
+        ;;
+    *)
+        echo "Verwendung: mira-screenshot [--telegram|--local|--auto-on|--auto-off|--status]"
+        exit 2
+        ;;
+esac
+
+SCREENSHOT_DIR="/home/pi/Pictures/Mira"
+RUNTIME_DIR="/run/user/$(id -u)"
+OUTPUT="HDMI-A-1"
+
+mkdir -p "$SCREENSHOT_DIR"
+
+# Aktiven Wayland-Socket ermitteln
+WAYLAND_SOCKET=""
+
+for socket in "$RUNTIME_DIR"/wayland-*; do
+    if [ -S "$socket" ]; then
+        WAYLAND_SOCKET="$(basename "$socket")"
+        break
+    fi
+done
+
+if [ -z "$WAYLAND_SOCKET" ]; then
+    echo "Mira: Kein Wayland-Socket gefunden."
+    exit 1
+fi
+
+# Eindeutigen Dateinamen erstellen
+TIMESTAMP="$(date '+%Y-%m-%d_%H-%M-%S-%N')"
+FILE="$SCREENSHOT_DIR/mira-$TIMESTAMP.png"
+
+# Screenshot aufnehmen
+if XDG_RUNTIME_DIR="$RUNTIME_DIR" \
+   WAYLAND_DISPLAY="$WAYLAND_SOCKET" \
+   grim -o "$OUTPUT" "$FILE"; then
+
+    echo "Mira: Screenshot gespeichert!"
+    echo "$FILE"
+
+    # MIRA_SCREENSHOT_SOUND_V1
+    # Bestätigung erst nach erfolgreicher Speicherung.
+    # Wiedergabe ist optional und blockiert nicht.
+    SOUND_FILE="/usr/local/share/mira/sounds/mira-screenshot.wav"
+    SOUND_DISABLED="/home/pi/.config/mira/screenshot_sound.disabled"
+
+    if [ ! -e "$SOUND_DISABLED" ] && \
+       [ -s "$SOUND_FILE" ] && \
+       command -v pw-play >/dev/null 2>&1; then
+        (
+            XDG_RUNTIME_DIR="/run/user/$(id -u)" \
+            pw-play --volume 1.0 "$SOUND_FILE" \
+                >/dev/null 2>&1 || true
+        ) </dev/null >/dev/null 2>&1 &
+    fi
+else
+    rm -f "$FILE"
+    echo "Mira: Screenshot fehlgeschlagen."
+    exit 1
+fi
+
+
+# Telegram-Auftrag nur vormerken; Aufnahme nicht blockieren
+QUEUE_IMAGE=0
+
+if [ "$SEND_MODE" = "telegram" ]; then
+    QUEUE_IMAGE=1
+elif [ "$SEND_MODE" = "auto" ]; then
+    if python3 "$QUEUE" enabled; then
+        QUEUE_IMAGE=1
+    fi
+fi
+
+if [ "$QUEUE_IMAGE" -eq 1 ]; then
+    if python3 "$QUEUE" enqueue "$FILE"; then
+        systemctl --user start --no-block             mira-screenshot-upload.service 2>/dev/null || true
+    else
+        echo "Mira: Screenshot gespeichert, Vormerkung fehlgeschlagen."
+    fi
+fi
