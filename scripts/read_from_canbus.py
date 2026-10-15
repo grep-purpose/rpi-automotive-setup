@@ -396,6 +396,7 @@ back = 0
 nextbtn = 0
 prev = 0
 setup = 0
+setup_press_started = None
 
 # ---------------------------
 # System metrics / processes
@@ -6073,6 +6074,7 @@ async def read_on_canbus(message):
 
     canid = message.arbitration_id
     msg = binascii.hexlify(message.data).decode('ascii').upper()
+
     canid_print = str(hex(message.arbitration_id).lstrip('0x').upper())
     if show_can_messages_in_logs:
         logger.info(f"CAN-Message with CAN-ID: {canid_print} Message: {msg} received")
@@ -7262,8 +7264,45 @@ async def toggle_hudiy_kodi():
 @handle_errors
 async def process_canid_461(msg):
     global up, down, select, back, nextbtn, prev, setup
+    global setup_press_started
     global toggle_fis1, toggle_fis2, pause_fis1, pause_fis2, camera_active
     global select_press_time
+
+    # MIRA_SETUP_INDEPENDENT_V2
+    # SETUP unabhängig von control_pi_by_rns_e_buttons verarbeiten.
+    # Kurze Betätigung bleibt bei deaktivierter Tastensteuerung wirkungslos.
+    if msg == '373001000100':
+        if setup_press_started is None:
+            setup_press_started = time.monotonic()
+        return
+
+    if msg == '373004000100':
+        if setup_press_started is not None:
+            duration = time.monotonic() - setup_press_started
+            setup_press_started = None
+
+            if duration >= 2.5:
+                logger.info(
+                    "Mira SETUP Screenshot: Long Press %.2f Sekunden",
+                    duration
+                )
+                try:
+                    import subprocess
+                    subprocess.Popen(
+                        ["/usr/local/bin/mira-screenshot"],
+                        stdin=subprocess.DEVNULL,
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        start_new_session=True
+                    )
+                except Exception:
+                    logger.exception(
+                        "Mira SETUP Screenshot konnte nicht gestartet werden"
+                    )
+            elif control_pi_by_rns_e_buttons:
+                device.emit(uinput.KEY_M, 1)
+                device.emit(uinput.KEY_M, 0)
+        return
 
     if control_pi_by_rns_e_buttons:
         loop = asyncio.get_running_loop()
@@ -7408,21 +7447,6 @@ async def process_canid_461(msg):
                     camera_active = not camera_active
                     fire_and_forget(loop, toggle_camera(), 'toggle_camera')
             prev = 0
-        # SETUP Press
-        elif msg == '373001000100':
-            setup += 1
-        # SETUP Release
-        elif msg == '373004000100' and setup > 0:
-            if setup <= 4:
-                if ENABLE_LOGGING:
-                    logger.info("RNS-E SETUP: Kurz -> Sprachassistent (KEY_M)")
-                device.emit(uinput.KEY_M, 1)
-                device.emit(uinput.KEY_M, 0)
-            else:
-                if ENABLE_LOGGING:
-                    logger.info("RNS-E SETUP: Lang -> Toggle App (Hudiy <-> Kodi)")
-                fire_and_forget(loop, toggle_hudiy_kodi(), 'toggle_hudiy_kodi')
-            setup = 0
 
 
 async def process_canid_5C0_5C3(msg):
