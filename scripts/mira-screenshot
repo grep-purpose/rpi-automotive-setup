@@ -1,6 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# MIRA_TELEGRAM_V1
+SEND_TELEGRAM=0
+
+case "${1:-}" in
+    "")
+        ;;
+    --telegram)
+        SEND_TELEGRAM=1
+        ;;
+    --local)
+        SEND_TELEGRAM=0
+        ;;
+    *)
+        echo "Verwendung: mira-screenshot [--telegram|--local]"
+        exit 2
+        ;;
+esac
+
 # Mira Screenshot Service
 SCREENSHOT_DIR="/home/pi/Pictures/Mira"
 RUNTIME_DIR="/run/user/$(id -u)"
@@ -38,4 +56,11 @@ else
     rm -f "$FILE"
     echo "Mira: Screenshot fehlgeschlagen."
     exit 1
+fi
+
+# Optionaler Telegram-Versand
+if [ "$SEND_TELEGRAM" -eq 1 ]; then
+    if ! python3 /usr/local/lib/mira/mira_telegram_send.py "$FILE"; then
+        echo "Mira: Screenshot lokal gesichert, Telegram-Upload fehlgeschlagen."
+    fi
 fi
