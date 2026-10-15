@@ -1,25 +1,34 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# MIRA_TELEGRAM_V1
-SEND_TELEGRAM=0
+# MIRA_SCREENSHOT_V12
+QUEUE="/usr/local/lib/mira/mira_screenshot_queue.py"
+SEND_MODE="auto"
 
 case "${1:-}" in
     "")
         ;;
     --telegram)
-        SEND_TELEGRAM=1
+        SEND_MODE="telegram"
         ;;
     --local)
-        SEND_TELEGRAM=0
+        SEND_MODE="local"
+        ;;
+    --auto-on)
+        exec python3 "$QUEUE" auto-on
+        ;;
+    --auto-off)
+        exec python3 "$QUEUE" auto-off
+        ;;
+    --status)
+        exec python3 "$QUEUE" status
         ;;
     *)
-        echo "Verwendung: mira-screenshot [--telegram|--local]"
+        echo "Verwendung: mira-screenshot [--telegram|--local|--auto-on|--auto-off|--status]"
         exit 2
         ;;
 esac
 
-# Mira Screenshot Service
 SCREENSHOT_DIR="/home/pi/Pictures/Mira"
 RUNTIME_DIR="/run/user/$(id -u)"
 OUTPUT="HDMI-A-1"
@@ -58,9 +67,22 @@ else
     exit 1
 fi
 
-# Optionaler Telegram-Versand
-if [ "$SEND_TELEGRAM" -eq 1 ]; then
-    if ! python3 /usr/local/lib/mira/mira_telegram_send.py "$FILE"; then
-        echo "Mira: Screenshot lokal gesichert, Telegram-Upload fehlgeschlagen."
+
+# Telegram-Auftrag nur vormerken; Aufnahme nicht blockieren
+QUEUE_IMAGE=0
+
+if [ "$SEND_MODE" = "telegram" ]; then
+    QUEUE_IMAGE=1
+elif [ "$SEND_MODE" = "auto" ]; then
+    if python3 "$QUEUE" enabled; then
+        QUEUE_IMAGE=1
+    fi
+fi
+
+if [ "$QUEUE_IMAGE" -eq 1 ]; then
+    if python3 "$QUEUE" enqueue "$FILE"; then
+        systemctl --user start --no-block             mira-screenshot-upload.service 2>/dev/null || true
+    else
+        echo "Mira: Screenshot gespeichert, Vormerkung fehlgeschlagen."
     fi
 fi

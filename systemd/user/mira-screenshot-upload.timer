@@ -1,0 +1,11 @@
+[Unit]
+Description=Mira Screenshot Upload Retry Timer
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=1min
+AccuracySec=10s
+Unit=mira-screenshot-upload.service
+
+[Install]
+WantedBy=timers.target

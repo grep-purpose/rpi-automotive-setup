@@ -1,0 +1,7 @@
+[Unit]
+Description=Mira Screenshot Telegram Upload Queue
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /usr/local/lib/mira/mira_screenshot_queue.py process
+TimeoutStartSec=900
