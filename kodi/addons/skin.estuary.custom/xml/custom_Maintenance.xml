@@ -36,7 +36,7 @@
                 <control type="label">
                     <left>35</left>
                     <top>0</top>
-                    <width>720</width>
+                    <width>1050</width>
                     <height>92</height>
                     <font>font60</font>
                     <textcolor>ffb7c0ca</textcolor>
@@ -100,7 +100,7 @@
                 <control type="label">
                     <left>35</left>
                     <top>0</top>
-                    <width>720</width>
+                    <width>1050</width>
                     <height>92</height>
                     <font>font60</font>
                     <textcolor>ffffffff</textcolor>
@@ -161,6 +161,16 @@
                     <label>Kodi neu starten</label>
                     <property name="RowType">action</property>
                     <onclick>Notification(Kodi,Neustart wird nach DRM/TTY-Test angebunden,2500)</onclick>
+                </item>
+                <item>
+                    <label>Raspberry Pi neu starten</label>
+                    <property name="RowType">action</property>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/power_control.py,reboot)</onclick>
+                </item>
+                <item>
+                    <label>System herunterfahren</label>
+                    <property name="RowType">action</property>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/power_control.py,poweroff)</onclick>
                 </item>
             </content>
             <pagecontrol>9620</pagecontrol>
