@@ -53,91 +53,105 @@
             <onright>50</onright>
             <onup>50</onup>
             <ondown>50</ondown>
-            <onclick>noop</onclick>
-            <itemlayout width="845" height="100">
+            <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_ui.py,select)</onclick>
+            <itemlayout width="845" height="110">
                 <control type="label">
                     <left>22</left>
-                    <top>0</top>
-                    <width>805</width>
-                    <height>94</height>
-                    <font>font50</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <label>$INFO[ListItem.Label]</label>
+                    <top>4</top>
+                    <width>800</width>
+                    <height>58</height>
+                    <font>font45</font>
+                    <textcolor>FFF0F2F5</textcolor>
                     <aligny>center</aligny>
+                    <scroll>true</scroll>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+                <control type="label">
+                    <left>22</left>
+                    <top>62</top>
+                    <width>800</width>
+                    <height>38</height>
+                    <font>font35</font>
+                    <textcolor>FFB3BAC5</textcolor>
+                    <aligny>center</aligny>
+                    <scroll>true</scroll>
+                    <label>$INFO[ListItem.Label2]</label>
                 </control>
             </itemlayout>
-            <focusedlayout width="845" height="100">
+            <focusedlayout width="845" height="110">
                 <control type="image">
                     <left>0</left>
                     <top>0</top>
                     <width>850</width>
-                    <height>94</height>
+                    <height>106</height>
                     <texture colordiffuse="66C8CFD7">colors/white.png</texture>
                     <visible>Control.HasFocus(50)</visible>
                 </control>
                 <control type="label">
                     <left>22</left>
-                    <top>0</top>
-                    <width>805</width>
-                    <height>94</height>
-                    <font>font50</font>
-                    <textcolor>fff0f2f5</textcolor>
-                    <label>$INFO[ListItem.Label]</label>
+                    <top>4</top>
+                    <width>800</width>
+                    <height>58</height>
+                    <font>font45</font>
+                    <textcolor>FFF0F2F5</textcolor>
                     <aligny>center</aligny>
+                    <scroll>true</scroll>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+                <control type="label">
+                    <left>22</left>
+                    <top>62</top>
+                    <width>800</width>
+                    <height>38</height>
+                    <font>font35</font>
+                    <textcolor>FFB3BAC5</textcolor>
+                    <aligny>center</aligny>
+                    <scroll>true</scroll>
+                    <label>$INFO[ListItem.Label2]</label>
                 </control>
             </focusedlayout>
         </control>
         <control type="group">
             <visible>!String.IsEqual(Window(11189).Property(MiraPhoneView),sms)</visible>
             <control type="label">
-                <left>1015</left>
-                <top>155</top>
-                <width>820</width>
-                <height>70</height>
-                <font>font55</font>
-                <textcolor>fff0f2f5</textcolor>
-                <label>[B]Wählfeld[/B]</label>
-                <aligny>center</aligny>
-            </control>
-            <control type="label">
-                <left>1030</left>
-                <top>230</top>
-                <width>800</width>
-                <height>75</height>
-                <font>font35</font>
+                <left>1010</left>
+                <top>150</top>
+                <width>840</width>
+                <height>130</height>
+                <font>font45</font>
                 <textcolor>FFB3BAC5</textcolor>
                 <label>Nummer eingeben</label>
                 <aligny>center</aligny>
-                <align>left</align>
+                <align>center</align>
                 <scroll>true</scroll>
                 <visible>String.IsEmpty(Window(11189).Property(MiraPhoneNumber))</visible>
             </control>
             <control type="label">
-                <left>1030</left>
-                <top>230</top>
-                <width>800</width>
-                <height>75</height>
-                <font>font50</font>
-                <textcolor>fff0f2f5</textcolor>
-                <label>$INFO[Window(11189).Property(MiraPhoneNumber)]</label>
+                <left>1010</left>
+                <top>150</top>
+                <width>840</width>
+                <height>130</height>
+                <font>font75</font>
+                <textcolor>FFFFFFFF</textcolor>
+                <label>[B]$INFO[Window(11189).Property(MiraPhoneNumber)][/B]</label>
                 <aligny>center</aligny>
-                <align>left</align>
+                <align>center</align>
                 <scroll>true</scroll>
                 <visible>!String.IsEmpty(Window(11189).Property(MiraPhoneNumber))</visible>
             </control>
             <control type="button" id="9600">
-                <left>1095</left>
+                <left>1195</left>
                 <top>310</top>
-                <width>140</width>
-                <height>146</height>
-                <font>font55</font>
+                <width>110</width>
+                <height>115</height>
+                <font>font60</font>
                 <label>[B]1[/B]</label>
                 <textcolor>FFF0F2F5</textcolor>
                 <focusedcolor>FF10151C</focusedcolor>
-                <texturefocus colordiffuse="FFC3CAD2">mira/phone-circle-v2.png</texturefocus>
-                <texturenofocus colordiffuse="FF2A3440">mira/phone-circle-v2.png</texturenofocus>
+                <texturefocus colordiffuse="FFC3CAD2">mira/phone-key-v4.png</texturefocus>
+                <texturenofocus colordiffuse="FF2A3440">mira/phone-key-v4.png</texturenofocus>
                 <onup>9601</onup>
-                <ondown>9611</ondown>
+                <ondown>9612</ondown>
                 <onleft>9600</onleft>
                 <onright>9600</onright>
                 <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_ui.py,digit,1)</onclick>
@@ -147,16 +161,16 @@
                 <textoffsety>0</textoffsety>
             </control>
             <control type="button" id="9601">
-                <left>1355</left>
+                <left>1375</left>
                 <top>310</top>
-                <width>140</width>
-                <height>146</height>
-                <font>font55</font>
+                <width>110</width>
+                <height>115</height>
+                <font>font60</font>
                 <label>[B]2[/B]</label>
                 <textcolor>FFF0F2F5</textcolor>
                 <focusedcolor>FF10151C</focusedcolor>
-                <texturefocus colordiffuse="FFC3CAD2">mira/phone-circle-v2.png</texturefocus>
-                <texturenofocus colordiffuse="FF2A3440">mira/phone-circle-v2.png</texturenofocus>
+                <texturefocus colordiffuse="FFC3CAD2">mira/phone-key-v4.png</texturefocus>
+                <texturenofocus colordiffuse="FF2A3440">mira/phone-key-v4.png</texturenofocus>
                 <onup>9602</onup>
                 <ondown>9600</ondown>
                 <onleft>9601</onleft>
@@ -168,16 +182,16 @@
                 <textoffsety>0</textoffsety>
             </control>
             <control type="button" id="9602">
-                <left>1615</left>
+                <left>1555</left>
                 <top>310</top>
-                <width>140</width>
-                <height>146</height>
-                <font>font55</font>
+                <width>110</width>
+                <height>115</height>
+                <font>font60</font>
                 <label>[B]3[/B]</label>
                 <textcolor>FFF0F2F5</textcolor>
                 <focusedcolor>FF10151C</focusedcolor>
-                <texturefocus colordiffuse="FFC3CAD2">mira/phone-circle-v2.png</texturefocus>
-                <texturenofocus colordiffuse="FF2A3440">mira/phone-circle-v2.png</texturenofocus>
+                <texturefocus colordiffuse="FFC3CAD2">mira/phone-key-v4.png</texturefocus>
+                <texturenofocus colordiffuse="FF2A3440">mira/phone-key-v4.png</texturenofocus>
                 <onup>9603</onup>
                 <ondown>9601</ondown>
                 <onleft>9602</onleft>
@@ -189,16 +203,16 @@
                 <textoffsety>0</textoffsety>
             </control>
             <control type="button" id="9603">
-                <left>1095</left>
+                <left>1195</left>
                 <top>460</top>
-                <width>140</width>
-                <height>146</height>
-                <font>font55</font>
+                <width>110</width>
+                <height>115</height>
+                <font>font60</font>
                 <label>[B]4[/B]</label>
                 <textcolor>FFF0F2F5</textcolor>
                 <focusedcolor>FF10151C</focusedcolor>
-                <texturefocus colordiffuse="FFC3CAD2">mira/phone-circle-v2.png</texturefocus>
-                <texturenofocus colordiffuse="FF2A3440">mira/phone-circle-v2.png</texturenofocus>
+                <texturefocus colordiffuse="FFC3CAD2">mira/phone-key-v4.png</texturefocus>
+                <texturenofocus colordiffuse="FF2A3440">mira/phone-key-v4.png</texturenofocus>
                 <onup>9604</onup>
                 <ondown>9602</ondown>
                 <onleft>9603</onleft>
@@ -210,16 +224,16 @@
                 <textoffsety>0</textoffsety>
             </control>
             <control type="button" id="9604">
-                <left>1355</left>
+                <left>1375</left>
                 <top>460</top>
-                <width>140</width>
-                <height>146</height>
-                <font>font55</font>
+                <width>110</width>
+                <height>115</height>
+                <font>font60</font>
                 <label>[B]5[/B]</label>
                 <textcolor>FFF0F2F5</textcolor>
                 <focusedcolor>FF10151C</focusedcolor>
-                <texturefocus colordiffuse="FFC3CAD2">mira/phone-circle-v2.png</texturefocus>
-                <texturenofocus colordiffuse="FF2A3440">mira/phone-circle-v2.png</texturenofocus>
+                <texturefocus colordiffuse="FFC3CAD2">mira/phone-key-v4.png</texturefocus>
+                <texturenofocus colordiffuse="FF2A3440">mira/phone-key-v4.png</texturenofocus>
                 <onup>9605</onup>
                 <ondown>9603</ondown>
                 <onleft>9604</onleft>
@@ -231,16 +245,16 @@
                 <textoffsety>0</textoffsety>
             </control>
             <control type="button" id="9605">
-                <left>1615</left>
+                <left>1555</left>
                 <top>460</top>
-                <width>140</width>
-                <height>146</height>
-                <font>font55</font>
+                <width>110</width>
+                <height>115</height>
+                <font>font60</font>
                 <label>[B]6[/B]</label>
                 <textcolor>FFF0F2F5</textcolor>
                 <focusedcolor>FF10151C</focusedcolor>
-                <texturefocus colordiffuse="FFC3CAD2">mira/phone-circle-v2.png</texturefocus>
-                <texturenofocus colordiffuse="FF2A3440">mira/phone-circle-v2.png</texturenofocus>
+                <texturefocus colordiffuse="FFC3CAD2">mira/phone-key-v4.png</texturefocus>
+                <texturenofocus colordiffuse="FF2A3440">mira/phone-key-v4.png</texturenofocus>
                 <onup>9606</onup>
                 <ondown>9604</ondown>
                 <onleft>9605</onleft>
@@ -252,16 +266,16 @@
                 <textoffsety>0</textoffsety>
             </control>
             <control type="button" id="9606">
-                <left>1095</left>
+                <left>1195</left>
                 <top>610</top>
-                <width>140</width>
-                <height>146</height>
-                <font>font55</font>
+                <width>110</width>
+                <height>115</height>
+                <font>font60</font>
                 <label>[B]7[/B]</label>
                 <textcolor>FFF0F2F5</textcolor>
                 <focusedcolor>FF10151C</focusedcolor>
-                <texturefocus colordiffuse="FFC3CAD2">mira/phone-circle-v2.png</texturefocus>
-                <texturenofocus colordiffuse="FF2A3440">mira/phone-circle-v2.png</texturenofocus>
+                <texturefocus colordiffuse="FFC3CAD2">mira/phone-key-v4.png</texturefocus>
+                <texturenofocus colordiffuse="FF2A3440">mira/phone-key-v4.png</texturenofocus>
                 <onup>9607</onup>
                 <ondown>9605</ondown>
                 <onleft>9606</onleft>
@@ -273,16 +287,16 @@
                 <textoffsety>0</textoffsety>
             </control>
             <control type="button" id="9607">
-                <left>1355</left>
+                <left>1375</left>
                 <top>610</top>
-                <width>140</width>
-                <height>146</height>
-                <font>font55</font>
+                <width>110</width>
+                <height>115</height>
+                <font>font60</font>
                 <label>[B]8[/B]</label>
                 <textcolor>FFF0F2F5</textcolor>
                 <focusedcolor>FF10151C</focusedcolor>
-                <texturefocus colordiffuse="FFC3CAD2">mira/phone-circle-v2.png</texturefocus>
-                <texturenofocus colordiffuse="FF2A3440">mira/phone-circle-v2.png</texturenofocus>
+                <texturefocus colordiffuse="FFC3CAD2">mira/phone-key-v4.png</texturefocus>
+                <texturenofocus colordiffuse="FF2A3440">mira/phone-key-v4.png</texturenofocus>
                 <onup>9608</onup>
                 <ondown>9606</ondown>
                 <onleft>9607</onleft>
@@ -294,16 +308,16 @@
                 <textoffsety>0</textoffsety>
             </control>
             <control type="button" id="9608">
-                <left>1615</left>
+                <left>1555</left>
                 <top>610</top>
-                <width>140</width>
-                <height>146</height>
-                <font>font55</font>
+                <width>110</width>
+                <height>115</height>
+                <font>font60</font>
                 <label>[B]9[/B]</label>
                 <textcolor>FFF0F2F5</textcolor>
                 <focusedcolor>FF10151C</focusedcolor>
-                <texturefocus colordiffuse="FFC3CAD2">mira/phone-circle-v2.png</texturefocus>
-                <texturenofocus colordiffuse="FF2A3440">mira/phone-circle-v2.png</texturenofocus>
+                <texturefocus colordiffuse="FFC3CAD2">mira/phone-key-v4.png</texturefocus>
+                <texturenofocus colordiffuse="FF2A3440">mira/phone-key-v4.png</texturenofocus>
                 <onup>9609</onup>
                 <ondown>9607</ondown>
                 <onleft>9608</onleft>
@@ -315,16 +329,16 @@
                 <textoffsety>0</textoffsety>
             </control>
             <control type="button" id="9609">
-                <left>1095</left>
+                <left>1195</left>
                 <top>760</top>
-                <width>140</width>
-                <height>146</height>
-                <font>font55</font>
+                <width>110</width>
+                <height>115</height>
+                <font>font60</font>
                 <label>[B]+[/B]</label>
                 <textcolor>FFF0F2F5</textcolor>
                 <focusedcolor>FF10151C</focusedcolor>
-                <texturefocus colordiffuse="FFC3CAD2">mira/phone-circle-v2.png</texturefocus>
-                <texturenofocus colordiffuse="FF2A3440">mira/phone-circle-v2.png</texturenofocus>
+                <texturefocus colordiffuse="FFC3CAD2">mira/phone-key-v4.png</texturefocus>
+                <texturenofocus colordiffuse="FF2A3440">mira/phone-key-v4.png</texturenofocus>
                 <onup>9610</onup>
                 <ondown>9608</ondown>
                 <onleft>9609</onleft>
@@ -336,16 +350,16 @@
                 <textoffsety>0</textoffsety>
             </control>
             <control type="button" id="9610">
-                <left>1355</left>
+                <left>1375</left>
                 <top>760</top>
-                <width>140</width>
-                <height>146</height>
-                <font>font55</font>
+                <width>110</width>
+                <height>115</height>
+                <font>font60</font>
                 <label>[B]0[/B]</label>
                 <textcolor>FFF0F2F5</textcolor>
                 <focusedcolor>FF10151C</focusedcolor>
-                <texturefocus colordiffuse="FFC3CAD2">mira/phone-circle-v2.png</texturefocus>
-                <texturenofocus colordiffuse="FF2A3440">mira/phone-circle-v2.png</texturenofocus>
+                <texturefocus colordiffuse="FFC3CAD2">mira/phone-key-v4.png</texturefocus>
+                <texturenofocus colordiffuse="FF2A3440">mira/phone-key-v4.png</texturenofocus>
                 <onup>9611</onup>
                 <ondown>9609</ondown>
                 <onleft>9610</onleft>
@@ -357,17 +371,17 @@
                 <textoffsety>0</textoffsety>
             </control>
             <control type="button" id="9611">
-                <left>1615</left>
+                <left>1555</left>
                 <top>760</top>
-                <width>140</width>
-                <height>146</height>
-                <font>font55</font>
+                <width>110</width>
+                <height>115</height>
+                <font>font60</font>
                 <label />
                 <textcolor>FFF0F2F5</textcolor>
                 <focusedcolor>FF10151C</focusedcolor>
-                <texturefocus colordiffuse="FFC3CAD2">mira/phone-circle-v2.png</texturefocus>
-                <texturenofocus colordiffuse="FF2A3440">mira/phone-circle-v2.png</texturenofocus>
-                <onup>9600</onup>
+                <texturefocus colordiffuse="FFC3CAD2">mira/phone-key-v4.png</texturefocus>
+                <texturenofocus colordiffuse="FF2A3440">mira/phone-key-v4.png</texturenofocus>
+                <onup>9612</onup>
                 <ondown>9610</ondown>
                 <onleft>9611</onleft>
                 <onright>9611</onright>
@@ -378,43 +392,62 @@
                 <textoffsety>0</textoffsety>
             </control>
             <control type="image">
-                <left>1643</left>
-                <top>789</top>
-                <width>84</width>
-                <height>88</height>
+                <left>1575</left>
+                <top>781</top>
+                <width>70</width>
+                <height>73</height>
                 <aspectratio>stretch</aspectratio>
                 <visible>!Control.HasFocus(9611)</visible>
                 <texture colordiffuse="FFF0F2F5">mira/phone-delete-arrow-v3.png</texture>
             </control>
             <control type="image">
-                <left>1643</left>
-                <top>789</top>
-                <width>84</width>
-                <height>88</height>
+                <left>1575</left>
+                <top>781</top>
+                <width>70</width>
+                <height>73</height>
                 <aspectratio>stretch</aspectratio>
                 <visible>Control.HasFocus(9611)</visible>
                 <texture colordiffuse="FF10151C">mira/phone-delete-arrow-v3.png</texture>
             </control>
             <control type="button" id="9612">
-                <left>1095</left>
-                <top>922</top>
-                <width>660</width>
-                <height>80</height>
-                <font>font45</font>
+                <left>1070</left>
+                <top>910</top>
+                <width>720</width>
+                <height>90</height>
+                <font>font50</font>
                 <label>[B]Anrufen[/B]</label>
                 <align>center</align>
                 <aligny>center</aligny>
-                <textcolor>FF8CD6A5</textcolor>
+                <textcolor>FFFFFFFF</textcolor>
                 <disabledcolor>FF64816E</disabledcolor>
                 <focusedcolor>FF10151C</focusedcolor>
-                <enable>false</enable>
+                <enable>true</enable>
                 <onclick>noop</onclick>
-                <onup>9611</onup>
-                <ondown>9600</ondown>
+                <onup>9600</onup>
+                <ondown>9611</ondown>
                 <onleft>9612</onleft>
                 <onright>9612</onright>
-                <texturefocus colordiffuse="FFC3CAD2">buttons/roundbutton-fo.png</texturefocus>
-                <texturenofocus colordiffuse="FF1B3025">buttons/roundbutton-fo.png</texturenofocus>
+                <texturefocus colordiffuse="FF56F080">mira/phone-call-v4.png</texturefocus>
+                <texturenofocus colordiffuse="FF10CE50">mira/phone-call-v4.png</texturenofocus>
+                <textoffsetx>70</textoffsetx>
+            </control>
+            <control type="image">
+                <left>1260</left>
+                <top>925</top>
+                <width>70</width>
+                <height>60</height>
+                <aspectratio>keep</aspectratio>
+                <visible>!Control.HasFocus(9612)</visible>
+                <texture colordiffuse="FFFFFFFF">home/mmi_icons_v1/phone.png</texture>
+            </control>
+            <control type="image">
+                <left>1260</left>
+                <top>925</top>
+                <width>70</width>
+                <height>60</height>
+                <aspectratio>keep</aspectratio>
+                <visible>Control.HasFocus(9612)</visible>
+                <texture colordiffuse="FF10151C">home/mmi_icons_v1/phone.png</texture>
             </control>
         </control>
         <control type="group">
