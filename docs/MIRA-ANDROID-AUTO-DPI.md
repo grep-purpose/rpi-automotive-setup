@@ -15,10 +15,12 @@ der tatsächliche aktuelle Wert bleibt im Kopf sichtbar. Drücken einer Zeile
 Übernahme beim nächsten Android-Auto-Start bleibt im Pop-up sichtbar.
 
 Das verfeinerte Layout rückt die Fläche weiter vom MIRA-Footer ab,
-vergrößert die DPI-Schrift auf font60 mit Fettschrift und zeigt den
-Übernahmehinweis zweizeilig in font55 mit Fettschrift. Die zusätzliche
-Bedienhilfe wurde entfernt. Eine eigene abgerundete Auswahltextur ersetzt
-die bisherige Transport-Fokustextur. Die Maße sind Skin-Koordinaten;
+vergrößert die DPI-Schrift auf font60 mit Fettschrift. Der Übernahmehinweis
+steht einzeilig unter einer dezenten Trennlinie. Die zusätzliche Bedienhilfe
+wurde entfernt. Der gespeicherte Wert wird nur in der Liste als „Aktuell“
+markiert; die Unterüberschrift lautet schlicht „Darstellungsgröße“.
+Eine eigene rechteckige Auswahltextur mit kleinen Eckradien ersetzt die
+bisherige pillenförmige Markierung. Die Maße sind Skin-Koordinaten;
 die Darstellung auf dem RNS-E wird vom Betreiber geprüft.
 
 Eine bestätigte Auswahl wird für den nächsten Start von HUDIY/Android Auto
@@ -39,7 +41,7 @@ Der Installer benötigt die beiden Dateien aus diesem Repository:
 Zusätzlich wird das Pop-up-Layout benötigt:
 
 - `apps/kodi/userdata/scripts/resources/skins/default/1080i/MiraAndroidAutoDPI.xml`
-- `apps/kodi/userdata/scripts/resources/media/mira_dpi_focus.png`
+- `apps/kodi/userdata/scripts/resources/media/mira_dpi_focus_rect.png`
 
 Die Repository-Verzeichnisstruktur beibehalten und im Repository-Hauptverzeichnis
 ausführen:

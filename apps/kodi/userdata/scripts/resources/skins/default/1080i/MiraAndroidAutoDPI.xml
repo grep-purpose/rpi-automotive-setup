@@ -24,10 +24,10 @@
       <left>310</left><top>205</top><width>1300</width><height>65</height>
       <font>font55</font><textcolor>ffcad3dd</textcolor>
       <align>center</align><aligny>center</aligny>
-      <label>[B]Darstellungsgröße · Aktuell: $INFO[Window(Home).Property(RNSE.AndroidAuto.DPI)] DPI[/B]</label>
+      <label>Darstellungsgröße</label>
     </control>
     <control type="list" id="9500">
-      <left>350</left><top>285</top><width>1220</width><height>455</height>
+      <left>350</left><top>300</top><width>1220</width><height>455</height>
       <orientation>vertical</orientation>
       <onup>9500</onup><ondown>9500</ondown>
       <onleft>Control.Move(9500,-1)</onleft>
@@ -41,13 +41,13 @@
         <control type="label">
           <left>760</left><top>0</top><width>400</width><height>65</height>
           <font>font45</font><textcolor>ffcad3dd</textcolor>
-          <align>right</align><aligny>center</aligny><label>[B]$INFO[ListItem.Label2][/B]</label>
+          <align>right</align><aligny>center</aligny><label>$INFO[ListItem.Label2]</label>
         </control>
       </itemlayout>
       <focusedlayout width="1220" height="65">
         <control type="image">
           <left>0</left><top>1</top><width>1220</width><height>63</height>
-          <texture border="28">/home/pi/.kodi/userdata/scripts/resources/media/mira_dpi_focus.png</texture>
+          <texture border="8">/home/pi/.kodi/userdata/scripts/resources/media/mira_dpi_focus_rect.png</texture>
         </control>
         <control type="label">
           <left>55</left><top>0</top><width>650</width><height>65</height>
@@ -57,15 +57,19 @@
         <control type="label">
           <left>760</left><top>0</top><width>400</width><height>65</height>
           <font>font45</font><textcolor>ffffffff</textcolor>
-          <align>right</align><aligny>center</aligny><label>[B]$INFO[ListItem.Label2][/B]</label>
+          <align>right</align><aligny>center</aligny><label>$INFO[ListItem.Label2]</label>
         </control>
       </focusedlayout>
     </control>
+    <control type="image">
+      <left>350</left><top>775</top><width>1220</width><height>2</height>
+      <texture colordiffuse="334f5965">colors/white.png</texture>
+    </control>
     <control type="label">
-      <left>290</left><top>755</top><width>1340</width><height>100</height>
-      <font>font55</font><textcolor>ffffffff</textcolor>
+      <left>290</left><top>790</top><width>1340</width><height>55</height>
+      <font>font45</font><textcolor>ffcad3dd</textcolor>
       <align>center</align><aligny>center</aligny>
-      <label>[B]Wird beim nächsten Start[CR]von Android Auto übernommen.[/B]</label>
+      <label>Gilt ab dem nächsten Android-Auto-Start.</label>
     </control>
   </controls>
 </window>

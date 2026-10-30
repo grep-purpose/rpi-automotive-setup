@@ -15,7 +15,7 @@ import xml.etree.ElementTree as ET
 
 SCRIPT = "mira_android_auto_settings.py"
 RESOURCE = Path("resources/skins/default/1080i/MiraAndroidAutoDPI.xml")
-FOCUS = Path("resources/media/mira_dpi_focus.png")
+FOCUS = Path("resources/media/mira_dpi_focus_rect.png")
 ACTION = "RunScript(/home/pi/.kodi/userdata/scripts/" + SCRIPT + ",select)"
 SYNC = "RunScript(/home/pi/.kodi/userdata/scripts/" + SCRIPT + ",sync)"
 
