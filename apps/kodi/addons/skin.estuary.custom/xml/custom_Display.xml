@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <window id="1157">
+    <onload>RunScript(/home/pi/.kodi/userdata/scripts/mira_android_auto_settings.py,sync)</onload>
     <defaultcontrol always="true">9200</defaultcontrol>
     <controls>
         <control type="image">
@@ -46,7 +47,7 @@
                 <control type="label">
                     <left>790</left>
                     <top>0</top>
-                    <width>920</width>
+                    <width>820</width>
                     <height>92</height>
                     <font>font60</font>
                     <textcolor>ff8d99ae</textcolor>
@@ -110,7 +111,7 @@
                 <control type="label">
                     <left>790</left>
                     <top>0</top>
-                    <width>920</width>
+                    <width>820</width>
                     <height>92</height>
                     <font>font60</font>
                     <textcolor>ffffffff</textcolor>
@@ -148,9 +149,10 @@
             </focusedlayout>
             <content>
                 <item>
-                    <label>Anzeigeeinstellungen</label>
-                    <property name="RowType">action</property>
-                    <onclick>Notification(Anzeige,Anzeigeeinstellungen folgen,2000)</onclick>
+                    <label>Android Auto</label>
+                    <label2>$INFO[Window(Home).Property(RNSE.AndroidAuto.DPI),, DPI]</label2>
+                    <property name="RowType">submenu</property>
+                    <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_android_auto_settings.py,select)</onclick>
                 </item>
             </content>
             <pagecontrol>9620</pagecontrol>
