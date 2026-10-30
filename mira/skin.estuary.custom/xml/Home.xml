@@ -246,7 +246,7 @@
                 <item>
                     <label>Telefon</label>
                     <icon>home/mmi_icons_v1/phone.png</icon>
-                    <onclick>noop</onclick>
+                    <onclick>ActivateWindow(1189)</onclick>
                 </item>
                 <item>
                     <label>Android Auto</label>

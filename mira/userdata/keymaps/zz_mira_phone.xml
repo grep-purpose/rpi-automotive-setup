@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<keymap>
+    <window1189>
+        <keyboard>
+            <one>Down</one>
+            <two>Up</two>
+            <return>Select</return>
+            <escape>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_ui.py,back)</escape>
+            <backspace>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_ui.py,back)</backspace>
+            <up>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_ui.py,up)</up>
+            <down>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_ui.py,down)</down>
+            <left>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_ui.py,left)</left>
+            <right>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_ui.py,right)</right>
+            <prev_track>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_ui.py,left)</prev_track>
+            <next_track>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_ui.py,right)</next_track>
+        </keyboard>
+    </window1189>
+</keymap>
