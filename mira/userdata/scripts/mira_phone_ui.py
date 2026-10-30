@@ -1,6 +1,9 @@
+# MIRA_PHONE_UI_CACHE_V9
+# MIRA_PHONE_CALL_V7
 # MIRA_PHONE_UI_V5
 # MIRA_PHONE_SELECT_V6
 import json
+import subprocess
 from pathlib import Path
 import sys
 import unicodedata
@@ -12,7 +15,7 @@ W=xbmcgui.Window(11189)
 
 def focus(cid):xbmc.executebuiltin('SetFocus(%d)' % cid)
 def focused(cid):return xbmc.getCondVisibility('Control.HasFocus(%d)' % cid)
-def right():return 9650 if W.getProperty('MiraPhoneView')=='sms' else 9600
+def right():return 9651 if W.getProperty('MiraPhoneCallPresent') else (9650 if W.getProperty('MiraPhoneView')=='sms' else 9600)
 
 def read_data():
     path=W.getProperty('MiraPhoneDataFile')
@@ -30,11 +33,10 @@ def render():
     title={'calls':'Anrufliste','contacts':'Kontakte','sms':'Nachrichten'}[mode]
     W.setProperty('MiraPhoneListTitle',title)
     control=W.getControl(50);data=read_data();items=[];old_key=''
-    try:
-        old=control.getSelectedItem()
-        if old and W.getProperty('MiraPhoneRenderedView')==mode:old_key=old.getProperty('MiraPhoneKey')
-        old_position=control.getSelectedPosition()
-    except (RuntimeError,AttributeError):old_position=0
+    if W.getProperty('MiraPhoneRenderedView')==mode:
+        old_key=xbmc.getInfoLabel('Container(50).ListItem.Property(MiraPhoneKey)')
+    try:old_position=max(0,int(xbmc.getInfoLabel('Container(50).CurrentItem'))-1)
+    except ValueError:old_position=0
     try:position=int(W.getProperty('MiraPhonePosition.'+mode) or '0')
     except ValueError:position=0
     if W.getProperty('MiraPhoneRenderedView')==mode:position=max(0,old_position)
@@ -77,7 +79,8 @@ def view(name):
     if name!='sms':W.setProperty('MiraPhoneLastList',name)
     render();W.setProperty('MiraPhoneLastFocus','50');focus(50)
 
-def refresh():
+def refresh(force=False):
+    W.setProperty('MiraPhoneRefreshForce','true' if force else 'false')
     W.setProperty('MiraPhoneRefreshToken',uuid.uuid4().hex)
     script=Path(__file__).with_name('mira_phone_refresh.py')
     xbmc.executebuiltin('RunScript(%s)' % script)
@@ -139,7 +142,7 @@ def select():
     else:
         chosen=0
     W.setProperty('MiraPhoneNumber',numbers[chosen]['number'])
-    focus(9600)
+    focus(right())
 
 
 def restore():
@@ -155,16 +158,25 @@ def main():
             try:W.getControl(50);break
             except RuntimeError:
                 if monitor.waitForAbort(0.05):return
-        W.setProperty('MiraPhoneNumber','');W.setProperty('MiraPhoneDataFile','')
+        W.setProperty('MiraPhoneNumber','')
+        cached=''
+        try:
+            probe=subprocess.run(['/usr/bin/python3',str(Path(__file__).with_name('mira_phone_cache.py'))],capture_output=True,text=True,timeout=4)
+            candidate=probe.stdout.strip()
+            if candidate and Path(candidate).is_file():cached=candidate
+        except Exception:pass
+        W.setProperty('MiraPhoneDataFile',cached)
+        W.setProperty('MiraPhoneCacheFile',cached)
         W.setProperty('MiraPhoneRenderedView','');view('calls');refresh()
+        xbmc.executebuiltin('RunScript(%s)' % Path(__file__).with_name('mira_phone_call_watch.py'))
     elif mode=='views':
         selected=xbmcgui.Dialog().select('Telefon',['Anrufliste','Kontakte','Nachrichten','Daten aktualisieren'])
         if 0<=selected<3:view(('calls','contacts','sms')[selected])
-        elif selected==3:refresh()
+        elif selected==3:refresh(True)
     elif mode=='select':select()
     elif mode=='dial':
         if W.getProperty('MiraPhoneView')=='sms':view(W.getProperty('MiraPhoneLastList') or 'calls')
-        focus(9600)
+        focus(right())
     elif mode=='digit':
         digit=sys.argv[2] if len(sys.argv)>2 else ''
         digit={'star':'*','hash':'#','plus':'+'}.get(digit,digit)

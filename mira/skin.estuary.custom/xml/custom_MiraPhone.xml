@@ -112,7 +112,7 @@
             </focusedlayout>
         </control>
         <control type="group">
-            <visible>!String.IsEqual(Window(11189).Property(MiraPhoneView),sms)</visible>
+            <visible>[!String.IsEqual(Window(11189).Property(MiraPhoneView),sms)] + !String.IsEqual(Window(11189).Property(MiraPhoneCallPresent),true)</visible>
             <control type="label">
                 <left>1010</left>
                 <top>150</top>
@@ -422,7 +422,7 @@
                 <disabledcolor>FF64816E</disabledcolor>
                 <focusedcolor>FF10151C</focusedcolor>
                 <enable>true</enable>
-                <onclick>noop</onclick>
+                <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_calls.py,dial)</onclick>
                 <onup>9600</onup>
                 <ondown>9611</ondown>
                 <onleft>9612</onleft>
@@ -451,7 +451,7 @@
             </control>
         </control>
         <control type="group">
-            <visible>String.IsEqual(Window(11189).Property(MiraPhoneView),sms)</visible>
+            <visible>[String.IsEqual(Window(11189).Property(MiraPhoneView),sms)] + !String.IsEqual(Window(11189).Property(MiraPhoneCallPresent),true)</visible>
             <control type="label">
                 <left>1015</left>
                 <top>155</top>
@@ -494,5 +494,75 @@
             <param name="footer_left_id" value="9002" />
             <param name="footer_right_id" value="9004" />
         </include>
+        <control type="group">
+            <visible>String.IsEqual(Window(11189).Property(MiraPhoneCallPresent),true)</visible>
+            <control type="label">
+                <left>1010</left>
+                <top>180</top>
+                <width>840</width>
+                <height>150</height>
+                <font>font60</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <textcolor>FFFFFFFF</textcolor>
+                <label>[B]$INFO[Window(11189).Property(MiraPhoneCallName)][/B]</label>
+                <scroll>true</scroll>
+            </control>
+            <control type="label">
+                <left>1010</left>
+                <top>340</top>
+                <width>840</width>
+                <height>85</height>
+                <font>font45</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <textcolor>FFFFFFFF</textcolor>
+                <label>$INFO[Window(11189).Property(MiraPhoneCallNumber)]</label>
+                <scroll>true</scroll>
+            </control>
+            <control type="label">
+                <left>1010</left>
+                <top>490</top>
+                <width>840</width>
+                <height>100</height>
+                <font>font45</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <textcolor>FFFFFFFF</textcolor>
+                <label>$INFO[Window(11189).Property(MiraPhoneCallStatus)]</label>
+                <scroll>true</scroll>
+            </control>
+            <control type="label">
+                <left>1010</left>
+                <top>620</top>
+                <width>840</width>
+                <height>120</height>
+                <font>font75</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <textcolor>FFFFFFFF</textcolor>
+                <label>[B]$INFO[Window(11189).Property(MiraPhoneCallDuration)][/B]</label>
+                <scroll>true</scroll>
+            </control>
+            <control type="button" id="9651">
+                <left>1070</left>
+                <top>910</top>
+                <width>720</width>
+                <height>90</height>
+                <font>font50</font>
+                <label>[B]$INFO[Window(11189).Property(MiraPhoneHangupLabel)][/B]</label>
+                <align>center</align>
+                <aligny>center</aligny>
+                <textcolor>FFFFFFFF</textcolor>
+                <focusedcolor>FFFFFFFF</focusedcolor>
+                <onup>9651</onup>
+                <ondown>9651</ondown>
+                <onleft>9651</onleft>
+                <onright>9651</onright>
+                <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_calls.py,hangup)</onclick>
+                <texturefocus colordiffuse="FFFF5050">mira/phone-call-v4.png</texturefocus>
+                <texturenofocus colordiffuse="FFCE3038">mira/phone-call-v4.png</texturenofocus>
+            </control>
+        </control>
     </controls>
 </window>

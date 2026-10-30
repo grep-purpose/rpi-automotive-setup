@@ -1,3 +1,4 @@
+# MIRA_PHONE_DATA_CACHE_V9
 #!/usr/bin/env python3
 """Read-only PBAP worker. No call, message, read-status or audio mutations."""
 import argparse
@@ -11,6 +12,7 @@ import re
 import tempfile
 import time
 import unicodedata
+from mira_phone_cache import load as cache_load, save as cache_save
 
 
 def unescape(value):
@@ -106,7 +108,7 @@ def calls_from(text,contacts):
 
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--output',required=True);args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--output',required=True);parser.add_argument('--force',action='store_true');args=parser.parse_args()
     output=Path(args.output);output.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
     data=dict(status='loading',contacts=[],calls=[],loaded=[],errors={})
     def publish():
@@ -131,6 +133,12 @@ def main():
                 devices.append(str(device['Address']))
         if len(devices)!=1:
             data['status']='no_device' if not devices else 'multiple_devices';publish();return
+        address=devices[0].upper()
+        cached=cache_load(address)
+        if cached is not None:data.update(cached)
+        data['device']=address
+        data.setdefault('_cached_at',{})
+        data['status']='loading';data['errors']={};publish()
         bus=dbus.SessionBus();states={};context=GLib.MainContext.default()
         def changed(interface,values,invalidated,path=None):
             if str(interface)=='org.bluez.obex.Transfer1':states.setdefault(str(path),{}).update(dict(values))
@@ -141,6 +149,9 @@ def main():
         with tempfile.TemporaryDirectory(prefix='mira-pbap-'+output.stem+'-',dir=output.parent) as folder:
             folder=Path(folder)
             for book,key in (('pb','contacts'),('cch','calls')):
+                age=time.time()-data['_cached_at'].get(key,0)
+                if key=='contacts' and key in data['loaded'] and 0<=age<300 and not args.force:
+                    continue
                 try:
                     pbap.Select('int',book,timeout=30)
                     target=folder/(book+'.vcf')
@@ -163,7 +174,9 @@ def main():
                     if not actual.is_relative_to(folder.resolve()):raise RuntimeError('UnexpectedTransferPath')
                     text=actual.read_text(encoding='utf-8-sig',errors='replace')
                     data[key]=contacts_from(text) if key=='contacts' else calls_from(text,data['contacts'])
-                    data['loaded'].append(key)
+                    if key not in data['loaded']:data['loaded'].append(key)
+                    data['_cached_at'][key]=time.time()
+                    cache_save(data)
                 except Exception as error:
                     data['errors'][key]=error.get_dbus_name() if hasattr(error,'get_dbus_name') else type(error).__name__
                 publish()
