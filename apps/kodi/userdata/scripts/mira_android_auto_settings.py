@@ -145,27 +145,33 @@ def main():
     if command != "select":
         raise ValueError("Unbekannte Aktion")
 
-    # Also prevents two rapid button presses from opening competing dialogs.
+    # A modal window may outlive a skin reload. Never hold a file lock
+    # across doModal(): a hidden old window must not block future openings.
+    if hudiy_running():
+        raise RuntimeError("HUDIY läuft noch. Bitte zuerst zu MIRA zurückkehren.")
+    current = synchronize()
+    value = choose_dpi(current)
+    if value is None:
+        return
+
+    # Serialize only the brief configuration update, with explicit unlock.
     lock_path = CONFIG.parent / ".mira-dpi.lock"
     with lock_path.open("a") as lock:
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
-            return
-        if hudiy_running():
-            raise RuntimeError("HUDIY läuft noch. Bitte zuerst zu MIRA zurückkehren.")
-        current = synchronize()
-        value = choose_dpi(current)
-        if value is None:
-            return
-        changed = save_dpi(CONFIG, value, current)
-        synchronize()
-        if changed:
-            xbmcgui.Dialog().notification(
-                "Android Auto",
-                str(value) + " DPI · Wirksam beim nächsten Start",
-                xbmcgui.NOTIFICATION_INFO, 3500,
-            )
+            raise RuntimeError("DPI-Speicherung ist belegt. Bitte erneut versuchen.")
+        try:
+            changed = save_dpi(CONFIG, value, current)
+        finally:
+            fcntl.flock(lock, fcntl.LOCK_UN)
+    synchronize()
+    if changed:
+        xbmcgui.Dialog().notification(
+            "Android Auto",
+            str(value) + " DPI · Wirksam beim nächsten Start",
+            xbmcgui.NOTIFICATION_INFO, 3500,
+        )
 
 
 if __name__ == "__main__":

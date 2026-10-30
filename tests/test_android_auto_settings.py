@@ -1,4 +1,5 @@
 import importlib.util
+import fcntl
 import json
 from pathlib import Path
 import sys
@@ -106,6 +107,45 @@ class SettingsTests(unittest.TestCase):
         self.assertEqual(control.addItem.call_count, 7)
         control.selectItem.assert_called_once_with(1)
         focus.assert_called_once_with(9500)
+
+    def test_busy_old_lock_does_not_block_opening_or_cancel(self):
+        lock_path = self.config.parent / ".mira-dpi.lock"
+        with lock_path.open("a") as held:
+            fcntl.flock(held, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            with patch.object(helper, "CONFIG", self.config), \
+                 patch.object(helper, "synchronize", return_value=150), \
+                 patch.object(helper, "hudiy_running", return_value=False), \
+                 patch.object(helper, "choose_dpi", return_value=None) as choose, \
+                 patch.object(sys, "argv", ["script", "select"]):
+                helper.main()
+                choose.assert_called_once_with(150)
+        self.assertEqual(self.config.read_bytes(), self.raw)
+
+    def test_busy_save_reports_error_instead_of_silent_return(self):
+        lock_path = self.config.parent / ".mira-dpi.lock"
+        with lock_path.open("a") as held:
+            fcntl.flock(held, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            with patch.object(helper, "CONFIG", self.config), \
+                 patch.object(helper, "synchronize", return_value=150), \
+                 patch.object(helper, "hudiy_running", return_value=False), \
+                 patch.object(helper, "choose_dpi", return_value=160), \
+                 patch.object(sys, "argv", ["script", "select"]):
+                with self.assertRaisesRegex(RuntimeError, "belegt"):
+                    helper.main()
+        self.assertEqual(self.config.read_bytes(), self.raw)
+
+    def test_failed_save_releases_short_lock(self):
+        with patch.object(helper, "CONFIG", self.config), \
+             patch.object(helper, "synchronize", return_value=150), \
+             patch.object(helper, "hudiy_running", return_value=False), \
+             patch.object(helper, "choose_dpi", return_value=160), \
+             patch.object(helper, "save_dpi", side_effect=OSError("write failed")), \
+             patch.object(sys, "argv", ["script", "select"]):
+            with self.assertRaises(OSError):
+                helper.main()
+        with (self.config.parent / ".mira-dpi.lock").open("r") as stream:
+            fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            fcntl.flock(stream, fcntl.LOCK_UN)
 
     def test_popup_return_cancels_and_click_returns_selected_value(self):
         dialog = helper.DPIWindow()

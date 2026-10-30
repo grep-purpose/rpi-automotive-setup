@@ -91,16 +91,30 @@ der Auswahl geänderte DPI oder vor dem Ersetzen geänderte Konfiguration
 führt zum Abbruch statt zum Überschreiben. Diese Prüfungen ersetzen keine
 gemeinsame Sperre mit einem externen HUDIY-Starter.
 
+Die Dateisperre wird ausschließlich während des kurzen Speichervorgangs
+gehalten und im finally-Block explizit freigegeben. Während des modalen
+Pop-ups bleibt sie frei. Eine belegte Schreibsperre erzeugt eine sichtbare
+Fehlermeldung statt eines stillen Abbruchs.
+
+In einer Betreiberdiagnose vom 30.10.2026 hielt der Kodi-Prozess die alte,
+über die gesamte Pop-up-Laufzeit gehaltene Sperre. Zum Freigeben dieses
+bereits bestehenden Zustands muss der haltende Kodi-Prozess beendet werden;
+ein einmaliger Pi-Neustart gibt sie ebenfalls frei. Die Sperrdatei muss
+nicht gelöscht werden. Welcher konkrete GUI-Ablauf die alte Instanz
+zurückließ, ist nicht abschließend nachgewiesen.
+
 ## Prüfung
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_android_auto_settings.py' -v
 ```
 
-Zwölf lokale Tests mit nachgebildeter Kodi-API prüfen unter anderem
+Fünfzehn lokale Tests mit nachgebildeter Kodi-API prüfen unter anderem
 Abbrechen/Vorauswahl, Wertebereich, unveränderte Fremdeinstellungen,
 Backups, laufendes bzw. startendes HUDIY, Pop-up-Vorauswahl und
 Return/Zeilenbestätigung sowie Installation, Upgrade und Rollback.
+Zusätzliche Regressionstests prüfen Öffnen/Abbrechen bei alter belegter
+Sperre, sichtbaren Schreibfehler und Freigabe nach Speicherfehler.
 Python und XML sind statisch geprüft. GUI-Darstellung, RNS-E-Drehradbedienung
 und tatsächliche Übernahme beim nächsten HUDIY-Start müssen auf dem Pi
 geprüft werden.
