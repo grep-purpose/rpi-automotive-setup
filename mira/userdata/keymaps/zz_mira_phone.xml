@@ -4,7 +4,7 @@
         <keyboard>
             <one>Down</one>
             <two>Up</two>
-            <return>Select</return>
+            <return>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_activate.py)</return>
             <escape>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_ui.py,back)</escape>
             <backspace>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_ui.py,back)</backspace>
             <up>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_ui.py,up)</up>

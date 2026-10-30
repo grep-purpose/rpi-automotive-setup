@@ -1,4 +1,5 @@
 # MIRA_PHONE_UI_V5
+# MIRA_PHONE_SELECT_V6
 import json
 from pathlib import Path
 import sys
@@ -82,24 +83,64 @@ def refresh():
     xbmc.executebuiltin('RunScript(%s)' % script)
 
 def select():
-    item=W.getControl(50).getSelectedItem()
-    if not item:return
-    if item.getProperty('MiraPhoneAction')=='az':
-        records=read_data().get('contacts',[])
-        letters=sorted({r.get('initial',letter(r['name'])) for r in records},key=lambda x:('ZZ' if x=='#' else x))
-        index=xbmcgui.Dialog().select('Buchstabe wählen',letters)
-        if index>=0:
-            target=next((i+1 for i,r in enumerate(records) if r.get('initial',letter(r['name']))==letters[index]),0)
-            W.getControl(50).selectItem(target)
+    mode=W.getProperty('MiraPhoneView')
+    def native(name):
+        return xbmc.getInfoLabel('Container(50).ListItem.'+name)
+    action=native('Property(MiraPhoneAction)')
+    name=native('Label')
+    raw=native('Property(MiraPhoneNumbers)')
+    current=xbmc.getInfoLabel('Container(50).CurrentItem').strip()
+    records=read_data().get(mode,[]) if mode in ('contacts','calls') else []
+    if action=='az' or (mode=='contacts' and records and current=='1'):
+        letters=sorted(
+            {r.get('initial',letter(r['name'])) for r in records},
+            key=lambda x:('ZZ' if x=='#' else x)
+        )
+        chosen=xbmcgui.Dialog().select('Buchstabe wählen',letters)
+        if chosen>=0:
+            target=next(
+                (i+1 for i,r in enumerate(records)
+                 if r.get('initial',letter(r['name']))==letters[chosen]),
+                0
+            )
+            xbmc.executebuiltin('SetFocus(50,%d,absolute)' % target)
         return
-    try:numbers=json.loads(item.getProperty('MiraPhoneNumbers') or '[]')
-    except ValueError:return
-    if not numbers:return
+    try:
+        numbers=json.loads(raw or '[]')
+    except ValueError:
+        numbers=[]
+    if not numbers:
+        try:
+            index=int(current)-1-(1 if mode=='contacts' and records else 0)
+        except ValueError:
+            index=-1
+        if 0<=index<len(records) and name==records[index]['name']:
+            numbers=records[index].get('numbers',[])
+    numbers=[
+        n for n in numbers
+        if isinstance(n,dict)
+        and isinstance(n.get('number'),str)
+        and n['number']
+    ]
+    xbmc.log(
+        '[MIRA Phone Select V6] Rufnummern gefunden: %d' % len(numbers),
+        xbmc.LOGINFO
+    )
+    if not numbers:
+        return
     if len(numbers)>1:
-        index=xbmcgui.Dialog().select(item.getLabel(),[n.get('label','Telefon')+' · '+n.get('display',n['number']) for n in numbers])
-        if index<0:return
-    else:index=0
-    W.setProperty('MiraPhoneNumber',numbers[index]['number']);focus(9600)
+        chosen=xbmcgui.Dialog().select(
+            name or 'Rufnummer wählen',
+            [n.get('label','Telefon')+' · '+n.get('display',n['number'])
+             for n in numbers]
+        )
+        if chosen<0:
+            return
+    else:
+        chosen=0
+    W.setProperty('MiraPhoneNumber',numbers[chosen]['number'])
+    focus(9600)
+
 
 def restore():
     try:cid=int(W.getProperty('MiraPhoneLastFocus'))
