@@ -1,0 +1,26 @@
+{
+  "application": {
+    "windowWidth": 0,
+    "windowHeight": 0,
+    "width": 784,
+    "height": 468,
+    "x": 10,
+    "y": 0,
+    "framelessWindow": true,
+    "splitWithProjections": false
+  },
+  "appearance": {
+    "bottomBarHeight": 100
+  },
+  "androidAuto": {
+    "resolution": "480p",
+    "dpi": 150,
+    "width": 784,
+    "height": 468,
+    "x": 10,
+    "y": 0,
+    "widthMargin": 16,
+    "heightMargin": 12,
+    "fps": "30"
+  }
+}
