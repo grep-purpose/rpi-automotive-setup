@@ -14,6 +14,13 @@ der tatsächliche aktuelle Wert bleibt im Kopf sichtbar. Drücken einer Zeile
 übernimmt sie, Return/Zurück schließt ohne Speichern. Der Hinweis zur
 Übernahme beim nächsten Android-Auto-Start bleibt im Pop-up sichtbar.
 
+Das verfeinerte Layout rückt die Fläche weiter vom MIRA-Footer ab,
+vergrößert die DPI-Schrift auf font60 mit Fettschrift und zeigt den
+Übernahmehinweis zweizeilig in font55 mit Fettschrift. Die zusätzliche
+Bedienhilfe wurde entfernt. Eine eigene abgerundete Auswahltextur ersetzt
+die bisherige Transport-Fokustextur. Die Maße sind Skin-Koordinaten;
+die Darstellung auf dem RNS-E wird vom Betreiber geprüft.
+
 Eine bestätigte Auswahl wird für den nächsten Start von HUDIY/Android Auto
 gespeichert. Die Funktion startet keine Anwendung neu. Sie ändert ausschließlich
 `androidAuto.dpi` in `~/.hudiy/share/config/main_configuration.json`.
@@ -32,6 +39,7 @@ Der Installer benötigt die beiden Dateien aus diesem Repository:
 Zusätzlich wird das Pop-up-Layout benötigt:
 
 - `apps/kodi/userdata/scripts/resources/skins/default/1080i/MiraAndroidAutoDPI.xml`
+- `apps/kodi/userdata/scripts/resources/media/mira_dpi_focus.png`
 
 Die Repository-Verzeichnisstruktur beibehalten und im Repository-Hauptverzeichnis
 ausführen:

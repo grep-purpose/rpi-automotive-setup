@@ -141,9 +141,11 @@ class SettingsTests(unittest.TestCase):
         self.assertEqual(self.config.read_bytes(), self.raw)
         script = self.home / ".kodi/userdata/scripts" / installer.SCRIPT
         self.assertTrue(script.exists())
+        self.assertTrue((script.parent / installer.FOCUS).is_file())
         installer.restore(backup, self.home)
         self.assertEqual(xml.read_bytes(), original)
         self.assertFalse(script.exists())
+        self.assertFalse((script.parent / installer.FOCUS).exists())
         self.assertEqual(self.config.read_bytes(), self.raw)
 
     def test_unrecognized_menu_rejected(self):
@@ -169,6 +171,7 @@ class SettingsTests(unittest.TestCase):
         self.assertEqual(script.read_bytes(), before)
         self.assertEqual(xml.read_text(), original)
         self.assertFalse((script.parent / installer.RESOURCE).exists())
+        self.assertFalse((script.parent / installer.FOCUS).exists())
         self.assertEqual(self.config.read_bytes(), self.raw)
 
 
