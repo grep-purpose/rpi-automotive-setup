@@ -40,11 +40,57 @@ def hudiy_running():
     return result.returncode == 0
 
 
-def synchronize(path=CONFIG):
+def synchronize(path=None):
+    path = CONFIG if path is None else path
     _, data = read_config(path)
     dpi = data["androidAuto"]["dpi"]
     xbmcgui.Window(10000).setProperty(PROPERTY, str(dpi))
     return dpi
+
+
+class DPIWindow(xbmcgui.WindowXMLDialog):
+    """Modal selection using MIRA's USB confirmation dialog design."""
+
+    def configure(self, current):
+        self.current = current
+        self.value = None
+
+    def onInit(self):
+        control = self.getControl(9500)
+        control.reset()
+        for value in VALUES:
+            item = xbmcgui.ListItem(
+                label=str(value) + " DPI",
+                label2="Aktuell" if value == self.current else "",
+            )
+            control.addItem(item)
+        self.setFocusId(9500)
+        control.selectItem(VALUES.index(self.current) if self.current in VALUES else 0)
+
+    def onClick(self, control_id):
+        if control_id == 9500:
+            index = self.getControl(9500).getSelectedPosition()
+            if 0 <= index < len(VALUES):
+                self.value = VALUES[index]
+                self.close()
+
+    def onAction(self, action):
+        if action.getId() in (9, 10, 92):
+            self.value = None
+            self.close()
+
+
+def choose_dpi(current):
+    dialog = DPIWindow(
+        "MiraAndroidAutoDPI.xml", str(Path(__file__).resolve().parent),
+        "default", "1080i",
+    )
+    dialog.configure(current)
+    try:
+        dialog.doModal()
+        return dialog.value
+    finally:
+        del dialog
 
 
 def save_dpi(path, value, previous_dpi):
@@ -109,21 +155,15 @@ def main():
         if hudiy_running():
             raise RuntimeError("HUDIY läuft noch. Bitte zuerst zu MIRA zurückkehren.")
         current = synchronize()
-        selected = xbmcgui.Dialog().select(
-            "Android Auto · Darstellungsgröße",
-            [str(value) + " DPI" for value in VALUES],
-            preselect=VALUES.index(current) if current in VALUES else -1,
-        )
-        if selected < 0:
+        value = choose_dpi(current)
+        if value is None:
             return
-        if selected >= len(VALUES):
-            raise ValueError("Ungültige Auswahl")
-        changed = save_dpi(CONFIG, VALUES[selected], current)
+        changed = save_dpi(CONFIG, value, current)
         synchronize()
         if changed:
             xbmcgui.Dialog().notification(
                 "Android Auto",
-                str(VALUES[selected]) + " DPI · Wirksam beim nächsten Start",
+                str(value) + " DPI · Wirksam beim nächsten Start",
                 xbmcgui.NOTIFICATION_INFO, 3500,
             )
 

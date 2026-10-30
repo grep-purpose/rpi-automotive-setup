@@ -1,9 +1,18 @@
 # Android-Auto-DPI in MIRA
 
-Setup → Anzeige → Android Auto öffnet das vorhandene Kodi-Auswahlfenster.
+Setup → Anzeige → Android Auto öffnet ein eigenes MIRA-Pop-up.
+Gestaltungsvorlage ist das vorhandene USB-Auswurf-Pop-up aus
+`apps/kodi/skin.estuary.custom/xml/custom_MiraUSBEjectConfirm.xml`:
+abgedunkelter Hintergrund, zwei abgerundete Panel-Ebenen, dieselben
+Transport-Texturen und große Skin-Schriften. Das globale Kodi-Auswahlfenster
+wird nicht verändert.
 Die Zeile zeigt den aus HUDIYs Konfiguration gelesenen DPI-Wert rechts an.
 Auswahl: 140, 150, 160, 170, 180, 190 und 200 DPI. Der aktuelle Wert ist
 vorausgewählt, sofern er in dieser Liste liegt. Abbrechen ändert nichts.
+Bei einem gespeicherten Wert außerhalb der Liste startet der Fokus auf 140;
+der tatsächliche aktuelle Wert bleibt im Kopf sichtbar. Drücken einer Zeile
+übernimmt sie, Return/Zurück schließt ohne Speichern. Der Hinweis zur
+Übernahme beim nächsten Android-Auto-Start bleibt im Pop-up sichtbar.
 
 Eine bestätigte Auswahl wird für den nächsten Start von HUDIY/Android Auto
 gespeichert. Die Funktion startet keine Anwendung neu. Sie ändert ausschließlich
@@ -20,6 +29,10 @@ Der Installer benötigt die beiden Dateien aus diesem Repository:
 - `tools/install_mira_android_auto_settings.py`
 - `apps/kodi/userdata/scripts/mira_android_auto_settings.py`
 
+Zusätzlich wird das Pop-up-Layout benötigt:
+
+- `apps/kodi/userdata/scripts/resources/skins/default/1080i/MiraAndroidAutoDPI.xml`
+
 Die Repository-Verzeichnisstruktur beibehalten und im Repository-Hauptverzeichnis
 ausführen:
 
@@ -29,7 +42,8 @@ python3 tools/install_mira_android_auto_settings.py
 
 Der Installer prüft den aktiven Skin, den bestehenden Platzhalter bzw. die
 bereits installierte Zeile, Python-Syntax und XML. Er ändert die lokale
-`custom_Display.xml` gezielt und installiert das Kodi-Skript. Der Installer
+`custom_Display.xml` gezielt und installiert das Kodi-Skript samt eigenem
+XML-Dialog unter den Skript-Ressourcen. Der Installer
 übernimmt keine vollständige Skin-Datei vom Server über die lokale Fassung.
 Nach erfolgreicher Installation wird `kodi-send --action="ReloadSkin()"`
 ausgeführt. Ein Pi-Neustart ist nicht erforderlich.
@@ -49,8 +63,10 @@ Die letzte Installation zurücknehmen:
 python3 tools/install_mira_android_auto_settings.py --rollback
 ```
 
-Das stellt Menüdatei und vorheriges Skript wieder her bzw. entfernt das neu
-installierte Skript. Ein bereits gewählter DPI-Wert bleibt dabei erhalten.
+Das stellt Menüdatei, Skript und Pop-up-XML auf den Stand vor dieser
+Installation zurück bzw. entfernt neu angelegte Dateien. Beim Upgrade vom
+ersten DPI-Menü wird dadurch die vorherige Kodi-Auswahl wiederhergestellt.
+Ein bereits gewählter DPI-Wert bleibt dabei erhalten.
 Kodi wird anschließend erneut geladen.
 
 Vor jeder tatsächlichen DPI-Änderung sichert das Kodi-Skript die ursprüngliche
@@ -71,9 +87,10 @@ gemeinsame Sperre mit einem externen HUDIY-Starter.
 python3 -m unittest discover -s tests -p 'test_android_auto_settings.py' -v
 ```
 
-Neun lokale Tests mit nachgebildeter Kodi-API prüfen unter anderem
+Zwölf lokale Tests mit nachgebildeter Kodi-API prüfen unter anderem
 Abbrechen/Vorauswahl, Wertebereich, unveränderte Fremdeinstellungen,
-Backups, laufendes bzw. startendes HUDIY sowie Installation und Rollback.
+Backups, laufendes bzw. startendes HUDIY, Pop-up-Vorauswahl und
+Return/Zeilenbestätigung sowie Installation, Upgrade und Rollback.
 Python und XML sind statisch geprüft. GUI-Darstellung, RNS-E-Drehradbedienung
 und tatsächliche Übernahme beim nächsten HUDIY-Start müssen auf dem Pi
 geprüft werden.

@@ -14,6 +14,7 @@ import tempfile
 import xml.etree.ElementTree as ET
 
 SCRIPT = "mira_android_auto_settings.py"
+RESOURCE = Path("resources/skins/default/1080i/MiraAndroidAutoDPI.xml")
 ACTION = "RunScript(/home/pi/.kodi/userdata/scripts/" + SCRIPT + ",select)"
 SYNC = "RunScript(/home/pi/.kodi/userdata/scripts/" + SCRIPT + ",sync)"
 
@@ -93,6 +94,10 @@ def install(home, source):
     xml = home / ".kodi/addons/skin.estuary.custom/xml/custom_Display.xml"
     target = home / ".kodi/userdata/scripts" / SCRIPT
     helper = source / "apps/kodi/userdata/scripts" / SCRIPT
+    resource = target.parent / RESOURCE
+    resource_source = source / "apps/kodi/userdata/scripts" / RESOURCE
+    resource_code = resource_source.read_bytes()
+    ET.fromstring(resource_code)
     original = xml.read_bytes()
     updated = patched_xml(original.decode("utf-8")).encode("utf-8")
     code = helper.read_bytes()
@@ -101,16 +106,17 @@ def install(home, source):
     dpi = json.loads(config.read_text())["androidAuto"]["dpi"]
     if type(dpi) is not int:
         raise ValueError("Gespeicherte DPI ungültig; keine Änderung")
-    for path in (xml, target):
+    for path in (xml, target, resource):
         if path.is_symlink():
             raise ValueError("Verknüpfte Zieldatei: " + str(path))
     target.parent.mkdir(parents=True, exist_ok=True)
+    resource.parent.mkdir(parents=True, exist_ok=True)
     backup_root = home / ".local/state/mira/android-auto-settings-backups"
     backup_root.mkdir(parents=True, exist_ok=True, mode=0o700)
     backup = backup_root / datetime.now().strftime("%Y%m%d-%H%M%S-%f")
     backup.mkdir(mode=0o700)
     manifest = []
-    for index, path in enumerate((xml, target)):
+    for index, path in enumerate((xml, target, resource)):
         entry = {"target": str(path.relative_to(home)),
                  "existed": path.exists(), "saved": str(index)}
         if path.exists():
@@ -120,16 +126,19 @@ def install(home, source):
     shutil.copy2(config, backup / "main_configuration.local-backup.json")
     (backup / "main_configuration.local-backup.json").chmod(0o600)
     try:
+        write_atomic(resource, resource_code, 0o644)
         write_atomic(target, code, 0o644)
         write_atomic(xml, updated, xml.stat().st_mode & 0o777)
         assert target.read_bytes() == code
         assert xml.read_bytes() == updated
+        assert resource.read_bytes() == resource_code
         ET.parse(xml)
+        ET.parse(resource)
         ast.parse(target.read_text())
     except Exception:
         restore(backup, home)
         raise
-    print("Installiert und geprüft: Anzeige → Android Auto → 140–200 DPI")
+    print("Installiert und geprüft: Eigenes MIRA-Pop-up für 140–200 DPI")
     print("HUDIY-Konfiguration unverändert; aktueller Wert:", dpi)
     print("Installationsbackup:", backup)
     return backup

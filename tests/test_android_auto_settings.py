@@ -12,7 +12,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.modules.setdefault("xbmc", types.SimpleNamespace(
     log=Mock(), LOGERROR=4))
 sys.modules.setdefault("xbmcgui", types.SimpleNamespace(
-    Window=Mock(), Dialog=Mock(), NOTIFICATION_INFO=0, NOTIFICATION_ERROR=3))
+    Window=Mock(), Dialog=Mock(), WindowXMLDialog=object, ListItem=Mock(),
+    NOTIFICATION_INFO=0, NOTIFICATION_ERROR=3))
 
 
 def load(name, path):
@@ -84,19 +85,43 @@ class SettingsTests(unittest.TestCase):
         self.assertEqual(self.config.read_bytes(), self.raw)
 
     def test_cancel_does_not_save_and_current_is_preselected(self):
-        dialog = Mock()
-        dialog.select.return_value = -1
         with patch.object(helper, "CONFIG", self.config), \
              patch.object(helper, "synchronize", return_value=150), \
              patch.object(helper, "hudiy_running", return_value=False), \
-             patch.object(helper.xbmcgui, "Dialog", return_value=dialog), \
+             patch.object(helper, "choose_dpi", return_value=None) as choose, \
              patch.object(helper, "save_dpi") as save, \
              patch.object(sys, "argv", ["script", "select"]):
             helper.main()
             save.assert_not_called()
-        self.assertEqual(dialog.select.call_args.kwargs["preselect"], 1)
-        self.assertEqual(len(dialog.select.call_args.args[1]), 7)
+        choose.assert_called_once_with(150)
         self.assertEqual(self.config.read_bytes(), self.raw)
+
+    def test_popup_preselects_saved_value_and_lists_seven_rows(self):
+        dialog = helper.DPIWindow()
+        dialog.configure(150)
+        control = Mock()
+        with patch.object(dialog, "getControl", return_value=control, create=True), \
+             patch.object(dialog, "setFocusId", create=True) as focus:
+            dialog.onInit()
+        self.assertEqual(control.addItem.call_count, 7)
+        control.selectItem.assert_called_once_with(1)
+        focus.assert_called_once_with(9500)
+
+    def test_popup_return_cancels_and_click_returns_selected_value(self):
+        dialog = helper.DPIWindow()
+        dialog.configure(150)
+        control = Mock()
+        control.getSelectedPosition.return_value = 6
+        with patch.object(dialog, "getControl", return_value=control, create=True), \
+             patch.object(dialog, "close", create=True) as close:
+            dialog.onClick(9500)
+            self.assertEqual(dialog.value, 200)
+            close.assert_called_once()
+            for action_id in (9, 10, 92):
+                action = Mock()
+                action.getId.return_value = action_id
+                dialog.onAction(action)
+                self.assertIsNone(dialog.value)
 
     def test_install_and_rollback_preserve_configuration(self):
         settings = self.home / ".kodi/userdata/guisettings.xml"
@@ -124,6 +149,27 @@ class SettingsTests(unittest.TestCase):
     def test_unrecognized_menu_rejected(self):
         with self.assertRaises(ValueError):
             installer.patched_xml('<window id="1157"><defaultcontrol>1</defaultcontrol></window>')
+
+    def test_upgrade_rollback_restores_previous_helper(self):
+        settings = self.home / ".kodi/userdata/guisettings.xml"
+        settings.parent.mkdir(parents=True)
+        settings.write_text('<settings><setting id="lookandfeel.skin">'
+                            'skin.estuary.custom</setting></settings>')
+        xml = self.home / ".kodi/addons/skin.estuary.custom/xml/custom_Display.xml"
+        xml.parent.mkdir(parents=True)
+        original = installer.patched_xml((ROOT / "tests/display-before.xml").read_text())
+        xml.write_text(original)
+        script = self.home / ".kodi/userdata/scripts" / installer.SCRIPT
+        script.parent.mkdir(parents=True)
+        script.write_text("# previous working DPI helper\n")
+        before = script.read_bytes()
+        backup = installer.install(self.home, ROOT)
+        self.assertNotEqual(script.read_bytes(), before)
+        installer.restore(backup, self.home)
+        self.assertEqual(script.read_bytes(), before)
+        self.assertEqual(xml.read_text(), original)
+        self.assertFalse((script.parent / installer.RESOURCE).exists())
+        self.assertEqual(self.config.read_bytes(), self.raw)
 
 
 if __name__ == "__main__":
