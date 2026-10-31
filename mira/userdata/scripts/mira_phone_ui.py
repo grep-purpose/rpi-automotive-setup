@@ -1,3 +1,4 @@
+# MIRA_PHONE_LISTS_V25
 # MIRA_PHONE_UI_V10
 # MIRA_PHONE_UI_CACHE_V9
 # MIRA_PHONE_CALL_V7
@@ -32,6 +33,29 @@ def letter(name):
     text=''.join(c for c in unicodedata.normalize('NFKD',name) if not unicodedata.combining(c)).upper()
     return text[0] if text and 'A'<=text[0]<='Z' else '#'
 
+def _mira_phone_row_v25(mode, record):
+    numbers=record.get('numbers',[])
+    if mode=='calls':
+        kind=record.get('kind','Anruf') or 'Anruf'
+        icon={'Ausgehend':'outgoing','Eingehend':'incoming','Verpasst':'missed'}.get(kind)
+        stamp=str(record.get('time','') or '').strip()
+        right=stamp
+        parts=stamp.rsplit(' ',1)
+        if len(parts)==2:
+            date=parts[0].split('.')
+            if len(date)==3 and all(x.isdigit() for x in date):
+                right='%s.%s. · %s'%(date[0],date[1],parts[1])
+        return ('mira/phone-list-v25-'+icon+'.png' if icon else 'mira/phone-footer-v17-receiver.png'),kind,right
+    if len(numbers)==1:
+        number=numbers[0]
+        left=str(number.get('display') or number.get('number') or '')
+        right=str(number.get('label') or 'Telefon')
+    elif len(numbers)>1:
+        left='%d Rufnummern'%len(numbers);right='Auswählen'
+    else:
+        left='Keine Rufnummer';right=''
+    return 'mira/phone-list-v25-person.png',left,right
+
 def render():
     mode=W.getProperty('MiraPhoneView') or 'calls'
     title={'calls':'Anrufliste','contacts':'Kontakte','sms':'Nachrichten'}[mode]
@@ -47,7 +71,10 @@ def render():
     records=data.get(mode,[]) if mode in ('contacts','calls') else []
     if mode=='contacts' and records:
         item=xbmcgui.ListItem(label='A–Z · Buchstabe wählen')
-        item.setProperty('MiraPhoneAction','az');items.append(item)
+        item.setProperty('MiraPhoneAction','az')
+        item.setProperty('MiraPhoneRowIcon','mira/phone-list-v25-search.png')
+        item.setProperty('MiraPhoneRowLeft','Alphabet öffnen')
+        items.append(item)
     for record in records:
         numbers=record.get('numbers',[])
         if mode=='calls':
@@ -55,6 +82,10 @@ def render():
         else:
             detail=numbers[0].get('display',numbers[0]['number']) if len(numbers)==1 else '%d Rufnummern' % len(numbers)
         item=xbmcgui.ListItem(label=record['name'],label2=detail)
+        row_icon,row_left,row_right=_mira_phone_row_v25(mode,record)
+        item.setProperty('MiraPhoneRowIcon',row_icon)
+        item.setProperty('MiraPhoneRowLeft',row_left)
+        item.setProperty('MiraPhoneRowRight',row_right)
         item.setProperty('MiraPhoneNumbers',json.dumps(numbers,ensure_ascii=False))
         item.setProperty('MiraPhoneInitial',record.get('initial',letter(record['name'])))
         item.setProperty('MiraPhoneKey',json.dumps([record['name'],numbers,record.get('time','')],ensure_ascii=False,sort_keys=True))

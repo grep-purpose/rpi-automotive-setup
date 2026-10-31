@@ -224,6 +224,17 @@
             <size>30</size>
             <style>bold</style>
         </font>
+        <font>
+            <name>MiraPhoneListNameV25</name>
+            <filename>NotoSans-Regular.ttf</filename>
+            <size>52</size>
+            <style>bold</style>
+        </font>
+        <font>
+            <name>MiraPhoneListDetailV25</name>
+            <filename>NotoSans-Regular.ttf</filename>
+            <size>36</size>
+        </font>
     </fontset>
     <fontset id="Arial" idloc="31053">
         <font>
@@ -431,6 +442,17 @@
             <filename>arial.ttf</filename>
             <size>30</size>
             <style>bold</style>
+        </font>
+        <font>
+            <name>MiraPhoneListNameV25</name>
+            <filename>arial.ttf</filename>
+            <size>52</size>
+            <style>bold</style>
+        </font>
+        <font>
+            <name>MiraPhoneListDetailV25</name>
+            <filename>arial.ttf</filename>
+            <size>36</size>
         </font>
     </fontset>
 </fonts>
