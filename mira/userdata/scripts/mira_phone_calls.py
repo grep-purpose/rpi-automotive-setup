@@ -1,3 +1,4 @@
+# MIRA_PHONE_FOOTER_V19
 # MIRA_PHONE_POPUP_V11
 # MIRA_PHONE_CALL_V10
 # MIRA_PHONE_CALL_V7
@@ -72,8 +73,9 @@ def update(data,started):
     path=call['path'];state=call['state']
     number=call['number']
     remote=call.get('name','').strip()
-    if remote and number_key(remote)==number_key(number):remote=''
+    if number_key(number) and remote and number_key(remote)==number_key(number):remote=''
     name=find_name(number) or remote or number or 'Unbekannte Nummer'
+    W.setProperty('MiraPhoneFooterIsNumber','true' if number and name==number else '')
     W.setProperty('MiraPhoneCallName',name)
     detail=number if number and number_key(name)!=number_key(number) else ''
     W.setProperty('MiraPhoneCallDetail',detail)

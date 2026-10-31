@@ -537,7 +537,7 @@
                             <aligny>center</aligny>
                             <scroll>false</scroll>
                             <label>[B]$INFO[Window(11189).Property(MiraPhoneCallName)][/B]</label>
-                            <visible>![!String.IsEmpty(Window(11189).Property(MiraPhoneCallNumber)) + String.IsEqual(Window(11189).Property(MiraPhoneCallName),$INFO[Window(11189).Property(MiraPhoneCallNumber)])]</visible>
+                            <visible>!String.IsEqual(Window(11189).Property(MiraPhoneFooterIsNumber),true)</visible>
                         </control>
                         <control type="label">
                             <left>66</left>
@@ -549,20 +549,15 @@
                             <aligny>center</aligny>
                             <scroll>false</scroll>
                             <label>[B]$INFO[Window(11189).Property(MiraPhoneCallNumber)][/B]</label>
-                            <visible>!String.IsEmpty(Window(11189).Property(MiraPhoneCallNumber)) + String.IsEqual(Window(11189).Property(MiraPhoneCallName),$INFO[Window(11189).Property(MiraPhoneCallNumber)])</visible>
+                            <visible>String.IsEqual(Window(11189).Property(MiraPhoneFooterIsNumber),true)</visible>
                         </control>
-                        <control type="label">
+                        <control type="image">
                             <left>362</left>
                             <top>0</top>
                             <width>138</width>
                             <height>74</height>
-                            <font>font45</font>
-                            <textcolor>FFFFFFFF</textcolor>
-                            <aligny>center</aligny>
-                            <scroll>false</scroll>
-                            <label>[B]--[/B]</label>
                             <visible>String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Anruf gehalten)</visible>
-                            <align>right</align>
+                            <texture>mira/phone-footer-v19-held.png</texture>
                         </control>
                         <control type="label">
                             <left>362</left>
