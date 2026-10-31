@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window id="1190" type="dialog">
+    <defaultcontrol always="true">9660</defaultcontrol>
+    <controls>
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>1920</width>
+            <height>1020</height>
+            <texture colordiffuse="99000000">colors/white.png</texture>
+        </control>
+        <control type="image">
+            <left>210</left>
+            <top>130</top>
+            <width>1500</width>
+            <height>820</height>
+            <texture border="45" colordiffuse="b3ffffff">music/transport_normal.png</texture>
+        </control>
+        <control type="image">
+            <left>210</left>
+            <top>130</top>
+            <width>1500</width>
+            <height>820</height>
+            <texture border="45" colordiffuse="e6ffffff">music/transport_normal.png</texture>
+        </control>
+        <control type="label">
+            <left>310</left>
+            <top>205</top>
+            <width>1300</width>
+            <height>110</height>
+            <font>font55</font>
+            <textcolor>ffffffff</textcolor>
+            <align>center</align>
+            <aligny>center</aligny>
+            <label>Eingehender Anruf</label>
+        </control>
+        <control type="label">
+            <left>310</left>
+            <top>330</top>
+            <width>1300</width>
+            <height>120</height>
+            <font>font75</font>
+            <textcolor>FFFFFFFF</textcolor>
+            <align>center</align>
+            <aligny>center</aligny>
+            <label>[B]$INFO[Window(Home).Property(MiraPhonePopupName)][/B]</label>
+            <scroll>true</scroll>
+        </control>
+        <control type="label">
+            <left>310</left>
+            <top>475</top>
+            <width>1300</width>
+            <height>70</height>
+            <font>font45</font>
+            <textcolor>ffffffff</textcolor>
+            <align>center</align>
+            <aligny>center</aligny>
+            <label>$INFO[Window(Home).Property(MiraPhonePopupDetail)]</label>
+            <scroll>true</scroll>
+        </control>
+        <control type="button" id="9660">
+            <left>420</left>
+            <top>610</top>
+            <width>500</width>
+            <height>145</height>
+            <label>[B]Annehmen[/B]</label>
+            <font>font55</font>
+            <textcolor>ffffffff</textcolor>
+            <focusedcolor>FF10151C</focusedcolor>
+            <align>center</align>
+            <aligny>center</aligny>
+            <texturenofocus colordiffuse="FF10CE50">mira/phone-call-v4.png</texturenofocus>
+            <texturefocus colordiffuse="FF56F080">mira/phone-call-v4.png</texturefocus>
+            <onleft>9661</onleft>
+            <onright>9661</onright>
+            <onup>9661</onup>
+            <ondown>9661</ondown>
+            <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_popup.py,answer,$INFO[Window(Home).Property(MiraPhonePopupPath)])</onclick>
+        </control>
+        <control type="button" id="9661">
+            <left>1000</left>
+            <top>610</top>
+            <width>500</width>
+            <height>145</height>
+            <label>[B]Ablehnen[/B]</label>
+            <font>font55</font>
+            <textcolor>ffffffff</textcolor>
+            <focusedcolor>FF10151C</focusedcolor>
+            <align>center</align>
+            <aligny>center</aligny>
+            <texturenofocus colordiffuse="FFCE3038">mira/phone-call-v4.png</texturenofocus>
+            <texturefocus colordiffuse="FFFF5050">mira/phone-call-v4.png</texturefocus>
+            <onleft>9660</onleft>
+            <onright>9660</onright>
+            <onup>9660</onup>
+            <ondown>9660</ondown>
+            <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_popup.py,hangup,$INFO[Window(Home).Property(MiraPhonePopupPath)])</onclick>
+        </control>
+    </controls>
+    <onback>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_popup.py,dismiss)</onback>
+</window>

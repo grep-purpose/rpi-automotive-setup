@@ -1,3 +1,4 @@
+# MIRA_PHONE_POPUP_V11
 # MIRA_PHONE_CALL_V10
 # MIRA_PHONE_CALL_V7
 from pathlib import Path
@@ -24,7 +25,8 @@ def backend(request):
         return {'ok':False,'error':'Telefonverbindung antwortet nicht.'}
 
 def focus(cid):
-    xbmc.executebuiltin('SetFocus(%d)'%cid)
+    if xbmcgui.getCurrentWindowId()==11189 and xbmcgui.getCurrentWindowDialogId()==9999:
+        xbmc.executebuiltin('SetFocus(%d)'%cid)
 
 def number_key(value):
     value=str(value or '').strip()
@@ -41,7 +43,7 @@ def find_name(number):
     key=number_key(number)
     if not key:return ''
     try:
-        filename=W.getProperty('MiraPhoneDataFile') or W.getProperty('MiraPhoneCacheFile')
+        filename=W.getProperty('MiraPhoneCallContactsFile') or W.getProperty('MiraPhoneDataFile') or W.getProperty('MiraPhoneCacheFile')
         data=json.loads(Path(filename).read_text())
         matches=[r for r in data.get('contacts',[])
                  if any(number_key(n.get('number',''))==key for n in r.get('numbers',[]))]
