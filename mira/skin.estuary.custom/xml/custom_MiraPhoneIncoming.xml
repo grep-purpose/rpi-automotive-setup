@@ -96,6 +96,24 @@
             <ondown>9660</ondown>
             <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_popup.py,hangup,$INFO[Window(Home).Property(MiraPhonePopupPath)])</onclick>
         </control>
+        <control type="image">
+            <left>420</left>
+            <top>610</top>
+            <width>500</width>
+            <height>145</height>
+            <aspectratio>stretch</aspectratio>
+            <texture>mira/phone-selected-v13-500x145.png</texture>
+            <visible>Control.HasFocus(9660)</visible>
+        </control>
+        <control type="image">
+            <left>1000</left>
+            <top>610</top>
+            <width>500</width>
+            <height>145</height>
+            <aspectratio>stretch</aspectratio>
+            <texture>mira/phone-selected-v13-500x145.png</texture>
+            <visible>Control.HasFocus(9661)</visible>
+        </control>
     </controls>
     <onback>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_popup.py,dismiss)</onback>
 </window>

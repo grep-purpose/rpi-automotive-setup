@@ -449,6 +449,15 @@
                 <visible>Control.HasFocus(9612)</visible>
                 <texture colordiffuse="FF10151C">home/mmi_icons_v1/phone.png</texture>
             </control>
+            <control type="image">
+                <left>1070</left>
+                <top>910</top>
+                <width>720</width>
+                <height>90</height>
+                <aspectratio>stretch</aspectratio>
+                <texture>mira/phone-selected-v13-720x90.png</texture>
+                <visible>Control.HasFocus(9612)</visible>
+            </control>
         </control>
         <control type="group">
             <visible>[String.IsEqual(Window(11189).Property(MiraPhoneView),sms)] + !String.IsEqual(Window(11189).Property(MiraPhoneCallPresent),true)</visible>
@@ -604,6 +613,34 @@
                 <texturefocus colordiffuse="FFFF5050">mira/phone-call-v4.png</texturefocus>
                 <texturenofocus colordiffuse="FFCE3038">mira/phone-call-v4.png</texturenofocus>
             </control>
+            <control type="image">
+                <left>1070</left>
+                <top>910</top>
+                <width>720</width>
+                <height>90</height>
+                <aspectratio>stretch</aspectratio>
+                <texture>mira/phone-selected-v13-720x90.png</texture>
+                <visible>Control.HasFocus(9651) + [!String.IsEqual(Window(11189).Property(MiraPhoneCallCanAnswer),true)]</visible>
+            </control>
+            <control type="image">
+                <left>1070</left>
+                <top>910</top>
+                <width>350</width>
+                <height>90</height>
+                <aspectratio>stretch</aspectratio>
+                <texture>mira/phone-selected-v13-350x90.png</texture>
+                <visible>Control.HasFocus(9652) + [String.IsEqual(Window(11189).Property(MiraPhoneCallCanAnswer),true)]</visible>
+            </control>
+            <control type="image">
+                <left>1440</left>
+                <top>910</top>
+                <width>350</width>
+                <height>90</height>
+                <aspectratio>stretch</aspectratio>
+                <texture>mira/phone-selected-v13-350x90.png</texture>
+                <visible>Control.HasFocus(9653) + [String.IsEqual(Window(11189).Property(MiraPhoneCallCanAnswer),true)]</visible>
+            </control>
         </control>
     </controls>
+    <onunload>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_return.py,cancel,$INFO[Window(Home).Property(MiraPhoneReturnToken)])</onunload>
 </window>
