@@ -432,19 +432,19 @@
                 <textoffsetx>70</textoffsetx>
             </control>
             <control type="image">
-                <left>1251</left>
-                <top>917.5</top>
-                <width>88</width>
-                <height>75</height>
+                <left>1263.5</left>
+                <top>928</top>
+                <width>63</width>
+                <height>54</height>
                 <aspectratio>keep</aspectratio>
                 <visible>!Control.HasFocus(9612)</visible>
                 <texture colordiffuse="FFFFFFFF">mira/phone-footer-v17-receiver.png</texture>
             </control>
             <control type="image">
-                <left>1251</left>
-                <top>917.5</top>
-                <width>88</width>
-                <height>75</height>
+                <left>1263.5</left>
+                <top>928</top>
+                <width>63</width>
+                <height>54</height>
                 <aspectratio>keep</aspectratio>
                 <visible>Control.HasFocus(9612)</visible>
                 <texture colordiffuse="FFFFFFFF">mira/phone-footer-v17-receiver.png</texture>
@@ -607,4 +607,5 @@
         </control>
     </controls>
     <onunload>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_return.py,cancel,$INFO[Window(Home).Property(MiraPhoneReturnToken)])</onunload>
+    <!--MIRA_PHONE_ICON_V24-->
 </window>
