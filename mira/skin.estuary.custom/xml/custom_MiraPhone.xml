@@ -432,22 +432,22 @@
                 <textoffsetx>70</textoffsetx>
             </control>
             <control type="image">
-                <left>1260</left>
-                <top>925</top>
-                <width>70</width>
-                <height>60</height>
+                <left>1251</left>
+                <top>917.5</top>
+                <width>88</width>
+                <height>75</height>
                 <aspectratio>keep</aspectratio>
                 <visible>!Control.HasFocus(9612)</visible>
-                <texture colordiffuse="FFFFFFFF">home/mmi_icons_v1/phone.png</texture>
+                <texture colordiffuse="FFFFFFFF">mira/phone-footer-v17-receiver.png</texture>
             </control>
             <control type="image">
-                <left>1260</left>
-                <top>925</top>
-                <width>70</width>
-                <height>60</height>
+                <left>1251</left>
+                <top>917.5</top>
+                <width>88</width>
+                <height>75</height>
                 <aspectratio>keep</aspectratio>
                 <visible>Control.HasFocus(9612)</visible>
-                <texture colordiffuse="FFFFFFFF">home/mmi_icons_v1/phone.png</texture>
+                <texture colordiffuse="FFFFFFFF">mira/phone-footer-v17-receiver.png</texture>
             </control>
         </control>
         <control type="group">
