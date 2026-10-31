@@ -65,43 +65,6 @@
                     <visible>!String.IsEmpty(ListItem.Property(MiraPhoneRowIcon))</visible>
                 </control>
                 <control type="label">
-                    <left>120</left>
-                    <top>9</top>
-                    <width>730</width>
-                    <height>65</height>
-                    <font>MiraPhoneListNameV25</font>
-                    <textcolor>FFF0F2F5</textcolor>
-                    <aligny>center</aligny>
-                    <scroll>false</scroll>
-                    <label>$INFO[ListItem.Label]</label>
-                    <visible>!String.IsEmpty(ListItem.Property(MiraPhoneRowIcon))</visible>
-                </control>
-                <control type="label">
-                    <left>120</left>
-                    <top>78</top>
-                    <width>380</width>
-                    <height>50</height>
-                    <font>MiraPhoneListDetailV25</font>
-                    <textcolor>FFCAD1DA</textcolor>
-                    <aligny>center</aligny>
-                    <scroll>false</scroll>
-                    <label>$INFO[ListItem.Property(MiraPhoneRowLeft)]</label>
-                    <visible>!String.IsEmpty(ListItem.Property(MiraPhoneRowIcon))</visible>
-                </control>
-                <control type="label">
-                    <left>510</left>
-                    <top>78</top>
-                    <width>340</width>
-                    <height>50</height>
-                    <font>MiraPhoneListDetailV25</font>
-                    <textcolor>FFCAD1DA</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
-                    <scroll>false</scroll>
-                    <label>$INFO[ListItem.Property(MiraPhoneRowRight)]</label>
-                    <visible>!String.IsEmpty(ListItem.Property(MiraPhoneRowIcon))</visible>
-                </control>
-                <control type="label">
                     <left>24</left>
                     <top>9</top>
                     <width>822</width>
@@ -112,6 +75,115 @@
                     <scroll>true</scroll>
                     <label>$INFO[ListItem.Label]</label>
                     <visible>String.IsEmpty(ListItem.Property(MiraPhoneRowIcon))</visible>
+                </control>
+                <control type="group">
+                    <left>0</left>
+                    <top>0</top>
+                    <width>870</width>
+                    <height>150</height>
+                    <visible>!String.IsEqual(Window(11189).Property(MiraPhoneView),calls)</visible>
+                    <control type="label">
+                        <left>120</left>
+                        <top>9</top>
+                        <width>730</width>
+                        <height>65</height>
+                        <font>MiraPhoneListNameV25</font>
+                        <textcolor>FFF0F2F5</textcolor>
+                        <aligny>center</aligny>
+                        <scroll>false</scroll>
+                        <label>$INFO[ListItem.Label]</label>
+                        <visible>!String.IsEmpty(ListItem.Property(MiraPhoneRowIcon))</visible>
+                    </control>
+                    <control type="label">
+                        <left>120</left>
+                        <top>78</top>
+                        <width>380</width>
+                        <height>50</height>
+                        <font>MiraPhoneListDetailV25</font>
+                        <textcolor>FFCAD1DA</textcolor>
+                        <aligny>center</aligny>
+                        <scroll>false</scroll>
+                        <label>$INFO[ListItem.Property(MiraPhoneRowLeft)]</label>
+                        <visible>!String.IsEmpty(ListItem.Property(MiraPhoneRowIcon))</visible>
+                    </control>
+                    <control type="label">
+                        <left>510</left>
+                        <top>78</top>
+                        <width>340</width>
+                        <height>50</height>
+                        <font>MiraPhoneListDetailV25</font>
+                        <textcolor>FFCAD1DA</textcolor>
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <scroll>false</scroll>
+                        <label>$INFO[ListItem.Property(MiraPhoneRowRight)]</label>
+                        <visible>!String.IsEmpty(ListItem.Property(MiraPhoneRowIcon))</visible>
+                    </control>
+                </control>
+                <control type="group">
+                    <left>0</left>
+                    <top>0</top>
+                    <width>870</width>
+                    <height>150</height>
+                    <visible>String.IsEqual(Window(11189).Property(MiraPhoneView),calls) + !String.IsEmpty(ListItem.Property(MiraPhoneRowIcon))</visible>
+                    <control type="group">
+                        <left>120</left>
+                        <top>0</top>
+                        <width>475</width>
+                        <height>150</height>
+                        <control type="label">
+                            <left>0</left>
+                            <top>9</top>
+                            <width>475</width>
+                            <height>65</height>
+                            <font>MiraPhoneListNameV25</font>
+                            <textcolor>FFF0F2F5</textcolor>
+                            <aligny>center</aligny>
+                            <scroll>false</scroll>
+                            <label>$INFO[ListItem.Label]</label>
+                        </control>
+                        <control type="label">
+                            <left>0</left>
+                            <top>78</top>
+                            <width>475</width>
+                            <height>50</height>
+                            <font>MiraPhoneListDetailV25</font>
+                            <textcolor>FFCAD1DA</textcolor>
+                            <aligny>center</aligny>
+                            <scroll>false</scroll>
+                            <label>$INFO[ListItem.Property(MiraPhoneRowLeft)]</label>
+                        </control>
+                    </control>
+                    <control type="group">
+                        <left>615</left>
+                        <top>0</top>
+                        <width>235</width>
+                        <height>150</height>
+                        <control type="label">
+                            <left>0</left>
+                            <top>9</top>
+                            <width>235</width>
+                            <height>65</height>
+                            <font>MiraPhoneListTimeV26</font>
+                            <textcolor>FFF0F2F5</textcolor>
+                            <align>right</align>
+                            <aligny>center</aligny>
+                            <scroll>false</scroll>
+                            <label>$INFO[ListItem.Property(MiraPhoneRowTime)]</label>
+                        </control>
+                        <control type="label">
+                            <left>0</left>
+                            <top>78</top>
+                            <width>235</width>
+                            <height>50</height>
+                            <font>MiraPhoneListDateV26</font>
+                            <textcolor>FFCAD1DA</textcolor>
+                            <align>right</align>
+                            <aligny>center</aligny>
+                            <scroll>false</scroll>
+                            <label>$INFO[ListItem.Property(MiraPhoneRowDate)]</label>
+                        </control>
+                    </control>
                 </control>
             </itemlayout>
             <focusedlayout width="870" height="150">
@@ -133,43 +205,6 @@
                     <visible>!String.IsEmpty(ListItem.Property(MiraPhoneRowIcon))</visible>
                 </control>
                 <control type="label">
-                    <left>120</left>
-                    <top>9</top>
-                    <width>730</width>
-                    <height>65</height>
-                    <font>MiraPhoneListNameV25</font>
-                    <textcolor>FFF0F2F5</textcolor>
-                    <aligny>center</aligny>
-                    <scroll>true</scroll>
-                    <label>$INFO[ListItem.Label]</label>
-                    <visible>!String.IsEmpty(ListItem.Property(MiraPhoneRowIcon))</visible>
-                </control>
-                <control type="label">
-                    <left>120</left>
-                    <top>78</top>
-                    <width>380</width>
-                    <height>50</height>
-                    <font>MiraPhoneListDetailV25</font>
-                    <textcolor>FFCAD1DA</textcolor>
-                    <aligny>center</aligny>
-                    <scroll>false</scroll>
-                    <label>$INFO[ListItem.Property(MiraPhoneRowLeft)]</label>
-                    <visible>!String.IsEmpty(ListItem.Property(MiraPhoneRowIcon))</visible>
-                </control>
-                <control type="label">
-                    <left>510</left>
-                    <top>78</top>
-                    <width>340</width>
-                    <height>50</height>
-                    <font>MiraPhoneListDetailV25</font>
-                    <textcolor>FFCAD1DA</textcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
-                    <scroll>false</scroll>
-                    <label>$INFO[ListItem.Property(MiraPhoneRowRight)]</label>
-                    <visible>!String.IsEmpty(ListItem.Property(MiraPhoneRowIcon))</visible>
-                </control>
-                <control type="label">
                     <left>24</left>
                     <top>9</top>
                     <width>822</width>
@@ -180,6 +215,140 @@
                     <scroll>true</scroll>
                     <label>$INFO[ListItem.Label]</label>
                     <visible>String.IsEmpty(ListItem.Property(MiraPhoneRowIcon))</visible>
+                </control>
+                <control type="group">
+                    <left>0</left>
+                    <top>0</top>
+                    <width>870</width>
+                    <height>150</height>
+                    <visible>!String.IsEqual(Window(11189).Property(MiraPhoneView),calls)</visible>
+                    <control type="label">
+                        <left>120</left>
+                        <top>9</top>
+                        <width>730</width>
+                        <height>65</height>
+                        <font>MiraPhoneListNameV25</font>
+                        <textcolor>FFF0F2F5</textcolor>
+                        <aligny>center</aligny>
+                        <scroll>true</scroll>
+                        <label>$INFO[ListItem.Label]</label>
+                        <visible>!String.IsEmpty(ListItem.Property(MiraPhoneRowIcon)) + Control.HasFocus(50)</visible>
+                    </control>
+                    <control type="label">
+                        <left>120</left>
+                        <top>9</top>
+                        <width>730</width>
+                        <height>65</height>
+                        <font>MiraPhoneListNameV25</font>
+                        <textcolor>FFF0F2F5</textcolor>
+                        <aligny>center</aligny>
+                        <scroll>false</scroll>
+                        <label>$INFO[ListItem.Label]</label>
+                        <visible>!String.IsEmpty(ListItem.Property(MiraPhoneRowIcon)) + !Control.HasFocus(50)</visible>
+                    </control>
+                    <control type="label">
+                        <left>120</left>
+                        <top>78</top>
+                        <width>380</width>
+                        <height>50</height>
+                        <font>MiraPhoneListDetailV25</font>
+                        <textcolor>FFCAD1DA</textcolor>
+                        <aligny>center</aligny>
+                        <scroll>false</scroll>
+                        <label>$INFO[ListItem.Property(MiraPhoneRowLeft)]</label>
+                        <visible>!String.IsEmpty(ListItem.Property(MiraPhoneRowIcon))</visible>
+                    </control>
+                    <control type="label">
+                        <left>510</left>
+                        <top>78</top>
+                        <width>340</width>
+                        <height>50</height>
+                        <font>MiraPhoneListDetailV25</font>
+                        <textcolor>FFCAD1DA</textcolor>
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <scroll>false</scroll>
+                        <label>$INFO[ListItem.Property(MiraPhoneRowRight)]</label>
+                        <visible>!String.IsEmpty(ListItem.Property(MiraPhoneRowIcon))</visible>
+                    </control>
+                </control>
+                <control type="group">
+                    <left>0</left>
+                    <top>0</top>
+                    <width>870</width>
+                    <height>150</height>
+                    <visible>String.IsEqual(Window(11189).Property(MiraPhoneView),calls) + !String.IsEmpty(ListItem.Property(MiraPhoneRowIcon))</visible>
+                    <control type="group">
+                        <left>120</left>
+                        <top>0</top>
+                        <width>475</width>
+                        <height>150</height>
+                        <control type="label">
+                            <left>0</left>
+                            <top>9</top>
+                            <width>475</width>
+                            <height>65</height>
+                            <font>MiraPhoneListNameV25</font>
+                            <textcolor>FFF0F2F5</textcolor>
+                            <aligny>center</aligny>
+                            <scroll>true</scroll>
+                            <label>$INFO[ListItem.Label]</label>
+                            <visible>Control.HasFocus(50)</visible>
+                        </control>
+                        <control type="label">
+                            <left>0</left>
+                            <top>9</top>
+                            <width>475</width>
+                            <height>65</height>
+                            <font>MiraPhoneListNameV25</font>
+                            <textcolor>FFF0F2F5</textcolor>
+                            <aligny>center</aligny>
+                            <scroll>false</scroll>
+                            <label>$INFO[ListItem.Label]</label>
+                            <visible>!Control.HasFocus(50)</visible>
+                        </control>
+                        <control type="label">
+                            <left>0</left>
+                            <top>78</top>
+                            <width>475</width>
+                            <height>50</height>
+                            <font>MiraPhoneListDetailV25</font>
+                            <textcolor>FFCAD1DA</textcolor>
+                            <aligny>center</aligny>
+                            <scroll>false</scroll>
+                            <label>$INFO[ListItem.Property(MiraPhoneRowLeft)]</label>
+                        </control>
+                    </control>
+                    <control type="group">
+                        <left>615</left>
+                        <top>0</top>
+                        <width>235</width>
+                        <height>150</height>
+                        <control type="label">
+                            <left>0</left>
+                            <top>9</top>
+                            <width>235</width>
+                            <height>65</height>
+                            <font>MiraPhoneListTimeV26</font>
+                            <textcolor>FFF0F2F5</textcolor>
+                            <align>right</align>
+                            <aligny>center</aligny>
+                            <scroll>false</scroll>
+                            <label>$INFO[ListItem.Property(MiraPhoneRowTime)]</label>
+                        </control>
+                        <control type="label">
+                            <left>0</left>
+                            <top>78</top>
+                            <width>235</width>
+                            <height>50</height>
+                            <font>MiraPhoneListDateV26</font>
+                            <textcolor>FFCAD1DA</textcolor>
+                            <align>right</align>
+                            <aligny>center</aligny>
+                            <scroll>false</scroll>
+                            <label>$INFO[ListItem.Property(MiraPhoneRowDate)]</label>
+                        </control>
+                    </control>
                 </control>
             </focusedlayout>
         </control>
@@ -681,4 +850,6 @@
     <onunload>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_return.py,cancel,$INFO[Window(Home).Property(MiraPhoneReturnToken)])</onunload>
     <!--MIRA_PHONE_ICON_V24-->
     <!--MIRA_PHONE_LISTS_V25-->
+    <!--MIRA_PHONE_LISTS_V26-->
+    <!--MIRA_PHONE_LISTS_V27-->
 </window>
