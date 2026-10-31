@@ -1,3 +1,4 @@
+# MIRA_PHONE_CALL_V10
 # MIRA_PHONE_CALL_V7
 import json
 import re
@@ -62,17 +63,32 @@ def execute(request, bus):
         simulated = False
 
     if simulated:
-        if action == 'status':
-            return {'ok': True, 'calls': [{
-                'path': simpath,
-                'state': 'incoming',
-                'number': '',
-                'name': 'MIRA Testanruf · Simulation',
-                'start': ''
-            }]}
-        raise ValueError(
-            'Simulation aktiv. Bitte zuerst den Testanruf beenden.'
-        )
+        values=json.loads(simfile.read_text())
+        state=values.get('state','incoming')
+        if action=='status':
+            return {'ok':True,'calls':[{'path':simpath,'state':state,
+                'number':'','name':'MIRA Testanruf · Simulation',
+                'start':values.get('start','')}]}
+        if action=='answer':
+            if request.get('path')!=simpath or state!='incoming':
+                raise ValueError('Der simulierte Anruf klingelt nicht mehr.')
+            from datetime import datetime
+            values['state']='active'
+            values['start']=datetime.now().astimezone().isoformat()
+            temporary=simfile.with_suffix('.tmp')
+            fd=os.open(temporary,os.O_WRONLY|os.O_CREAT|os.O_TRUNC,0o600)
+            with os.fdopen(fd,'w') as output:json.dump(values,output)
+            os.replace(temporary,simfile)
+            return {'ok':True}
+        raise ValueError('Simulation aktiv. Bitte zuerst den Testanruf beenden.')
+    if action=='answer':
+        target=request.get('path','')
+        matching=[v for p,v in entries if p==target]
+        if not matching or str(matching[0].get('State',''))!='incoming':
+            raise ValueError('Dieser Anruf klingelt nicht mehr. Nichts angenommen.')
+        dbus.Interface(bus.get_object('org.ofono',target),
+                       'org.ofono.VoiceCall').Answer(timeout=10)
+        return {'ok':True}
     if action=='dial':
         number=request.get('number','')
         if not isinstance(number,str) or not re.fullmatch(r'\+?[0-9]{1,32}',number):

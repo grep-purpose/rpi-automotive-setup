@@ -517,7 +517,7 @@
                 <align>center</align>
                 <aligny>center</aligny>
                 <textcolor>FFFFFFFF</textcolor>
-                <label>$INFO[Window(11189).Property(MiraPhoneCallNumber)]</label>
+                <label>$INFO[Window(11189).Property(MiraPhoneCallDetail)]</label>
                 <scroll>true</scroll>
             </control>
             <control type="label">
@@ -559,6 +559,47 @@
                 <ondown>9651</ondown>
                 <onleft>9651</onleft>
                 <onright>9651</onright>
+                <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_calls.py,hangup)</onclick>
+                <texturefocus colordiffuse="FFFF5050">mira/phone-call-v4.png</texturefocus>
+                <texturenofocus colordiffuse="FFCE3038">mira/phone-call-v4.png</texturenofocus>
+                <visible>!String.IsEqual(Window(11189).Property(MiraPhoneCallCanAnswer),true)</visible>
+            </control>
+            <control type="button" id="9652">
+                <left>1070</left>
+                <top>910</top>
+                <width>350</width>
+                <height>90</height>
+                <font>font50</font>
+                <label>[B]Annehmen[/B]</label>
+                <align>center</align>
+                <aligny>center</aligny>
+                <textcolor>FFFFFFFF</textcolor>
+                <focusedcolor>FF10151C</focusedcolor>
+                <visible>String.IsEqual(Window(11189).Property(MiraPhoneCallCanAnswer),true)</visible>
+                <onup>9653</onup>
+                <ondown>9653</ondown>
+                <onleft>9652</onleft>
+                <onright>9652</onright>
+                <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_calls.py,answer)</onclick>
+                <texturefocus colordiffuse="FF56F080">mira/phone-call-v4.png</texturefocus>
+                <texturenofocus colordiffuse="FF10CE50">mira/phone-call-v4.png</texturenofocus>
+            </control>
+            <control type="button" id="9653">
+                <left>1440</left>
+                <top>910</top>
+                <width>350</width>
+                <height>90</height>
+                <font>font50</font>
+                <label>[B]Ablehnen[/B]</label>
+                <align>center</align>
+                <aligny>center</aligny>
+                <textcolor>FFFFFFFF</textcolor>
+                <focusedcolor>FF10151C</focusedcolor>
+                <visible>String.IsEqual(Window(11189).Property(MiraPhoneCallCanAnswer),true)</visible>
+                <onup>9652</onup>
+                <ondown>9652</ondown>
+                <onleft>9653</onleft>
+                <onright>9653</onright>
                 <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_calls.py,hangup)</onclick>
                 <texturefocus colordiffuse="FFFF5050">mira/phone-call-v4.png</texturefocus>
                 <texturenofocus colordiffuse="FFCE3038">mira/phone-call-v4.png</texturenofocus>

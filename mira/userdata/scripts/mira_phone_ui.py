@@ -1,3 +1,4 @@
+# MIRA_PHONE_UI_V10
 # MIRA_PHONE_UI_CACHE_V9
 # MIRA_PHONE_CALL_V7
 # MIRA_PHONE_UI_V5
@@ -15,7 +16,10 @@ W=xbmcgui.Window(11189)
 
 def focus(cid):xbmc.executebuiltin('SetFocus(%d)' % cid)
 def focused(cid):return xbmc.getCondVisibility('Control.HasFocus(%d)' % cid)
-def right():return 9651 if W.getProperty('MiraPhoneCallPresent') else (9650 if W.getProperty('MiraPhoneView')=='sms' else 9600)
+def right():
+    if W.getProperty('MiraPhoneCallPresent'):
+        return 9652 if W.getProperty('MiraPhoneCallCanAnswer') else 9651
+    return 9650 if W.getProperty('MiraPhoneView')=='sms' else 9600
 
 def read_data():
     path=W.getProperty('MiraPhoneDataFile')
