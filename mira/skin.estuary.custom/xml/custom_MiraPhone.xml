@@ -415,7 +415,7 @@
                 <width>720</width>
                 <height>90</height>
                 <font>font50</font>
-                <label>[B]Anrufen[/B]</label>
+                <label>Anrufen</label>
                 <align>center</align>
                 <aligny>center</aligny>
                 <textcolor>FFFFFFFF</textcolor>
@@ -427,7 +427,7 @@
                 <ondown>9611</ondown>
                 <onleft>9612</onleft>
                 <onright>9612</onright>
-                <texturefocus colordiffuse="FF56F080">mira/phone-call-v4.png</texturefocus>
+                <texturefocus colordiffuse="FFE4E8EC">mira/phone-call-v4.png</texturefocus>
                 <texturenofocus colordiffuse="FF10CE50">mira/phone-call-v4.png</texturenofocus>
                 <textoffsetx>70</textoffsetx>
             </control>
@@ -448,15 +448,6 @@
                 <aspectratio>keep</aspectratio>
                 <visible>Control.HasFocus(9612)</visible>
                 <texture colordiffuse="FF10151C">home/mmi_icons_v1/phone.png</texture>
-            </control>
-            <control type="image">
-                <left>1070</left>
-                <top>910</top>
-                <width>720</width>
-                <height>90</height>
-                <aspectratio>stretch</aspectratio>
-                <texture>mira/phone-selected-v13-720x90.png</texture>
-                <visible>Control.HasFocus(9612)</visible>
             </control>
         </control>
         <control type="group">
@@ -559,17 +550,17 @@
                 <width>720</width>
                 <height>90</height>
                 <font>font50</font>
-                <label>[B]$INFO[Window(11189).Property(MiraPhoneHangupLabel)][/B]</label>
+                <label>$INFO[Window(11189).Property(MiraPhoneHangupLabel)]</label>
                 <align>center</align>
                 <aligny>center</aligny>
                 <textcolor>FFFFFFFF</textcolor>
-                <focusedcolor>FFFFFFFF</focusedcolor>
+                <focusedcolor>FF10151C</focusedcolor>
                 <onup>9651</onup>
                 <ondown>9651</ondown>
                 <onleft>9651</onleft>
                 <onright>9651</onright>
                 <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_calls.py,hangup)</onclick>
-                <texturefocus colordiffuse="FFFF5050">mira/phone-call-v4.png</texturefocus>
+                <texturefocus colordiffuse="FFE4E8EC">mira/phone-call-v4.png</texturefocus>
                 <texturenofocus colordiffuse="FFCE3038">mira/phone-call-v4.png</texturenofocus>
                 <visible>!String.IsEqual(Window(11189).Property(MiraPhoneCallCanAnswer),true)</visible>
             </control>
@@ -579,7 +570,7 @@
                 <width>350</width>
                 <height>90</height>
                 <font>font50</font>
-                <label>[B]Annehmen[/B]</label>
+                <label>Annehmen</label>
                 <align>center</align>
                 <aligny>center</aligny>
                 <textcolor>FFFFFFFF</textcolor>
@@ -590,7 +581,7 @@
                 <onleft>9652</onleft>
                 <onright>9652</onright>
                 <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_calls.py,answer)</onclick>
-                <texturefocus colordiffuse="FF56F080">mira/phone-call-v4.png</texturefocus>
+                <texturefocus colordiffuse="FFE4E8EC">mira/phone-call-v4.png</texturefocus>
                 <texturenofocus colordiffuse="FF10CE50">mira/phone-call-v4.png</texturenofocus>
             </control>
             <control type="button" id="9653">
@@ -599,7 +590,7 @@
                 <width>350</width>
                 <height>90</height>
                 <font>font50</font>
-                <label>[B]Ablehnen[/B]</label>
+                <label>Ablehnen</label>
                 <align>center</align>
                 <aligny>center</aligny>
                 <textcolor>FFFFFFFF</textcolor>
@@ -610,35 +601,8 @@
                 <onleft>9653</onleft>
                 <onright>9653</onright>
                 <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_calls.py,hangup)</onclick>
-                <texturefocus colordiffuse="FFFF5050">mira/phone-call-v4.png</texturefocus>
+                <texturefocus colordiffuse="FFE4E8EC">mira/phone-call-v4.png</texturefocus>
                 <texturenofocus colordiffuse="FFCE3038">mira/phone-call-v4.png</texturenofocus>
-            </control>
-            <control type="image">
-                <left>1070</left>
-                <top>910</top>
-                <width>720</width>
-                <height>90</height>
-                <aspectratio>stretch</aspectratio>
-                <texture>mira/phone-selected-v13-720x90.png</texture>
-                <visible>Control.HasFocus(9651) + [!String.IsEqual(Window(11189).Property(MiraPhoneCallCanAnswer),true)]</visible>
-            </control>
-            <control type="image">
-                <left>1070</left>
-                <top>910</top>
-                <width>350</width>
-                <height>90</height>
-                <aspectratio>stretch</aspectratio>
-                <texture>mira/phone-selected-v13-350x90.png</texture>
-                <visible>Control.HasFocus(9652) + [String.IsEqual(Window(11189).Property(MiraPhoneCallCanAnswer),true)]</visible>
-            </control>
-            <control type="image">
-                <left>1440</left>
-                <top>910</top>
-                <width>350</width>
-                <height>90</height>
-                <aspectratio>stretch</aspectratio>
-                <texture>mira/phone-selected-v13-350x90.png</texture>
-                <visible>Control.HasFocus(9653) + [String.IsEqual(Window(11189).Property(MiraPhoneCallCanAnswer),true)]</visible>
             </control>
         </control>
     </controls>

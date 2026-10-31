@@ -25,18 +25,18 @@
         </control>
         <control type="label">
             <left>310</left>
-            <top>205</top>
+            <top>210</top>
             <width>1300</width>
-            <height>110</height>
-            <font>font55</font>
-            <textcolor>ffffffff</textcolor>
+            <height>75</height>
+            <font>font45</font>
+            <textcolor>FFCAD3DD</textcolor>
             <align>center</align>
             <aligny>center</aligny>
             <label>Eingehender Anruf</label>
         </control>
         <control type="label">
             <left>310</left>
-            <top>330</top>
+            <top>320</top>
             <width>1300</width>
             <height>120</height>
             <font>font75</font>
@@ -48,11 +48,11 @@
         </control>
         <control type="label">
             <left>310</left>
-            <top>475</top>
+            <top>455</top>
             <width>1300</width>
             <height>70</height>
             <font>font45</font>
-            <textcolor>ffffffff</textcolor>
+            <textcolor>FFCAD3DD</textcolor>
             <align>center</align>
             <aligny>center</aligny>
             <label>$INFO[Window(Home).Property(MiraPhonePopupDetail)]</label>
@@ -60,17 +60,17 @@
         </control>
         <control type="button" id="9660">
             <left>420</left>
-            <top>610</top>
+            <top>600</top>
             <width>500</width>
             <height>145</height>
-            <label>[B]Annehmen[/B]</label>
-            <font>font55</font>
+            <label>Annehmen</label>
+            <font>font50</font>
             <textcolor>ffffffff</textcolor>
             <focusedcolor>FF10151C</focusedcolor>
             <align>center</align>
             <aligny>center</aligny>
             <texturenofocus colordiffuse="FF10CE50">mira/phone-call-v4.png</texturenofocus>
-            <texturefocus colordiffuse="FF56F080">mira/phone-call-v4.png</texturefocus>
+            <texturefocus colordiffuse="FFE4E8EC">mira/phone-call-v4.png</texturefocus>
             <onleft>9661</onleft>
             <onright>9661</onright>
             <onup>9661</onup>
@@ -79,40 +79,22 @@
         </control>
         <control type="button" id="9661">
             <left>1000</left>
-            <top>610</top>
+            <top>600</top>
             <width>500</width>
             <height>145</height>
-            <label>[B]Ablehnen[/B]</label>
-            <font>font55</font>
+            <label>Ablehnen</label>
+            <font>font50</font>
             <textcolor>ffffffff</textcolor>
             <focusedcolor>FF10151C</focusedcolor>
             <align>center</align>
             <aligny>center</aligny>
             <texturenofocus colordiffuse="FFCE3038">mira/phone-call-v4.png</texturenofocus>
-            <texturefocus colordiffuse="FFFF5050">mira/phone-call-v4.png</texturefocus>
+            <texturefocus colordiffuse="FFE4E8EC">mira/phone-call-v4.png</texturefocus>
             <onleft>9660</onleft>
             <onright>9660</onright>
             <onup>9660</onup>
             <ondown>9660</ondown>
             <onclick>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_popup.py,hangup,$INFO[Window(Home).Property(MiraPhonePopupPath)])</onclick>
-        </control>
-        <control type="image">
-            <left>420</left>
-            <top>610</top>
-            <width>500</width>
-            <height>145</height>
-            <aspectratio>stretch</aspectratio>
-            <texture>mira/phone-selected-v13-500x145.png</texture>
-            <visible>Control.HasFocus(9660)</visible>
-        </control>
-        <control type="image">
-            <left>1000</left>
-            <top>610</top>
-            <width>500</width>
-            <height>145</height>
-            <aspectratio>stretch</aspectratio>
-            <texture>mira/phone-selected-v13-500x145.png</texture>
-            <visible>Control.HasFocus(9661)</visible>
         </control>
     </controls>
     <onback>RunScript(/home/pi/.kodi/userdata/scripts/mira_phone_popup.py,dismiss)</onback>
