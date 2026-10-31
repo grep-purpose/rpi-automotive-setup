@@ -174,7 +174,7 @@
                 <control type="button" id="$PARAM[footer_right_id]">
                     <right>0</right>
                     <top>20</top>
-                    <width>660</width>
+                    <width>684</width>
                     <height>82</height>
                     <label />
                     <texturefocus>-</texturefocus>
@@ -206,7 +206,7 @@
                             <font>font55</font>
                             <textcolor>fff0f2f5</textcolor>
                             <label>[B]$INFO[Window(Home).Property(RNSE.Phone.Operator)][/B]</label>
-                            <visible>!String.IsEqual(Window(11189).Property(MiraPhoneCallPresent),true)</visible>
+                            <visible>![String.IsEqual(Window(11189).Property(MiraPhoneCallPresent),true) + !Window.IsActive(1189) + [!String.IsEmpty(Window(11189).Property(MiraPhoneCallDuration)) | String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Anruf gehalten) | [String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Verbindung wird aufgebaut …) | String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Es klingelt …)]]]</visible>
                         </control>
                         <control type="group">
                             <left>375</left>
@@ -355,7 +355,7 @@
                             <font>font55</font>
                             <textcolor>ffff8800</textcolor>
                             <label>[B]$INFO[Window(Home).Property(RNSE.Phone.Operator)][/B]</label>
-                            <visible>!String.IsEqual(Window(11189).Property(MiraPhoneCallPresent),true)</visible>
+                            <visible>![String.IsEqual(Window(11189).Property(MiraPhoneCallPresent),true) + !Window.IsActive(1189) + [!String.IsEmpty(Window(11189).Property(MiraPhoneCallDuration)) | String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Anruf gehalten) | [String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Verbindung wird aufgebaut …) | String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Es klingelt …)]]]</visible>
                         </control>
                         <control type="group">
                             <left>375</left>
@@ -495,28 +495,28 @@
                         <font>font55</font>
                         <textcolor>ff8d99ae</textcolor>
                         <label>[B]Kein Telefon[/B]</label>
-                        <visible>!String.IsEqual(Window(Home).Property(RNSE.Phone.Connected),true) + !String.IsEqual(Window(11189).Property(MiraPhoneCallPresent),true)</visible>
+                        <visible>!String.IsEqual(Window(Home).Property(RNSE.Phone.Connected),true) + ![String.IsEqual(Window(11189).Property(MiraPhoneCallPresent),true) + !Window.IsActive(1189) + [!String.IsEmpty(Window(11189).Property(MiraPhoneCallDuration)) | String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Anruf gehalten) | [String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Verbindung wird aufgebaut …) | String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Es klingelt …)]]]</visible>
                     </control>
                     <control type="group">
-                        <left>-140</left>
+                        <left>-164</left>
                         <top>4</top>
-                        <width>490</width>
+                        <width>514</width>
                         <height>74</height>
-                        <visible>String.IsEqual(Window(11189).Property(MiraPhoneCallPresent),true)</visible>
+                        <visible>String.IsEqual(Window(11189).Property(MiraPhoneCallPresent),true) + !Window.IsActive(1189) + [!String.IsEmpty(Window(11189).Property(MiraPhoneCallDuration)) | String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Anruf gehalten) | [String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Verbindung wird aufgebaut …) | String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Es klingelt …)]]</visible>
                         <control type="image">
                             <left>0</left>
                             <top>0</top>
-                            <width>490</width>
+                            <width>514</width>
                             <height>74</height>
-                            <texture>mira/phone-footer-v17-normal.png</texture>
+                            <texture>mira/phone-footer-v18-normal.png</texture>
                             <visible>!Control.HasFocus($PARAM[footer_right_id])</visible>
                         </control>
                         <control type="image">
                             <left>0</left>
                             <top>0</top>
-                            <width>490</width>
+                            <width>514</width>
                             <height>74</height>
-                            <texture>mira/phone-footer-v17-focus.png</texture>
+                            <texture>mira/phone-footer-v18-focus.png</texture>
                             <visible>Control.HasFocus($PARAM[footer_right_id])</visible>
                         </control>
                         <control type="image">
@@ -528,54 +528,67 @@
                             <texture colordiffuse="FFFFFFFF">mira/phone-footer-v17-receiver.png</texture>
                         </control>
                         <control type="label">
-                            <left>70</left>
+                            <left>66</left>
                             <top>0</top>
-                            <width>254</width>
+                            <width>282</width>
                             <height>74</height>
                             <font>font45</font>
                             <textcolor>FFFFFFFF</textcolor>
                             <aligny>center</aligny>
                             <scroll>false</scroll>
                             <label>[B]$INFO[Window(11189).Property(MiraPhoneCallName)][/B]</label>
+                            <visible>![!String.IsEmpty(Window(11189).Property(MiraPhoneCallNumber)) + String.IsEqual(Window(11189).Property(MiraPhoneCallName),$INFO[Window(11189).Property(MiraPhoneCallNumber)])]</visible>
                         </control>
                         <control type="label">
-                            <left>338</left>
+                            <left>66</left>
+                            <top>0</top>
+                            <width>282</width>
+                            <height>74</height>
+                            <font>font35</font>
+                            <textcolor>FFFFFFFF</textcolor>
+                            <aligny>center</aligny>
+                            <scroll>false</scroll>
+                            <label>[B]$INFO[Window(11189).Property(MiraPhoneCallNumber)][/B]</label>
+                            <visible>!String.IsEmpty(Window(11189).Property(MiraPhoneCallNumber)) + String.IsEqual(Window(11189).Property(MiraPhoneCallName),$INFO[Window(11189).Property(MiraPhoneCallNumber)])</visible>
+                        </control>
+                        <control type="label">
+                            <left>362</left>
                             <top>0</top>
                             <width>138</width>
                             <height>74</height>
                             <font>font45</font>
                             <textcolor>FFFFFFFF</textcolor>
+                            <aligny>center</aligny>
+                            <scroll>false</scroll>
+                            <label>[B]--[/B]</label>
+                            <visible>String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Anruf gehalten)</visible>
                             <align>right</align>
+                        </control>
+                        <control type="label">
+                            <left>362</left>
+                            <top>0</top>
+                            <width>138</width>
+                            <height>74</height>
+                            <font>font45</font>
+                            <textcolor>FFFFFFFF</textcolor>
                             <aligny>center</aligny>
                             <scroll>false</scroll>
                             <label>[B]$INFO[Window(11189).Property(MiraPhoneCallDuration)][/B]</label>
-                            <visible>!String.IsEmpty(Window(11189).Property(MiraPhoneCallDuration))</visible>
+                            <visible>!String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Anruf gehalten) + !String.IsEmpty(Window(11189).Property(MiraPhoneCallDuration))</visible>
+                            <align>right</align>
                         </control>
                         <control type="label">
-                            <left>338</left>
+                            <left>362</left>
                             <top>0</top>
                             <width>138</width>
                             <height>74</height>
                             <font>font45</font>
                             <textcolor>FFFFFFFF</textcolor>
-                            <align>right</align>
                             <aligny>center</aligny>
                             <scroll>false</scroll>
-                            <label>[B]Klingelt[/B]</label>
-                            <visible>String.IsEmpty(Window(11189).Property(MiraPhoneCallDuration)) + String.IsEqual(Window(11189).Property(MiraPhoneCallCanAnswer),true)</visible>
-                        </control>
-                        <control type="label">
-                            <left>338</left>
-                            <top>0</top>
-                            <width>138</width>
-                            <height>74</height>
-                            <font>font45</font>
-                            <textcolor>FFFFFFFF</textcolor>
+                            <label>[B]…[/B]</label>
+                            <visible>!String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Anruf gehalten) + String.IsEmpty(Window(11189).Property(MiraPhoneCallDuration))</visible>
                             <align>right</align>
-                            <aligny>center</aligny>
-                            <scroll>false</scroll>
-                            <label>[B]Anruf[/B]</label>
-                            <visible>String.IsEmpty(Window(11189).Property(MiraPhoneCallDuration)) + !String.IsEqual(Window(11189).Property(MiraPhoneCallCanAnswer),true)</visible>
                         </control>
                     </control>
                 </control>

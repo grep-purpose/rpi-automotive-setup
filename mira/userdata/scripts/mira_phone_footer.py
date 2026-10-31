@@ -1,4 +1,4 @@
-# MIRA_PHONE_FOOTER_V16
+# MIRA_PHONE_FOOTER_V18
 import xbmc
 import xbmcgui
 
@@ -9,6 +9,9 @@ def destination(connected, present):
     return 1189 if connected == 'true' or present == 'true' else 1160
 
 def main():
+    if xbmcgui.getCurrentWindowId() == 11189:
+        xbmc.executebuiltin('ActivateWindow(1160)')
+        return
     target = destination(HOME.getProperty('RNSE.Phone.Connected'),
                          PHONE.getProperty('MiraPhoneCallPresent'))
     if target == 1160:
