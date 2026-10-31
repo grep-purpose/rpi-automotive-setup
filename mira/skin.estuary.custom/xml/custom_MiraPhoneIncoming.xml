@@ -25,20 +25,20 @@
         </control>
         <control type="label">
             <left>310</left>
-            <top>210</top>
+            <top>205</top>
             <width>1300</width>
-            <height>75</height>
-            <font>font45</font>
-            <textcolor>FFCAD3DD</textcolor>
+            <height>110</height>
+            <font>font55</font>
+            <textcolor>FFFFFFFF</textcolor>
             <align>center</align>
             <aligny>center</aligny>
-            <label>Eingehender Anruf</label>
+            <label>[B]Eingehender Anruf[/B]</label>
         </control>
         <control type="label">
-            <left>310</left>
-            <top>320</top>
-            <width>1300</width>
-            <height>120</height>
+            <left>260</left>
+            <top>475</top>
+            <width>1400</width>
+            <height>130</height>
             <font>font75</font>
             <textcolor>FFFFFFFF</textcolor>
             <align>center</align>
@@ -48,9 +48,9 @@
         </control>
         <control type="label">
             <left>310</left>
-            <top>455</top>
+            <top>610</top>
             <width>1300</width>
-            <height>70</height>
+            <height>60</height>
             <font>font45</font>
             <textcolor>FFCAD3DD</textcolor>
             <align>center</align>
@@ -60,17 +60,17 @@
         </control>
         <control type="button" id="9660">
             <left>420</left>
-            <top>600</top>
+            <top>720</top>
             <width>500</width>
             <height>145</height>
-            <label>Annehmen</label>
-            <font>font50</font>
-            <textcolor>ffffffff</textcolor>
-            <focusedcolor>FF10151C</focusedcolor>
+            <label>[B]Annehmen[/B]</label>
+            <font>font55</font>
+            <textcolor>FFFFFFFF</textcolor>
+            <focusedcolor>FFFFFFFF</focusedcolor>
             <align>center</align>
             <aligny>center</aligny>
-            <texturenofocus colordiffuse="FF10CE50">mira/phone-call-v4.png</texturenofocus>
-            <texturefocus colordiffuse="FFE4E8EC">mira/phone-call-v4.png</texturefocus>
+            <texturenofocus colordiffuse="FF15964D">mira/phone-v15-mask-500x145.png</texturenofocus>
+            <texturefocus colordiffuse="FFFFFFFF">mira/phone-v15-green-focus-500x145.png</texturefocus>
             <onleft>9661</onleft>
             <onright>9661</onright>
             <onup>9661</onup>
@@ -79,17 +79,17 @@
         </control>
         <control type="button" id="9661">
             <left>1000</left>
-            <top>600</top>
+            <top>720</top>
             <width>500</width>
             <height>145</height>
-            <label>Ablehnen</label>
-            <font>font50</font>
-            <textcolor>ffffffff</textcolor>
-            <focusedcolor>FF10151C</focusedcolor>
+            <label>[B]Ablehnen[/B]</label>
+            <font>font55</font>
+            <textcolor>FFFFFFFF</textcolor>
+            <focusedcolor>FFFFFFFF</focusedcolor>
             <align>center</align>
             <aligny>center</aligny>
-            <texturenofocus colordiffuse="FFCE3038">mira/phone-call-v4.png</texturenofocus>
-            <texturefocus colordiffuse="FFE4E8EC">mira/phone-call-v4.png</texturefocus>
+            <texturenofocus colordiffuse="FFCE3038">mira/phone-v15-mask-500x145.png</texturenofocus>
+            <texturefocus colordiffuse="FFFFFFFF">mira/phone-v15-red-focus-500x145.png</texturefocus>
             <onleft>9660</onleft>
             <onright>9660</onright>
             <onup>9660</onup>
