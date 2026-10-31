@@ -528,9 +528,9 @@
                             <texture colordiffuse="FFFFFFFF">mira/phone-footer-v17-receiver.png</texture>
                         </control>
                         <control type="label">
-                            <left>66</left>
+                            <left>64</left>
                             <top>0</top>
-                            <width>282</width>
+                            <width>292</width>
                             <height>74</height>
                             <font>font45</font>
                             <textcolor>FFFFFFFF</textcolor>
@@ -538,18 +538,59 @@
                             <scroll>false</scroll>
                             <label>[B]$INFO[Window(11189).Property(MiraPhoneCallName)][/B]</label>
                             <visible>!String.IsEqual(Window(11189).Property(MiraPhoneFooterIsNumber),true)</visible>
+                            <align>center</align>
                         </control>
                         <control type="label">
-                            <left>66</left>
+                            <left>64</left>
                             <top>0</top>
-                            <width>282</width>
+                            <width>292</width>
                             <height>74</height>
-                            <font>font35</font>
+                            <font>MiraPhoneFooterNumberV21_38</font>
                             <textcolor>FFFFFFFF</textcolor>
                             <aligny>center</aligny>
                             <scroll>false</scroll>
                             <label>[B]$INFO[Window(11189).Property(MiraPhoneCallNumber)][/B]</label>
-                            <visible>String.IsEqual(Window(11189).Property(MiraPhoneFooterIsNumber),true)</visible>
+                            <visible>String.IsEqual(Window(11189).Property(MiraPhoneFooterIsNumber),true) + String.IsEqual(Window(11189).Property(MiraPhoneFooterNumberSize),38)</visible>
+                            <align>center</align>
+                        </control>
+                        <control type="label">
+                            <left>64</left>
+                            <top>0</top>
+                            <width>292</width>
+                            <height>74</height>
+                            <font>MiraPhoneFooterNumberV21_34</font>
+                            <textcolor>FFFFFFFF</textcolor>
+                            <aligny>center</aligny>
+                            <scroll>false</scroll>
+                            <label>[B]$INFO[Window(11189).Property(MiraPhoneCallNumber)][/B]</label>
+                            <visible>String.IsEqual(Window(11189).Property(MiraPhoneFooterIsNumber),true) + String.IsEqual(Window(11189).Property(MiraPhoneFooterNumberSize),34)</visible>
+                            <align>center</align>
+                        </control>
+                        <control type="label">
+                            <left>64</left>
+                            <top>0</top>
+                            <width>292</width>
+                            <height>74</height>
+                            <font>MiraPhoneFooterNumberV21_32</font>
+                            <textcolor>FFFFFFFF</textcolor>
+                            <aligny>center</aligny>
+                            <scroll>false</scroll>
+                            <label>[B]$INFO[Window(11189).Property(MiraPhoneCallNumber)][/B]</label>
+                            <visible>String.IsEqual(Window(11189).Property(MiraPhoneFooterIsNumber),true) + String.IsEqual(Window(11189).Property(MiraPhoneFooterNumberSize),32)</visible>
+                            <align>center</align>
+                        </control>
+                        <control type="label">
+                            <left>64</left>
+                            <top>0</top>
+                            <width>292</width>
+                            <height>74</height>
+                            <font>MiraPhoneFooterNumberV21_30</font>
+                            <textcolor>FFFFFFFF</textcolor>
+                            <aligny>center</aligny>
+                            <scroll>false</scroll>
+                            <label>[B]$INFO[Window(11189).Property(MiraPhoneCallNumber)][/B]</label>
+                            <visible>String.IsEqual(Window(11189).Property(MiraPhoneFooterIsNumber),true) + String.IsEqual(Window(11189).Property(MiraPhoneFooterNumberSize),30)</visible>
+                            <align>center</align>
                         </control>
                         <control type="image">
                             <left>362</left>
@@ -557,7 +598,7 @@
                             <width>138</width>
                             <height>74</height>
                             <visible>String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Anruf gehalten)</visible>
-                            <texture>mira/phone-footer-v19-held.png</texture>
+                            <texture>mira/phone-footer-v21-held.png</texture>
                         </control>
                         <control type="label">
                             <left>362</left>
@@ -578,7 +619,7 @@
                             <width>138</width>
                             <height>74</height>
                             <visible>!String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Anruf gehalten) + String.IsEmpty(Window(11189).Property(MiraPhoneCallDuration))</visible>
-                            <texture>mira/phone-footer-v20-dialing.png</texture>
+                            <texture>mira/phone-footer-v21-dialing.png</texture>
                         </control>
                     </control>
                 </control>
