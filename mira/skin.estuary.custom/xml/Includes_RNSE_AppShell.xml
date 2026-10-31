@@ -572,18 +572,13 @@
                             <visible>!String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Anruf gehalten) + !String.IsEmpty(Window(11189).Property(MiraPhoneCallDuration))</visible>
                             <align>right</align>
                         </control>
-                        <control type="label">
+                        <control type="image">
                             <left>362</left>
                             <top>0</top>
                             <width>138</width>
                             <height>74</height>
-                            <font>font45</font>
-                            <textcolor>FFFFFFFF</textcolor>
-                            <aligny>center</aligny>
-                            <scroll>false</scroll>
-                            <label>[B]…[/B]</label>
                             <visible>!String.IsEqual(Window(11189).Property(MiraPhoneCallStatus),Anruf gehalten) + String.IsEmpty(Window(11189).Property(MiraPhoneCallDuration))</visible>
-                            <align>right</align>
+                            <texture>mira/phone-footer-v20-dialing.png</texture>
                         </control>
                     </control>
                 </control>
